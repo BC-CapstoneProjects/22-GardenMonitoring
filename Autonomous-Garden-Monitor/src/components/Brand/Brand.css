@@ -1,0 +1,12 @@
+.brand {
+  @apply basis-2/3;
+  @apply text-left;
+}
+.brand h1 {
+  @apply inline-block;
+  @apply bg-accent;
+  @apply py-3 px-6;
+  @apply align-middle;
+  @apply text-xl font-bold;
+  @apply rounded;
+}
