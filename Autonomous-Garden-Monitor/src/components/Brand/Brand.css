@@ -1,8 +1,9 @@
 .brand {
   @apply basis-2/3;
-  @apply text-left;
+  @apply normal-case text-xl;
 }
 .brand h1 {
+  @apply btn btn-ghost normal-case text-xl;
   @apply inline-block;
   @apply bg-accent;
   @apply py-3 px-6;

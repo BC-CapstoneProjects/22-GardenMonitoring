@@ -79,13 +79,21 @@ const subjects = [
 function Garden() {
   return (
     <main id="garden-monitor">
+      
       <header>
-        <Brand>
-          Autonomous Garden Monitoring
-        </Brand>
-        <Menu>
-          <Link to="/settings">Setting</Link>
-        </Menu>
+        
+          <Brand>
+            Autonomous Garden Monitoring
+          </Brand>
+        
+          <Menu>
+            <Link to="/settings">Settings</Link>
+          </Menu>
+      
+       
+        
+          
+          
       </header>
       <section className="content">
         <h2 className="name">Garden</h2>
