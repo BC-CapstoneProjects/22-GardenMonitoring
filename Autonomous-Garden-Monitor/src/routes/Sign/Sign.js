@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import "./Sign.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { Link } from 'react-router-dom';
-import Garden from "../Garden/index";
 
 export default function (props) {
     let [authMode, setAuthMode] = useState("signin")
