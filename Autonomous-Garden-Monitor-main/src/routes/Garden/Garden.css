@@ -1,0 +1,29 @@
+#garden-monitor > header {
+  @apply flex flex-row;
+  @apply p-6;
+  @apply cursor-default;
+  @apply bg-gray-100;
+  @apply border;
+}
+
+#garden-monitor > section.content {
+  @apply text-center cursor-default;
+  @apply pt-16;
+  
+}
+
+#garden-monitor > section.content > h2.name {
+  @apply inline-block;
+  @apply bg-primary rounded;
+  @apply w-auto py-3 px-6;
+  @apply text-2xl font-semibold rounded;
+}
+
+#garden-monitor > section.content > .grid {
+  @apply bg-base-300;
+  @apply m-6 p-6;
+  @apply grid-cols-1 gap-6 sm:grid-cols-4;
+  @apply text-center rounded;
+  @apply cursor-default;
+  @apply shadow-2xl;
+}

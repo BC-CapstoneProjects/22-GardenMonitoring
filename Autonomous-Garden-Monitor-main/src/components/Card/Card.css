@@ -1,0 +1,28 @@
+.card {
+  @apply rounded;
+  @apply overflow-hidden;
+  
+}
+.card .title {
+  @apply p-3 text-lg text-center font-bold;
+}
+.card[data-state="success"] .title {
+  @apply bg-success;
+  @apply text-success-content;
+}
+.card[data-state="warning"] .title {
+  @apply bg-warning;
+  @apply text-warning-content;
+}
+.card[data-state="error"] .title {
+  @apply bg-error;
+  @apply text-error-content;
+}
+.card .preview {
+  @apply w-full h-40;
+  @apply overflow-hidden;
+}
+.card .preview img {
+  @apply w-full h-full;
+  @apply object-cover object-center;
+}

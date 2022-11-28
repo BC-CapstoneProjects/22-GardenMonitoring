@@ -1,0 +1,13 @@
+nav[data-menu] {
+  @apply basis-1/3;
+  @apply align-middle;
+  @apply text-right;
+}
+nav[data-menu] a {
+  @apply btn btn-ghost normal-case text-xl;
+  @apply inline-block;
+  @apply bg-primary rounded;
+  @apply py-3 px-6;
+  @apply font-semibold;
+  @apply align-middle;
+}
