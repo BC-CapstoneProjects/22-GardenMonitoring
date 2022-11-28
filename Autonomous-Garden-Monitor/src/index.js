@@ -4,15 +4,21 @@ import reportWebVitals from "./report";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+
 import "./index.css";
 
 import Garden from "./routes/Garden";
 import Subject from "./routes/Subject";
 import Settings from "./routes/Settings";
+import Sign from "./routes/Sign/Sign";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Sign />,
+  },
+  {
+    path: "/garden",
     element: <Garden />,
   },
   {
