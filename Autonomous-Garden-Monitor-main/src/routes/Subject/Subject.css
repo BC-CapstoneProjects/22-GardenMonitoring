@@ -1,0 +1,38 @@
+#subject-page > header {
+
+    @apply col-start-1 col-span-2;
+    @apply flex flex-row;
+    @apply p-6;
+
+    @apply cursor-default;
+    @apply m-2;
+    @apply border-primary rounded;
+    @apply shadow-xl;
+    @apply bg-green-500;  
+}
+
+#subject-page > section.table {
+    
+    @apply text-center cursor-default;
+    @apply pt-16;
+}
+
+subject-page >section.table 
+
+#subject-page > section.table > h2.name {
+
+    @apply bg-primary rounded;
+    @apply w-auto py-3 px-6;
+    @apply text-2xl font-semibold rounded;
+}
+
+#subject-page > td {
+
+    @apply border-slate-600;
+    @apply p-3;
+    @apply text-primary text-lg text-center font-bold;
+}
+
+#subject-page > body {
+
+}
