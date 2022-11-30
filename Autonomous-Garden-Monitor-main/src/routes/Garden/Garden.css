@@ -9,7 +9,6 @@
 #garden-monitor > section.content {
   @apply text-center cursor-default;
   @apply pt-16;
-  
 }
 
 #garden-monitor > section.content > h2.name {
