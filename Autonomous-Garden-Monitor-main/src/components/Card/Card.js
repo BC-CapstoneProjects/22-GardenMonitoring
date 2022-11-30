@@ -2,7 +2,7 @@ import "./Card.css";
 
 function Card({ title, src, alt }) {
   const handleClick = event => {
-    
+
   }
 
   return (
