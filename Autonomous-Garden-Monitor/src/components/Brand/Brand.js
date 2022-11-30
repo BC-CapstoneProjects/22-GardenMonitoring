@@ -1,9 +1,9 @@
 import "./Brand.css";
 
-function Brand({ children }) {
+function Brand({ alt, children }) {
   return (
     <div className="brand">
-      <h1>{children}</h1>
+      {children ?? <h1>{alt}</h1>}
     </div>
   );
 }

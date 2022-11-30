@@ -7,17 +7,17 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 
 import Garden from "./routes/Garden";
-import Subject from "./routes/Subject";
 import Settings from "./routes/Settings";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    exact: true,
     element: <Garden />,
   },
   {
-    path: "/view/:id",
-    element: <Subject />,
+    path: "/view/:subjectID",
+    element: <Garden />,
   },
   {
     path: "/settings",
