@@ -1,6 +1,8 @@
 import boto3
 from botocore.exceptions import ClientError
 import os, time, logging
+from pynput import keyboard
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -28,7 +30,9 @@ def new_user_garden(user_client):
     os.system('cls')
     garden_created = False
     while not garden_created:
-        garden_name = input("Please provide a unique Garden ID: ")
+        garden_name = input("Please provide a unique Garden ID or type 'q' to quit: ")
+        if garden_name == 'q':
+            break;
         try:
             response = user_client.create_bucket(
                 Bucket=garden_name,
@@ -36,6 +40,9 @@ def new_user_garden(user_client):
                     'LocationConstraint': 'us-west-2',
                 },
             )
+        except user_client.exceptions.ClientError:
+            print(bcolors.FAIL + "Invalid bucket name\n" + bcolors.ENDC)
+            continue
         except user_client.exceptions.BucketAlreadyExists:
             print(bcolors.FAIL + "Garden name already exists\n" + bcolors.ENDC)
             continue
@@ -56,12 +63,10 @@ def new_user_garden(user_client):
 
 def list_gardens(user_client):
     os.system('cls')
-    if len(gardens) == 0:
-        # print("user has not created a garden")
-        for bucket in s3.buckets.all():
-            # existing s3 buckets will default to a non-active status
-            if bucket.name not in gardens:
-                gardens[bucket.name] = "non-active"
+    for bucket in s3.buckets.all():
+        # existing s3 buckets will default to a non-active status
+        if bucket.name not in gardens:
+            gardens[bucket.name] = "non-active"
 
     print("Enter the garden name to toggle between active and non-active status, or enter 'q' to go back.\n\n")
     print("Garden name, Status: \n")
@@ -81,11 +86,11 @@ def select_garden(user_client):
             print("\n\nGarden status was not updated")
             time.sleep(.5)
         garden_selection = input("\n>    ")
-        if garden_selection in gardens and gardens[garden_selection] == "non-active":
+        if garden_selection in gardens and gardens[garden_selection] is "non-active":
             gardens[garden_selection] = "active"
             print(garden_selection, "was found and is", gardens[garden_selection])
             invalid_response = False
-        elif garden_selection in gardens and gardens[garden_selection] == "active":
+        elif garden_selection in gardens and gardens[garden_selection] is "active":
             gardens[garden_selection] = "non-active"
             print(garden_selection, "was found and is", gardens[garden_selection])
             invalid_response = False
@@ -95,6 +100,7 @@ def select_garden(user_client):
 
 
 def menu():
+    print(bcolors.FAIL + "SENSITIVE INFO, DO NOT UPLOAD PUBLICLY" + bcolors.ENDC)
     print("\nAGM Pilot UI:", time.gmtime(), "\n")
     print("1. View gardens")
     print("2. Create a new garden")
@@ -104,10 +110,15 @@ def menu():
 
 # upload file to active S3 in 'garden'
 def sync_garden(user_resource, file_name, user_gardens, object_name=None):
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id="",
+        aws_secret_access_key="",
+    )
     gardens_to_sync = 0
     active_gardens = []
     for key, value in user_gardens.items():
-        if value == "active":
+        if value is "active":
             gardens_to_sync += 1
             active_gardens.append(key)
     if gardens_to_sync == 0:
@@ -125,11 +136,13 @@ def sync_garden(user_resource, file_name, user_gardens, object_name=None):
 
     # upload file
         for x in active_gardens:
-            print(type(x))
-            obj = user_resource.Object(bucket_name=x, )
-            input()
+            #print(type(x))
+            #input()
             try:
-                response = user_resource.Bucket.name(x).upload_file(file_name, object_name)
+                #response = user_resource.Bucket.name(x).upload_file(file_name, object_name)
+
+                with open(str(test_file), "rb") as f:
+                    response = s3_client.upload_file('test.txt', x, "test")
             except ClientError as e:
                 logging.error(e)
                 return False
@@ -138,11 +151,13 @@ def sync_garden(user_resource, file_name, user_gardens, object_name=None):
         return False
 
 
-# example of new user
 if __name__ == '__main__':
-    directory = '/AGM-Pilot'
-    test_file = 'test.txt'
-    full_path = os.path.join(directory, test_file)
+    # listener = keyboard.Listener(on_press=menu_select)
+    # listener.start()
+    # listener.join()
+    #directory = 'C:/Users/benv/PycharmProjects/AGMPilot'
+    test_file = "test.txt"
+    #full_path = os.path.join(directory, test_file)
     bad_sync = False
     sync = False
     user_input = ""
