@@ -1,6 +1,7 @@
 .card {
   @apply rounded;
   @apply overflow-hidden;
+
 }
 .card .title {
   @apply p-3 text-lg text-center font-bold;

@@ -1,9 +1,14 @@
+import Account from "./Settings";
 import "./Settings.css";
 
 function Settings() {
   return (
+
     <div id="settings-page" data-key="settings">
-      Settings ..
+      <header>
+        Settings...
+      </header>
+      {/*<Component {...Account} />*/}
     </div>
   );
 }
