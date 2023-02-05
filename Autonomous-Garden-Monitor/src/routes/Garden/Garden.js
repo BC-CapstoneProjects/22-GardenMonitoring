@@ -13,6 +13,7 @@ import "./Garden.css";
 
 import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
+
 function Garden() {
   const { subjectID } = useParams();
   console.log("ID", subjectID);

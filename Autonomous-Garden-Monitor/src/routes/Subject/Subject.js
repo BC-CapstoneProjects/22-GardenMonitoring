@@ -1,16 +1,23 @@
 
 import "./Subject.css";
+//import { useParams } from "react-router-dom";
 import BarChart from "../../components/Charts/BarChart";
-
+//import PlantInfo from "../../components/Tables/IndividualPlantTable";
 import { Text } from "react-native";
+//import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
 
-function Subject({ name, imageSrc, imageAlt, type, sun, 
+function Subject({ id, state, name, imageSrc, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
   propMethods, otherMethods, containers, link }) {
+  // const { subjectID } = useParams();
+  // console.log("ID", subjectID);
   
-  
-  
+  // const subject = PlantDescriptions.find((value) => {
+  //   console.log("Filter Comparison:", (subjectID === value.id.toString()), subjectID, value.id.toString());
+  //   return (subjectID === value.id.toString())
+  // });
+
   return (
     <div id="subject-page" data-key="subject" class="grid grid-cols-2">   
     
@@ -31,7 +38,8 @@ function Subject({ name, imageSrc, imageAlt, type, sun,
         </h2>
         
       <section className="table" class="table-fixed">
-          <table class="modal-bodyborder-collapse 
+        <div class="text-black text-center">{"For more information about your "}{name}{" click here:"} <a href={ link } target="_blank" class="hover:underline text-blue-500" rel="noreferrer">garden.org</a></div>      
+        <table class="modal-bodyborder-collapse 
           border-separate border-spacing-2 border-slate-500 bg-slate-900/20 rounded">
         <tbody>
           <tr>
@@ -128,7 +136,6 @@ function Subject({ name, imageSrc, imageAlt, type, sun,
           </tr>
           </tbody>
         </table>
-        <div class="text-black text-center">{"For more information about your "}{name}{" click here:"} <a href={ link } target="_blank" class="hover:underline text-blue-500" rel="noreferrer">garden.org</a></div>
         </section>
       </div>
       
