@@ -155,9 +155,7 @@ if __name__ == '__main__':
     # listener = keyboard.Listener(on_press=menu_select)
     # listener.start()
     # listener.join()
-    #directory = 'C:/Users/benv/PycharmProjects/AGMPilot'
     test_file = "test.txt"
-    #full_path = os.path.join(directory, test_file)
     bad_sync = False
     sync = False
     user_input = ""
