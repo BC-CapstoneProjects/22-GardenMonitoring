@@ -1,30 +1,45 @@
-import { data } from "autoprefixer";
+
 import "./Subject.css";
-import BarChart from "../../components/charts/BarChart";
-import { useState } from "react";
-import { Text, StyleSheet } from "react-native";
+//import { useParams } from "react-router-dom";
+import BarChart from "../../components/Charts/BarChart";
+//import PlantInfo from "../../components/Tables/IndividualPlantTable";
+import { Text } from "react-native";
+//import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
 
 function Subject({ id, state, name, imageSrc, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
-  propMethods, otherMethods, containers }) {
+  propMethods, otherMethods, containers, link }) {
+  // const { subjectID } = useParams();
+  // console.log("ID", subjectID);
   
-  
-  
+  // const subject = PlantDescriptions.find((value) => {
+  //   console.log("Filter Comparison:", (subjectID === value.id.toString()), subjectID, value.id.toString());
+  //   return (subjectID === value.id.toString())
+  // });
+
   return (
     <div id="subject-page" data-key="subject" class="grid grid-cols-2">   
     
-      <header class="rounded">
+      <header class="modal-rounded">
         <Text style={{textAlignVertical: "center",color:"white"
-        ,fontSize:"130%"}}>User plant-name: {name + " \n" ?? "name not found "}
-        Genus: {type ?? <Text style={{color: "red"}}>{'Information Not Available'}</Text>}</Text>
+        ,fontSize:"130%"}}><a href="404.html" class="underline" rel="noopener">Common plant-name:</a> {name + " \n\n" ?? "name not found "}
+        <a href="404.html" class="underline" rel="noopener">Genus:</a> {type ?? <Text style={{color: "red"}}>{'Information Not Available'}</Text>}</Text>
       </header>
+      <div class="modal-body rounded">
+          <img src={imageSrc} alt={imageAlt} class="border-8 border-sky-500 hover:border-double rounded"/>
+          <p class="border-primary rounded">
+            <BarChart />
+          </p>
+      </div>
       <div >
       <h2 class="w-1/2 py-1/2 px-1/2 text-center text-2xl font-semibold rounded bg-primary rounded">
           Tips and Tricks
         </h2>
+        
       <section className="table" class="table-fixed">
-          <table class="modal-bodyborder-collapse 
+        <div class="text-black text-center">{"For more information about your "}{name}{" click here:"} <a href={ link } target="_blank" class="hover:underline text-blue-500" rel="noreferrer">garden.org</a></div>      
+        <table class="modal-bodyborder-collapse 
           border-separate border-spacing-2 border-slate-500 bg-slate-900/20 rounded">
         <tbody>
           <tr>
@@ -115,40 +130,17 @@ function Subject({ id, state, name, imageSrc, imageAlt, type, sun,
           <tr>
             <td class="border-2 border-slate-600 rounded hover:border-dashed bg-white">
               <p class="text-black ">
-              <b>Containers:</b> {containers ?? <Text style={{color: "red"}}>{'Information Not Available'}</Text>}  
+                <b>Containers:</b> {containers ?? <Text style={{color: "red"}}>{'Information Not Available'}</Text>}  
               </p>
             </td>
           </tr>
           </tbody>
         </table>
-        <div class="text-secondary">{"Table information sourced from: garden.org"}</div>
         </section>
       </div>
-      <div class="modal-body rounded">
-          <img src={imageSrc} alt={imageAlt} class="border-8 border-sky-500 hover:border-double"/>
-        
-          <p class="border-primary rounded">
-            <BarChart />
-            
-          </p>
-        </div>
-        
-      <div class="col-span-2">
       
-        </div>
-        
-          
-        
-          
-         
-      
-    
-        
-      
-        
-      
-      
-    </div>
+    <div class="col-span-2"></div>
+  </div>
   );
 }
 
