@@ -2,17 +2,24 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import reportWebVitals from "./report";
 
+
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
 
 import Garden from "./routes/Garden";
 import Settings from "./routes/Settings";
+import Sign from "./routes/Sign/Sign";
+//import Subject from "./routes/Subject";
 
 const router = createBrowserRouter([
   {
-    path: "/",
     exact: true,
+    path: "/",
+    element: <Sign />,
+  },
+  {
+    path: "/garden",
     element: <Garden />,
   },
   {
