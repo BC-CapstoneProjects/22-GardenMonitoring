@@ -11,6 +11,7 @@ import logger from 'morgan';
 // var cors = require('cors');
 import cors from 'cors';
 
+
 //define routers
 // var indexRouter = require('./routes/index');
 import { index } from './routes/index.js';
@@ -23,7 +24,13 @@ import { getImage } from './routes/getImage.js';
 // var publicDir = require('path').join(__dirname,'/public');
 // import publicDir from "./public";
 
+//define cronjobs
+import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
+
 var app = express();
+
+// Call scheduled job functions
+initScheduledJobs();
 
 // view engine setup
 app.set('views', './views');
