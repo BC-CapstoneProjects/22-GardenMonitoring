@@ -22,7 +22,7 @@ function Garden() {
     console.log("test");
     <Link to={`/`} />
   };
- 
+
   const subject = PlantDescriptions.find((value) => {
     console.log("Filter Comparison:", (subjectID === value.id.toString()), subjectID, value.id.toString());
     return (subjectID === value.id.toString())
