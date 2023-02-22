@@ -1,7 +1,8 @@
 import boto3
 from botocore.exceptions import ClientError
 import os, time, logging
-from pynput import keyboard
+from time import gmtime, strftime
+from config.definitions import ROOT_DIR
 
 
 class bcolors:
@@ -24,6 +25,8 @@ session = boto3.Session(
 client = session.client('s3')
 s3 = session.resource('s3')
 gardens = {}
+p = os.path.join(ROOT_DIR, 'images')
+images = os.listdir(p)
 
 
 def new_user_garden(user_client):
@@ -100,8 +103,8 @@ def select_garden(user_client):
 
 
 def menu():
-    print(bcolors.FAIL + "SENSITIVE INFO, DO NOT UPLOAD PUBLICLY" + bcolors.ENDC)
-    print("\nAGM Pilot UI:", time.gmtime(), "\n")
+    print(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
+    print("\nAGM Pilot UI:\n")
     print("1. View gardens")
     print("2. Create a new garden")
     print("3. Sync garden data")
@@ -109,15 +112,16 @@ def menu():
 
 
 # upload file to active S3 in 'garden'
-def sync_garden(user_resource, file_name, user_gardens, object_name=None):
+def sync_garden():
     s3_client = boto3.client(
         's3',
         aws_access_key_id="",
         aws_secret_access_key="",
+        # aws_session_token=SESSION_TOKEN
     )
     gardens_to_sync = 0
-    active_gardens = []
-    for key, value in user_gardens.items():
+    active_gardens = [] # used to store names of all gardens that will be uploaded to
+    for key, value in gardens.items():
         if value is "active":
             gardens_to_sync += 1
             active_gardens.append(key)
@@ -129,20 +133,32 @@ def sync_garden(user_resource, file_name, user_gardens, object_name=None):
     ready_to_sync = input("\n\ny/n: ")
 
     if ready_to_sync == 'y':
-
-    # using .basename will allow us to use the provided file_name if object_name is not passed
-        if object_name is None:
-            file = os.path.basename(file_name)
-
-    # upload file
-        for x in active_gardens:
-            #print(type(x))
-            #input()
+        for target_garden in active_gardens:
+            # first upload all image files from images folder
+            for image in images:
+                path = p
+                path += "\\"
+                path += image
+                print(path)
+                try:
+                    with open(str(path), "rb") as f:
+                        response = s3_client.upload_file(path, target_garden, str(image), ExtraArgs={ "ContentType": "image/jpeg"})
+                except ClientError as e:
+                    logging.error(e)
+                    return False
+            # finally upload the timestamp for this sync
             try:
-                #response = user_resource.Bucket.name(x).upload_file(file_name, object_name)
-
-                with open(str(test_file), "rb") as f:
-                    response = s3_client.upload_file('test.txt', x, "test")
+                try:
+                    fp = open("time_stamp.txt", "w")
+                    fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
+                    fp.close()
+                except FileNotFoundError:
+                    fp = open("time_stamp.txt", "w")
+                    fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
+                    fp.close()
+                with open(str('time_stamp.txt'), "rb") as f:
+                    response = s3_client.upload_file('time_stamp.txt', target_garden, str("time_stamp.txt"),
+                                                     ExtraArgs={"ContentType": "text/html"})
             except ClientError as e:
                 logging.error(e)
                 return False
@@ -152,10 +168,6 @@ def sync_garden(user_resource, file_name, user_gardens, object_name=None):
 
 
 if __name__ == '__main__':
-    # listener = keyboard.Listener(on_press=menu_select)
-    # listener.start()
-    # listener.join()
-    test_file = "test.txt"
     bad_sync = False
     sync = False
     user_input = ""
@@ -179,7 +191,7 @@ if __name__ == '__main__':
             sync = False
             new_user_garden(client)
         elif user_input == '3':
-            if sync_garden(s3, test_file, gardens, s3):
+            if sync_garden():
                 sync = True
             else:
                 bad_sync = True

@@ -1,6 +1,5 @@
 // var express = require('express');
 import express from 'express';
-
 var router = express.Router();
 
 export const getImage = router.get("/",function(req,res,next){
