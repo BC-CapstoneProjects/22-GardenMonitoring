@@ -3,12 +3,11 @@
   @apply normal-case text-xl;
 }
 .brand h1 {
-  @apply normal-case text-xl;
+  @apply btn btn-ghost normal-case text-xl;
   @apply inline-block;
   @apply bg-accent;
   @apply py-3 px-6;
-  @apply text-xl font-bold;
-  @apply text-success-content;
   @apply align-middle;
+  @apply text-xl font-bold;
   @apply rounded;
 }
