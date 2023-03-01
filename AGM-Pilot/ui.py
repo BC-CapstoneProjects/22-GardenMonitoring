@@ -50,8 +50,8 @@ class bcolors:
 
 
 session = boto3.Session(
-    aws_access_key_id="AKIAUFKX3XINW6TL6EF4",
-    aws_secret_access_key="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",
+    aws_access_key_id="",
+    aws_secret_access_key="",
 )
 
 client = session.client('s3')
