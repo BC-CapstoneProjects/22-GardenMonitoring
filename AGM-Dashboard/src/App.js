@@ -15,10 +15,24 @@ import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
+import { withAuthenticator } from '@aws-amplify/ui-react';
+import awsExports from './aws-exports';
+import { Amplify }  from 'aws-amplify';
+import { Auth } from 'aws-amplify';
+
+Amplify.configure(awsExports);
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
+
+  const handleSignOut = async () => {
+    try {
+      await Auth.signOut();
+    } catch (error) {
+      console.log('Error signing out: ', error);
+    }
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -48,4 +62,4 @@ function App() {
   );
 }
 
-export default App;
+export default withAuthenticator(App);
