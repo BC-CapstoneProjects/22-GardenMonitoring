@@ -10,8 +10,7 @@ import { useEffect, useState } from "react";
 const dynamoDB = new AWS.DynamoDB({
   apiVersion: "2012-08-10",
   region: "us-west-2",
-  accessKeyId: "AKIAVQY6VF26TRJVHAHI",
-  secretAccessKey: "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",
+  
 });
 
 function Subject({ id, state, name, imageSrc, imageAlt, type, sun, 
