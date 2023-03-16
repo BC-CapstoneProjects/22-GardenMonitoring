@@ -1,6 +1,6 @@
 const plants = [
   {
-    id: 1,
+    id: 0,
     name: 'Succulent',
     type: 'Echeveria',
     imageSrc: 'http://localhost:9000/images/plant1.avif',
@@ -21,7 +21,7 @@ const plants = [
     
   },
   {
-    id: 2,
+    id: 1,
     name: 'Pepppermint',
     type: 'Mentha x piperita',
     imageSrc: 'http://localhost:9000/images/plant2.avif',
@@ -42,7 +42,7 @@ const plants = [
     
   },
   {
-    id: 3,
+    id: 2,
     name: 'Rose',
     type: 'Rosa',
     
@@ -59,7 +59,7 @@ const plants = [
     link: 'https://garden.org/plants/view/181506/Roses-Rosa/'
   },
   {
-    id: 4,
+    id: 3,
     name: 'Prayer Plant',
     type: 'Goeppertia orbifolia',
     imageSrc: 'http://localhost:9000/images/plant4.avif',
@@ -75,7 +75,7 @@ const plants = [
     link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/'
   },
   {
-    id: 5,
+    id: 4,
     name: 'African Daisy',
     type: 'Gerbera',
     imageSrc: 'http://localhost:9000/images/plant5.avif',
@@ -93,7 +93,7 @@ const plants = [
     link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/'
   },
   {
-    id: 6,
+    id: 5,
     name: 'Shasta Daisy',
     type: 'Leucanthemum × superbum',
     imageSrc: 'http://localhost:9000/images/plant6.avif',
@@ -109,7 +109,7 @@ const plants = [
     link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/'
   },
   {
-    id: 7,
+    id: 6,
     name: 'Peace Lily',
     type: 'Herb',
     sun: 'Partial or Dappled Shade',
@@ -131,7 +131,7 @@ const plants = [
     
   },
   {
-    id: 8,
+    id: 7,
     name: 'Southern Maidenhair Fern',
     type: 'Adiantum capillus-veneris',
     imageSrc: 'http://localhost:9000/images/plant8.avif',
