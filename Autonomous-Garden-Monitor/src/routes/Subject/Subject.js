@@ -1,6 +1,7 @@
 import "./Subject.css";
 //import { useParams } from "react-router-dom";
 import BarChart from "../../components/Charts/BarChart";
+import LineChart from "../../components/Charts/LineChart";
 //import PlantInfo from "../../components/Tables/IndividualPlantTable";
 import { Text } from "react-native";
 //import PlantDescriptions from "../../components/Plants/PlantDescriptions";
@@ -39,7 +40,8 @@ function Subject({ id, state, name, imageSrc, imageAlt, type, sun,
       });
     }
   }, [id]);
-  
+
+
   console.log("Disease Data: ", id, diseaseData);
 
   return (
@@ -51,11 +53,39 @@ function Subject({ id, state, name, imageSrc, imageAlt, type, sun,
         </Text>
         <Text style={{width: "50%", textAlignVertical: "center", textAlign: "right", color: "white", fontSize: "130%"}}>
           Diseased: {diseaseData?.diseased?.BOOL?.toString() || "Loading .."} <br/><br/>Label: {diseaseData?.label.S || "Loading .."}</Text>
+        {/* <div> */}
+        {/* cmd='Mosaic Disease',
+            cbb='Bacterial Blight',
+            cgm='Green Mite',
+            cbsd='Brown Streak Disease',
+            healthy='Healthy',
+            unknown='Unknown') */}
+          {/* {diseaseData && ( */}
+            {/* switch (diseaseData?.label?.S) {
+              case "Mosaic Disease":
+                <p>Remove Plant from garden</p>
+                break;
+              case 'Bacterial Blight':
+                <p>Pestidce: Copper fungicides are labeled for control of bacterial blight on soybeans but need to be applied early in the disease cycle to be effective.</p><br/>
+                <p>Orgainc: https://wenkegardencenter.com/home-remedies-plant-disease/</p>
+                break;
+              case 'Green Mite':
+                <p>https://www.almanac.com/pest/aphids</p>
+                break;
+              case 'Unknown':
+                <p>Not sure whats wrong with this plant</p>
+                break;
+              default:
+                <p>Plant is looking good!</p>
+            } */}
+          {/* )} */}
+          {/* </div> */}
       </header>
       <div className="modal-body rounded">
         <img src={imageSrc} alt={imageAlt} className="border-8 border-sky-500 hover:border-double rounded"/>
         <p className="border-primary rounded">
-          <BarChart />
+          <LineChart />
+          
         </p>
       </div>
       <div >
