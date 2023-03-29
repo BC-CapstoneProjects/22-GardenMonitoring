@@ -13,6 +13,8 @@ import "./Garden.css";
 
 import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
+import BarChart from "../../components/Charts/BarChart";
+
 
 function Garden() {
   const { subjectID } = useParams();
@@ -68,8 +70,10 @@ function Garden() {
         <label htmlFor="my-modal-5" className="btn btn-sm btn-circle absolute right-2 top-2 bg-secondary text-white">✕</label>
           
           <Subject {...subject} />
+          
         </div>
       </div>
+      <BarChart />
     </main>
   );
 }
