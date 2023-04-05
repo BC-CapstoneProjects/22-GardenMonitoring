@@ -1,7 +1,11 @@
+import os
 import tkinter as tk
 import tkinter.ttk as ttk
+
+import botocore
 from ttkthemes import ThemedTk
 import webbrowser
+import boto3
 
 # Just simply import the azure.tcl file
 
@@ -15,7 +19,9 @@ button_names = {
 
 """
 guitest.py was built with the help from the following
-Example script for testing the Azure ttk theme
+Example script and assets, for testing the Azure ttk theme.
+Any additional implementation is original work created by
+Capstone, Group 7 (AGM), at Bellevue College.
 Original Author: rdbende
 License: MIT license
 Source: https://github.com/rdbende/ttk-widget-factory
@@ -30,13 +36,38 @@ class App(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self)
 
+        # AccountInfo
+        # Create a client for the IAM service
+        self.iam_client = boto3.client('iam')
+
+        # Call the get_user method to retrieve the IAM user information
+        self.user_info = self.iam_client.get_user()
+
+        self.gardens = {}
+        self.session = boto3.Session()
+        self.s3_client = self.session.client('s3')
+        self.s3 = self.session.resource('s3')
+        # Get the user's email (if available)
+        try:
+            self.email = self.user_info['User']['Email']
+        except KeyError:
+            self.email = 'Email not available'
+        for bucket in self.s3.buckets.all():
+            # existing s3 buckets will default to a non-active status
+            if bucket.name not in self.gardens:
+                self.gardens[bucket.name] = "non-active"
+
         # Make the app responsive
         for index in [0, 1, 2]:
             self.columnconfigure(index=index, weight=1)
             self.rowconfigure(index=index, weight=1)
 
         # Create value lists
-        self.option_menu_list = ["", "Select Garden", "Garden 1", "Garden 2"]
+        self.option_menu_list = ["", "Select Garden"]
+        for i, (name, status) in enumerate(self.gardens.items()):
+            garden = {"name": name, "garden id": i + 1}
+            self.option_menu_list.append(garden)
+
         self.combo_list = ["Combobox", "Editable item 1", "Editable item 2"]
         self.readonly_combo_list = ["Readonly combobox", "Item 1", "Item 2"]
 
@@ -52,6 +83,9 @@ class App(ttk.Frame):
         # Create widgets :)
         self.setup_widgets()
 
+
+
+
     def setup_widgets(self):
 
         # Create a Frame for the Checkbuttons
@@ -60,14 +94,13 @@ class App(ttk.Frame):
             row=1, column=0, padx=(20, 10), pady=(20, 10), sticky="nsew"
         )
 
-        # AccountInfo
         self.account_name = ttk.Label(
-            self.account_frame, text="Name:      user1"
+            self.account_frame, text=str("username:      " + self.user_info['User']['UserName'])
         )
         self.account_name.grid(row=1, column=0, padx=5, pady=10, sticky="nsew")
 
         self.account_email = ttk.Label(
-            self.account_frame, text="email:      user1@test.com"
+            self.account_frame, text=str("email:      " + self.email)
         )
         self.account_email.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
 
@@ -92,15 +125,18 @@ class App(ttk.Frame):
         self.widgets_frame.columnconfigure(index=0, weight=1)
 
         # Entry
-        self.entry = ttk.Entry(self.widgets_frame)
-        self.entry.insert(0, "Garden Name")
-        self.entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0, 10), sticky="ew")
+        self.garden_entry = ttk.Entry(self.widgets_frame)
+        self.garden_entry.insert(0, "Garden Name")
+        self.garden_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0, 10), sticky="ew")
 
         # Add Garden Button
-        self.button2 = ttk.Button(self.widgets_frame, text="Add Garden")
+        self.button2 = ttk.Button(self.widgets_frame, text="Add Garden",
+                                  command=lambda: self.new_user_garden(self.garden_entry.get()))
         self.button2.grid(row=2, columnspan=1, padx=5, pady=10, sticky="nsew")
+
         # Remove Garden Button
-        self.button3 = ttk.Button(self.widgets_frame, text="Remove Garden")
+        self.button3 = ttk.Button(self.widgets_frame, text="Remove Garden",
+                                  command=lambda: self.remove_user_garden(self.garden_entry.get()))
         self.button3.grid(row=2, column=1, padx=5, pady=10, sticky="nsew")
 
         # # Spinbox
@@ -139,6 +175,7 @@ class App(ttk.Frame):
             self.widgets_frame, self.var_4, *self.option_menu_list
         )
         self.optionmenu.grid(row=5, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
+        self.update_option_list()
 
         # Accentbutton
         self.accentbutton = ttk.Button(
@@ -275,6 +312,90 @@ class App(ttk.Frame):
         # Sizegrip
         self.sizegrip = ttk.Sizegrip(self)
         self.sizegrip.grid(row=100, column=100, padx=(0, 5), pady=(0, 5))
+
+    def update_option_list(self):
+        # check for new bucket names not in gardens dictionary
+        for bucket in self.s3.buckets.all():
+            # new buckets default to a non-active status
+            if bucket.name not in self.gardens:
+                self.gardens[bucket.name] = "non-active"
+
+        # create a list of garden names
+        # include dictionaries in the option_menu_list and then extract the "name" value from each dictionary
+        garden_names = [garden["name"] for garden in self.option_menu_list if isinstance(garden, dict)]
+
+        # add new gardens to the option menu
+        for name, status in self.gardens.items():
+            if name not in garden_names:
+                garden = {"name": name, "garden id": len(self.option_menu_list) + 1}
+                self.option_menu_list.append(garden)
+                garden_names.append(name)
+                self.optionmenu['menu'].add_command(label=name,
+                                                    command=lambda value=name: self.selected_garden.set(value))
+
+        # Remove gardens from the option menu that are no longer in self.gardens
+        menu = self.optionmenu['menu']
+        for i in range(menu.index('end')):
+            label = menu.entrycget(i, 'label')
+            if label not in self.gardens:
+                menu.delete(i)
+
+        # clear the current option menu and repopulate it with the updated garden list
+        self.optionmenu['menu'].delete(0, tk.END)
+        for garden in self.option_menu_list:
+            if isinstance(garden, dict):
+                self.optionmenu['menu'].add_command(label=garden['name'],
+                                                    command=lambda value=garden['name']: self.selected_garden.set(
+                                                        value))
+
+
+    def new_user_garden(self, garden_name):
+        response = "new_user_garden empty response"
+        garden_created = False
+        try:
+            response = self.s3_client.create_bucket(
+                Bucket=garden_name,
+                CreateBucketConfiguration={
+                    'LocationConstraint': 'us-west-2',
+                },
+            )
+        except self.s3_client.exceptions.ClientError:
+            print("Invalid bucket name\n")
+        except self.s3_client.exceptions.BucketAlreadyExists:
+            print("Garden name already exists\n")
+        else:
+            garden_created = True
+        # add new garden to the option list
+        self.update_option_list()
+        print(response)
+
+
+    def remove_user_garden(self, garden_name):
+        response = "remove_user_garden empty response"
+        try:
+            response = self.s3_client.delete_bucket(
+                Bucket=garden_name,
+            )
+            # Remove the garden from the gardens dictionary
+            if garden_name in self.gardens:
+                self.gardens.pop(garden_name)
+
+                # Remove the garden from the option menu list
+            for i, garden in enumerate(self.option_menu_list):
+                if isinstance(garden, dict) and garden['name'] == garden_name:
+                    self.option_menu_list.pop(i)
+                    break
+
+        except self.s3_client.exceptions.ClientError:
+            print("Invalid bucket name\n")
+        except botocore.exceptions.ParamValidationError as e:
+            # handle the exception here
+            print("ParamValidationError: {}".format(str(e)))
+
+        # Update the option menu list
+        self.gardens.pop(garden_name, None)
+        self.update_option_list()
+        print(response)
 
 
 if __name__ == "__main__":
