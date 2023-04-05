@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 
 import Brand from "../../components/Brand";
 
@@ -13,6 +13,8 @@ import "./Garden.css";
 
 import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
+import BarChart from "../../components/Charts/BarChart";
+
 
 function Garden() {
   const { subjectID } = useParams();
@@ -21,6 +23,12 @@ function Garden() {
   const onChangeHandler = () => {
     console.log("test");
     <Link to={`/`} />
+  };
+
+  const navigate = useNavigate();
+  const onModalStateChange = () => {
+    console.log("test");
+    navigate("/garden");
   };
 
   const subject = PlantDescriptions.find((value) => {
@@ -56,14 +64,16 @@ function Garden() {
           ))}
         </div>
       </section>
-      <input type="checkbox" id="my-modal-5" checked={!!subjectID} onChange={onChangeHandler} className="modal-toggle" />
+      <input type="checkbox" id="my-modal-5" checked={!!subjectID} onChange={onModalStateChange} className="modal-toggle" />
       <div className="modal bg-slate-900/30">
         <div className="modal-box w-11/12 max-w-5xl bg-green-300">
         <label htmlFor="my-modal-5" className="btn btn-sm btn-circle absolute right-2 top-2 bg-secondary text-white">✕</label>
           
           <Subject {...subject} />
+          
         </div>
       </div>
+      <BarChart />
     </main>
   );
 }

@@ -15,35 +15,35 @@ import {createWriteStream} from "fs";
 
 export const params = [
   {
-    Bucket: "benvc2", // The name of the bucket. For example, 'sample-bucket-101'.
+    Bucket: "winterdemo", // The name of the bucket. For example, 'sample-bucket-101'.
     Key: "plant1.avif", // The name of the object. For example, 'sample_upload.txt'.
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant2.avif", 
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant3.avif", 
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant4.avif", 
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant5.avif", 
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant6.avif", 
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant7.avif", 
   },
   {
-    Bucket: "benvc2", 
+    Bucket: "winterdemo", 
     Key: "plant8.avif", 
   }
 ];
