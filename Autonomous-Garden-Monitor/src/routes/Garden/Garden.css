@@ -12,9 +12,10 @@
   
 }
 
-#garden-monitor > section.content > h2.name {
+#garden-monitor > section.content > button.name {
   @apply inline-block;
   @apply bg-primary rounded;
+  @apply hover:bg-blue-700;
   @apply w-auto py-3 px-6;
   @apply text-2xl font-semibold rounded;
 }
@@ -26,4 +27,24 @@
   @apply text-center rounded;
   @apply cursor-default;
   @apply shadow-2xl;
+}
+
+#garden-monitor > section.content > .dropdown {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+#garden-monitor > section.content > .dropdown li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+#garden-monitor > section.content > .dropdown li:hover {
+  background-color: #f5f5f5;
 }
