@@ -15,8 +15,22 @@ import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
 import BarChart from "../../components/Charts/BarChart";
 
+import { useState } from "react";
+
 
 function Garden() {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [selectedGarden, setSelectedGarden] = useState("Garden");
+
+  const handleGardenSelection = (gardenName) => {
+    setSelectedGarden(gardenName);
+    setDropdownVisible(false);
+  };
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
   const { subjectID } = useParams();
   console.log("ID", subjectID);
 
@@ -46,7 +60,14 @@ function Garden() {
         </Menu>
       </header>
       <section className="content">
-        <h2 className="name">Garden</h2>
+        <button className="name" onClick={(e) => toggleDropdown(e)}>{ selectedGarden }</button>
+          { dropdownVisible && (
+            <ul className="dropdown">
+              <li onClick={() => handleGardenSelection("Garden 1")}>Garden 1</li>
+              <li onClick={() => handleGardenSelection("Garden 2")}>Garden 2</li>
+              <li onClick={() => handleGardenSelection("Garden 3")}>Garden 3</li>
+            </ul>
+          )}
         <div className="grid">
           {PlantDescriptions.map(({ id, state, name, imageSrc, imageAlt }) => (
             <Link
