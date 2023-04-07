@@ -8,7 +8,7 @@
     @apply m-2;
     @apply border-primary rounded;
     @apply shadow-xl;
-    @apply bg-green-500;
+    @apply bg-primary;
 }
 
 #subject-page > section.table {
