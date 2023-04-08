@@ -17,7 +17,8 @@ const plants = [
     propMethods: 'Cuttings: Leaf',
     otherMethods: 'Offsets',
     containers: 'Suitable in 1 gallon, Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/'
+    link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/',
+    disease: '0'
     
   },
   {
@@ -38,7 +39,8 @@ const plants = [
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Division, Stolons and runners',
     containers: 'Suitable in 1 gallon, Suitable in 3 gallon or larger',
-    link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/'
+    link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/',
+    disease: '4'
     
   },
   {
@@ -56,7 +58,8 @@ const plants = [
     flowers: 'Showy',
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Cuttings: Tip',
-    link: 'https://garden.org/plants/view/181506/Roses-Rosa/'
+    link: 'https://garden.org/plants/view/181506/Roses-Rosa/',
+    disease: '3'
   },
   {
     id: 3,
@@ -72,7 +75,8 @@ const plants = [
     flowers: 'Showy',
     suitableLocations: 'Houseplant',
     containers: 'Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/'
+    link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/',
+    disease: '0'
   },
   {
     id: 4,
@@ -90,7 +94,8 @@ const plants = [
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Division',
     containers: 'Suitable in 3 gallon or larger, Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/'
+    link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/',
+    disease: '6'
   },
   {
     id: 5,
@@ -106,7 +111,8 @@ const plants = [
     bloomSize: '2"-3"',
     flowerTime: 'Spring, Summer, Fall',
     suitableLocations: 'Xeriscapic',
-    link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/'
+    link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/',
+    disease: '5'
   },
   {
     id: 6,
@@ -127,7 +133,8 @@ const plants = [
     
     water: 'Mesic',
     containers: 'Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/'
+    link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',
+    disease: '2'
     
   },
   {
@@ -144,7 +151,8 @@ const plants = [
     suitableLocations: 'Terrariums, Bog gardening',
     propMethods: 'Division',
     containers: 'Suitable for hanging baskets, Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/'
+    link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/',
+    disease: '3'
   },
 ];
 

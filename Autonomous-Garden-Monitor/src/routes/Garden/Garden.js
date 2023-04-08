@@ -1,4 +1,3 @@
-// import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 
 import Brand from "../../components/Brand";
@@ -15,7 +14,7 @@ import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 
 import BarChart from "../../components/Charts/BarChart";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 function Garden() {
@@ -28,11 +27,22 @@ function Garden() {
   // show/hide chart state variable
   const [chartVisible, setChartVisible] = useState(false);
 
-  // state variable to refresh garden page
-  const navigate = useNavigate();
+  // refreshKey state variable
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const { subjectID } = useParams();
+  console.log("ID", subjectID);
+
+  useEffect(() => {
+    // could add more code here to be executed when the refreshKey state changes
+    if (refreshKey > 0) {
+      window.location.reload();
+    }
+  }, [refreshKey]);
 
   const refreshPage = () => {
-    navigate('/garden', { replace: true, state: { refresh: true } }); // navigates to current route thus refreshing the page
+     setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
+     // ensures that we are working with the most up-to-date state value 
   };
 
   const toggleChart = () => {
@@ -48,14 +58,12 @@ function Garden() {
     setDropdownVisible(!dropdownVisible);
   };
 
-  const { subjectID } = useParams();
-  console.log("ID", subjectID);
-
   const onChangeHandler = () => {
     console.log("test");
     <Link to={`/`} />
   };
 
+  const navigate = useNavigate();
   const onModalStateChange = () => {
     console.log("test");
     navigate("/garden");
@@ -74,7 +82,7 @@ function Garden() {
           <path fill="currentColor" d="M32,15C18,15,5,24,5,32s13,17,27,17s27-8,27-17S46,15,32,15z M32,45c-10,0-19-6-22-12
             c3-6,11-12,22-12s19,6,22,12C51,39,42,45,32,45z"/>
             <circle cx="32" cy="32" r="5" fill="currentColor">
-              {/* <animate attributeName="r" from="3" to="7" dur="1s" begin="0s" repeatCount="indefinite" /> */}
+              <animate attributeName="cx" values="16;48;32" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
             </circle>
         </svg>
         <Brand alt="Autonomous Garden Monitoring" onClick={refreshPage}/>
@@ -96,7 +104,7 @@ function Garden() {
           <button className="chart" onClick={toggleChart}>Toggle { selectedGarden } Chart</button>
             {chartVisible && <BarChart />}
         </div>
-          {PlantDescriptions.map(({ id, state, name, imageSrc, imageAlt }) => (
+          {PlantDescriptions.map(({ id, disease, state, name, imageSrc, imageAlt }) => (
             <Link
               key={id}
               to={`/view/${id}`}
