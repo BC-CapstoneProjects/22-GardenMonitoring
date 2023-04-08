@@ -33,19 +33,19 @@ const LineChart = () => {
               label: 'Mosaic Disease',
               data: [5, 10, 30, 20, 25, 30],
               fill: false,
-              borderColor: 'red',
+              borderColor: '#470000',
             },
             {
               label: 'Bacterial Blight',
               data: [10, 15, 20, 25, 30, 35],
               fill: false,
-              borderColor: 'yellow',
+              borderColor: '#f87272',
             },
             {
               label: 'Green Mite',
               data: [15, 20, 25, 30, 35, 35],
               fill: false,
-              borderColor: 'green',
+              borderColor: '#fbbd23',
             },
             {
               label: 'Brown Streak Disease',
@@ -57,13 +57,13 @@ const LineChart = () => {
               label: 'Healthy',
               data: [0, 30, 35, 40, 15, 50],
               fill: false,
-              borderColor: 'blue',
+              borderColor: '#36d399',
             },
             {
               label: 'Unknown',
               data: [30, 35, 40, 45, 50, 55],
               fill: false,
-              borderColor: 'purple',
+              borderColor: '#3abff8',
             },
           ],
         };
