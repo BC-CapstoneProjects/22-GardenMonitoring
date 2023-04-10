@@ -31,7 +31,7 @@ net.setInputSwapRB(True)
 
 
 flight_path = {}
-# me.takeoff()
+
 
 plant_x = 0
 plant_y = 0
@@ -49,10 +49,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-session = boto3.Session(
-    aws_access_key_id="AKIAUFKX3XINW6TL6EF4",
-    aws_secret_access_key="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",
-)
+session = boto3.Session()
 
 client = session.client('s3')
 s3 = session.resource('s3')
@@ -136,9 +133,10 @@ def select_garden(user_client):
 
 def monitor():
     rnd = np.random.default_rng(12345)
-    print("taking off")
-    # me.takeoff()
-    # time.sleep(2)
+    rnd_num = str(rnd.random())
+    print(bcolors.WARNING + "DRONE TAKING OFF" + bcolors.ENDC)
+    time.sleep(2)
+    me.takeoff()
     attempts = 0
     rotate_right_counter = 0
     rotate_left_counter = 0
@@ -169,75 +167,75 @@ def monitor():
                 cv2.putText(img, f'{classNames[classId - 1].upper()} {round(conf * 100, 2)}',
                             (box[0] + 10, box[1] + 30), cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (0, 255, 0), 2)
-                if classNames[classId - 1] == "cup" and conf >= 0.50:
+                if classNames[classId - 1] == "potted plant" and conf >= 0.50:
                     # dimensions of the box around the target object
                     x, y, w, h = box
                     object_not_found_counter = 0
                     attempts = 0
                     if image_captured:
                         print(bcolors.OKCYAN + "I've taken", images_captured, "pictures" + bcolors.ENDC)
-                        # me.move_back(20)
-                        # me.rotate_clockwise(40)
-                        # me.land()
+                        hold_counter = 0
+                        me.rotate_clockwise(50)
+                        me.move_back(30)
                         image_captured = False
-                        if images_captured >= 8:
-                            print(bcolors.OKCYAN + "I've taken at least 8 pictures")
-                            # me.land()
-                            # monitoring = False
+                        if images_captured >= 2:
+                            me.land()
+                            monitoring = False
 
                     if distance_ok and x_centered and y_centered:
                         hold_counter += 1
-                        if hold_counter > 2 and images_captured < 8:
-                            # frame_read = me.get_frame_read()
-                            # pic_ts = str(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
-                            # my_str = str(pic_ts)
+                        attempts = 0
+                        if hold_counter > 5 and images_captured < 2:
                             images_captured += 1
                             img_name = str(
-                                "images/test_plant" + str(rnd.random()) + str(me.get_barometer()) + "_" + str(
+                                "images/test_plant" + rnd_num + "_" + str(
                                     images_captured) + ".png")
-                            # cv2.imwrite(img_name, me.get_frame_read().frame)
+                            cv2.imwrite(img_name, me.get_frame_read().frame)
                             image_captured = True
                             hold_counter = 0
 
-                    print("W of current plant = ", w)
                     #  check distance from object, move until 40cm away from plant
-                    if w < 150:  # distance at roughly 60cm
+                    if w < 320:  # distance at roughly 60cm
                         # plant is more than 60cm away, can move up 40cm
                         move_forward_counter += 1
                         distance_ok = False
                         if move_forward_counter > 3:
                             move_forward_counter = 0
-                            # me.move_forward(20)
-                            print(bcolors.WARNING + "MOVING DRONE FORWARD" + bcolors.ENDC)
+                            me.move_forward(20)
+                            print(bcolors.WARNING + "MOVE DRONE FORWARD" + bcolors.ENDC)
+
                     else:
                         # distance of roughly 40cm from plant
-                        if w > 220:
-                            # me.move_back(20)
-                            print(bcolors.FAIL + "MOVE DRONE BACK" + bcolors.ENDC)
+                        if w > 440:
+                            move_backward_counter += 1
                             distance_ok = False
+                            if move_backward_counter > 1:
+                                me.move_back(20)
+                                print(bcolors.FAIL + "MOVE DRONE BACK" + bcolors.ENDC)
                         else:
                             distance_ok = True
                             hold_counter += 1
+                            attempts = 0
 
 
                     # check plant in x-axis
                     if x > 440:
-                        print(bcolors.WARNING + "X axis off center, move drone right" + bcolors.ENDC)
+                        #print(bcolors.WARNING + "X axis off center, move drone right" + bcolors.ENDC)
                         x_centered = False
                         rotate_right_counter += 1
                         if rotate_right_counter > 2:
                             #print("HELP HELP HELP HELP")
-                            print(bcolors.WARNING + "DRONE ROTATING CLOCKWISE" + bcolors.ENDC)
-                            # me.rotate_clockwise(10)
+                            print(bcolors.WARNING + "ROTATE DRONE CLOCKWISE" + bcolors.ENDC)
+                            me.rotate_clockwise(10)
                             rotate_right_counter = 0
                     elif x < 220:
-                        print(bcolors.WARNING + "X axis off center, move drone left" + bcolors.ENDC)
+                        #print(bcolors.WARNING + "X axis off center, move drone left" + bcolors.ENDC)
                         rotate_left_counter += 1
                         x_centered = False
                         if rotate_left_counter > 2:
                             #print("HELP HELP HELP HELP")
-                            print(bcolors.WARNING + "DRONE ROTATING COUNTERCLOCKWISE" + bcolors.ENDC)
-                            # me.rotate_counter_clockwise(10)
+                            print(bcolors.WARNING + "ROTATE DRONE COUNTERCLOCKWISE" + bcolors.ENDC)
+                            me.rotate_counter_clockwise(10)
                             rotate_left_counter = 0
                     else:
                         print(bcolors.OKGREEN + "X AXIS ON CENTER" + bcolors.ENDC)
@@ -245,23 +243,24 @@ def monitor():
                         rotate_left_counter = 0
                         rotate_right_counter = 0
                         hold_counter += 1
+                        attempts = 0
 
                     # check plant in y-axis
                     if y > 400:
-                        print(bcolors.WARNING + "Y axis off center, move drone down" + bcolors.ENDC)
+                        #print(bcolors.WARNING + "Y axis off center, move drone down" + bcolors.ENDC)
                         y_centered = False
                         move_down_counter += 1
                         if move_down_counter > 5:
-                            print(bcolors.WARNING + "DRONE MOVING DOWN" + bcolors.ENDC)
-                            # me.move_down(20)
+                            print(bcolors.WARNING + "MOVE DRONE DOWN" + bcolors.ENDC)
+                            me.move_down(20)
                             move_down_counter = 0
                     elif y < 80:
-                        print(bcolors.WARNING + "Y axis off center, move drone up" + bcolors.ENDC)
+                        #print(bcolors.WARNING + "Y axis off center, move drone up" + bcolors.ENDC)
                         y_centered = False
                         move_up_counter += 1
                         if move_up_counter > 5:
-                            print(bcolors.WARNING + "DRONE MOVING UP" + bcolors.ENDC)
-                            # me.move_up(20)
+                            print(bcolors.WARNING + "MOVE DRONE UP" + bcolors.ENDC)
+                            me.move_up(20)
                             move_up_counter = 0
                     else:
                         print(bcolors.OKGREEN + "Y AXIS ON CENTER" + bcolors.ENDC)
@@ -269,19 +268,19 @@ def monitor():
                         move_down_counter = 0
                         move_up_counter = 0
                         hold_counter += 1
+                        attempts = 0
 
                 # rotate clockwise until plant found
                 else:
                     object_not_found_counter += 1
-                    # print("object_not_found_counter = ", object_not_found_counter)
-                    if object_not_found_counter > 10:
+                    if object_not_found_counter > 5:
                         attempts += 1
                         object_not_found_counter = 0
-                        object_found_counter = 0
-                    elif attempts > 3:
-                        # me.land()
-                        print("3 failed attempts landing")
-                        # monitoring = False
+                        me.rotate_clockwise(40)
+                    elif attempts > 5:
+                        me.land()
+                        print(bcolors.FAIL + "5 failed attempts landing" + bcolors.ENDC)
+                        monitoring = False
         except:
             pass
         # me.send_rc_control(0, 0, 0, 0)
@@ -301,10 +300,7 @@ def menu():
 # upload file to active S3 in 'garden'
 def sync_garden():
     s3_client = boto3.client(
-        's3',
-        aws_access_key_id="",
-        aws_secret_access_key="",
-        # aws_session_token=SESSION_TOKEN
+        's3'
     )
     gardens_to_sync = 0
     active_gardens = []  # used to store names of all gardens that will be uploaded to
@@ -388,7 +384,7 @@ if __name__ == '__main__':
             me = tello.Tello()
             me.LOGGER.setLevel(logging.WARNING)
             me.connect()
-            print(me.get_battery())
+            print("Battery = " + str(me.get_battery()) + "%")
             if me.get_battery() <= 15:
                 me.streamoff()
                 print("Battery too low to fly.")
