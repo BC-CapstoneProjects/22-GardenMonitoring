@@ -1,6 +1,6 @@
 const plants = [
   {
-    id: 1,
+    id: 0,
     name: 'Succulent',
     type: 'Echeveria',
     imageSrc: 'http://localhost:9000/images/plant1.avif',
@@ -17,11 +17,12 @@ const plants = [
     propMethods: 'Cuttings: Leaf',
     otherMethods: 'Offsets',
     containers: 'Suitable in 1 gallon, Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/'
+    link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/',
+    disease: '0'
     
   },
   {
-    id: 2,
+    id: 1,
     name: 'Pepppermint',
     type: 'Mentha x piperita',
     imageSrc: 'http://localhost:9000/images/plant2.avif',
@@ -38,11 +39,12 @@ const plants = [
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Division, Stolons and runners',
     containers: 'Suitable in 1 gallon, Suitable in 3 gallon or larger',
-    link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/'
+    link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/',
+    disease: '4'
     
   },
   {
-    id: 3,
+    id: 2,
     name: 'Rose',
     type: 'Rosa',
     
@@ -56,10 +58,11 @@ const plants = [
     flowers: 'Showy',
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Cuttings: Tip',
-    link: 'https://garden.org/plants/view/181506/Roses-Rosa/'
+    link: 'https://garden.org/plants/view/181506/Roses-Rosa/',
+    disease: '3'
   },
   {
-    id: 4,
+    id: 3,
     name: 'Prayer Plant',
     type: 'Goeppertia orbifolia',
     imageSrc: 'http://localhost:9000/images/plant4.avif',
@@ -72,10 +75,11 @@ const plants = [
     flowers: 'Showy',
     suitableLocations: 'Houseplant',
     containers: 'Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/'
+    link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/',
+    disease: '0'
   },
   {
-    id: 5,
+    id: 4,
     name: 'African Daisy',
     type: 'Gerbera',
     imageSrc: 'http://localhost:9000/images/plant5.avif',
@@ -90,10 +94,11 @@ const plants = [
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Division',
     containers: 'Suitable in 3 gallon or larger, Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/'
+    link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/',
+    disease: '6'
   },
   {
-    id: 6,
+    id: 5,
     name: 'Shasta Daisy',
     type: 'Leucanthemum × superbum',
     imageSrc: 'http://localhost:9000/images/plant6.avif',
@@ -106,10 +111,11 @@ const plants = [
     bloomSize: '2"-3"',
     flowerTime: 'Spring, Summer, Fall',
     suitableLocations: 'Xeriscapic',
-    link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/'
+    link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/',
+    disease: '5'
   },
   {
-    id: 7,
+    id: 6,
     name: 'Peace Lily',
     type: 'Herb',
     sun: 'Partial or Dappled Shade',
@@ -127,11 +133,12 @@ const plants = [
     
     water: 'Mesic',
     containers: 'Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/'
+    link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',
+    disease: '2'
     
   },
   {
-    id: 8,
+    id: 7,
     name: 'Southern Maidenhair Fern',
     type: 'Adiantum capillus-veneris',
     imageSrc: 'http://localhost:9000/images/plant8.avif',
@@ -144,7 +151,8 @@ const plants = [
     suitableLocations: 'Terrariums, Bog gardening',
     propMethods: 'Division',
     containers: 'Suitable for hanging baskets, Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/'
+    link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/',
+    disease: '3'
   },
 ];
 
