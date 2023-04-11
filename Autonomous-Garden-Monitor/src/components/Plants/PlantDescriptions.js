@@ -18,8 +18,10 @@ const plants = [
     otherMethods: 'Offsets',
     containers: 'Suitable in 1 gallon, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/',
-    disease: '0'
-    
+    disease: 'http://localhost:9000/scans/Plant_0',
+    diseaseProbability: '30',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
   {
     id: 1,
@@ -40,8 +42,9 @@ const plants = [
     otherMethods: 'Division, Stolons and runners',
     containers: 'Suitable in 1 gallon, Suitable in 3 gallon or larger',
     link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/',
-    disease: '4'
-    
+    scan: 'http://localhost:9000/scans/plant1',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
   {
     id: 2,
@@ -59,7 +62,9 @@ const plants = [
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Cuttings: Tip',
     link: 'https://garden.org/plants/view/181506/Roses-Rosa/',
-    disease: '3'
+    disease: '2', 
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
   {
     id: 3,
@@ -76,7 +81,9 @@ const plants = [
     suitableLocations: 'Houseplant',
     containers: 'Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/',
-    disease: '0'
+    disease: '0',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
   {
     id: 4,
@@ -95,7 +102,9 @@ const plants = [
     otherMethods: 'Division',
     containers: 'Suitable in 3 gallon or larger, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/',
-    disease: '6'
+    disease: '6',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
   {
     id: 5,
@@ -112,7 +121,9 @@ const plants = [
     flowerTime: 'Spring, Summer, Fall',
     suitableLocations: 'Xeriscapic',
     link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/',
-    disease: '5'
+    disease: '5',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
   {
     id: 6,
@@ -134,7 +145,9 @@ const plants = [
     water: 'Mesic',
     containers: 'Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',
-    disease: '2'
+    disease: '2',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
     
   },
   {
@@ -152,7 +165,9 @@ const plants = [
     propMethods: 'Division',
     containers: 'Suitable for hanging baskets, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/',
-    disease: '3'
+    disease: '4',
+    probability: '20',
+    timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
 ];
 
