@@ -1,0 +1,29 @@
+{
+    "Items": [
+        {
+            "time_stamp": {
+                "S": "Sat-15-Feb-202302:08:23+0000"
+            },
+            "probability": {
+                "N": "50"
+            },
+            "disease": {
+                "S": "Green Mite"
+            }
+        },
+        {
+            "time_stamp": {
+                "S": "Sat-08-Feb-202302:08:23+0000"
+            },
+            "probability": {
+                "N": "15"
+            },
+            "disease": {
+                "S": "Green Mite"
+            }
+        }
+    ],
+    "Count": 2,
+    "ScannedCount": 2,
+    "ConsumedCapacity": null
+}
