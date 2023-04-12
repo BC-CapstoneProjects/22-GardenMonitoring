@@ -1,29 +1,12 @@
-{
-    "Items": [
-        {
-            "time_stamp": {
-                "S": "Sat-25-Feb-202302:08:23+0000"
-            },
-            "probability": {
-                "N": "15"
-            },
-            "disease": {
-                "S": "mosaic"
-            }
-        },
-        {
-            "time_stamp": {
-                "S": "Sat-18-Feb-202302:08:23+0000"
-            },
-            "probability": {
-                "N": "30"
-            },
-            "disease": {
-                "S": "mosaic"
-            }
-        }
-    ],
-    "Count": 2,
-    "ScannedCount": 2,
-    "ConsumedCapacity": null
-}
+[
+  {
+    "time_stamp": "Sat-25-Feb-202302:08:23+0000",
+    "probability": 15,
+    "disease": "mosaic"
+  },
+  {
+    "time_stamp": "Sat-18-Feb-202302:08:23+0000",
+    "probability": 30,
+    "disease": "mosaic"
+  }
+]

@@ -1,30 +1,52 @@
 import express from "express";
 import { dynamoDbClient } from "../public/libs/dynamoDbClient.js";
-import { ScanCommand } from "@aws-sdk/client-dynamodb";
+import { ScanCommand, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
+import fs from "fs/promises"; 
 
 const router = express.Router();
 
-// get params from client for specific plant table on aws
 const getPlantData = async (plantId) => {
-  
-    const params = {
-      TableName: "Plant_" + plantId, //concat second param to string for dynamodb request
-    };
+  const params = {
+    TableName: "Plant_" + plantId,
+  };
 
-    console.log("Fetching plant data with params:", params);
-    console.log("Table name:", params.TableName);
-    try {
-        const data = await dynamoDbClient.send(new ScanCommand(params));
-        console.log("Fetched plant data:", data);
-        // format data for json
-        const formattedData = data.Items.map((item) => ({
-            time_stamp: item.time_stamp.S,
-            probability: Number(item.probability.N),
-            disease: item.disease.S,
-        }));
+  console.log("Fetching plant data with params:", params);
+  console.log("Table name:", params.TableName);
+
+  const describeParams = {
+    TableName: params.TableName,
+  };
+  const describeTableData = await dynamoDbClient.send(new DescribeTableCommand(describeParams));
+  console.log("Table description:", describeTableData);
+
+  try {
+    const data = await dynamoDbClient.send(new ScanCommand(params));
+    console.log("Fetched plant data:", data);
+
+    if (data.Items.length === 0) {
+      console.log("No data found in the table.");
+      return [];
+    }
+
+    console.log("Data.Items:", data.Items);
+
+    const formattedData = data.Items.map((item) => {
+      console.log("Item:", item);
+      return {
+        time_stamp: item.time_stamp.S,
+        probability: Number(item.probability.N),
+        disease: item.disease.S,
+      };
+    });
+    console.log("Formatted plant data:", formattedData);
+
+    // Saving formattedData to JSON file in /public/scans/
+    const filePath = `./public/scans/Plant_${plantId}.json`;
+    await fs.writeFile(filePath, JSON.stringify(formattedData, null, 2));
+    console.log(`Saved plant data to ${filePath}`);
+
     return formattedData;
-  } 
-  catch (error) {
+  } catch (error) {
     console.error("Error fetching plant data:", error);
     return { error: "Error fetching plant data", details: error.message, fullError: error };
   }
@@ -32,8 +54,9 @@ const getPlantData = async (plantId) => {
 
 router.get("/plant/:plantId", async (req, res) => {
   const plantId = req.params.plantId;
+  console.log("Received request for plant:", plantId); // Add this line
   const plantData = await getPlantData(plantId);
-  res.json(plantData); // response is json with Plant_ table data
+  res.json(plantData);
 });
 
 export const getScans = router;
