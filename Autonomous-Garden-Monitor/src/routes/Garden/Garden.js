@@ -34,7 +34,8 @@ function Garden() {
   console.log("ID", subjectID);
 
   useEffect(() => {
-    // could add more code here to be executed when the refreshKey state changes
+    // we could add more code here to be executed when the refreshKey state changes...
+    // i.e. the 'Brand' component is clicked
     if (refreshKey > 0) {
       window.location.reload();
     }
@@ -58,10 +59,10 @@ function Garden() {
     setDropdownVisible(!dropdownVisible);
   };
 
-  const onChangeHandler = () => {
-    console.log("test");
-    <Link to={`/`} />
-  };
+  // const onChangeHandler = () => {
+  //   console.log("test");
+  //   <Link to={`/`} />
+  // };
 
   const navigate = useNavigate();
   const onModalStateChange = () => {

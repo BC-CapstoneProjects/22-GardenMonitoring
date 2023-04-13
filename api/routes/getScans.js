@@ -38,6 +38,29 @@ const getPlantData = async (plantId) => {
         disease: item.disease.S,
       };
     });
+
+    // convert timestamp in formattedData to ISO format, 
+    // then Sort the returned ISO timestampin descending order
+    formattedData.sort((a, b) => {
+      const convertToComparable = (timestamp) => {
+        const datePart = timestamp.slice(4, 15);
+        const timePart = timestamp.slice(15, 24);
+        const timezonePart = timestamp.slice(24);
+        const [day, monthStr, year] = datePart.split('-');
+        const monthMap = {
+          'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+          'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
+        };
+        const month = monthMap[monthStr];
+        return `${year}${month}${day}${timePart}${timezonePart}`;
+      };
+    
+      const comparableA = convertToComparable(a.time_stamp);
+      const comparableB = convertToComparable(b.time_stamp);
+    
+      return comparableB.localeCompare(comparableA);
+    });
+    
     console.log("Formatted plant data:", formattedData);
 
     // Saving formattedData to JSON file in /public/scans/

@@ -18,7 +18,7 @@ const plants = [
     otherMethods: 'Offsets',
     containers: 'Suitable in 1 gallon, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/',
-    disease: 'http://localhost:9000/scans/Plant_0',
+    scan: 'http://localhost:9000/getPlantJson/plant/0',
     diseaseProbability: '30',
     probability: '20',
     timestamp: 'Sat-18-Feb-202302:08:23+0000'
@@ -42,7 +42,7 @@ const plants = [
     otherMethods: 'Division, Stolons and runners',
     containers: 'Suitable in 1 gallon, Suitable in 3 gallon or larger',
     link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/',
-    scan: 'http://localhost:9000/scans/plant1',
+    scan: 'http://localhost:9000/getPlantJson/plant/1',
     probability: '20',
     timestamp: 'Sat-18-Feb-202302:08:23+0000'
   },
