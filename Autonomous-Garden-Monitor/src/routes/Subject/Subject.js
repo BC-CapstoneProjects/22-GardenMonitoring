@@ -21,7 +21,7 @@ function Subject({ id, disease, state, name, imageSrc, imageAlt, type, sun,
       const params = {
         TableName: "Garden",
         Key: {
-          "Garden_Id": { N: id.toString() }
+          "PlantID": { S: id.toString() }
         }
       };
       
@@ -43,10 +43,12 @@ function Subject({ id, disease, state, name, imageSrc, imageAlt, type, sun,
       <header className="rounded">
         <p style={{textAlign: "center", color: "white", fontSize: "130%", width: "50%"}}>
           <span className="underline">Common plant-name:</span> {name + " \n\n" ?? "name not found "}
-          <span className="underline">Genus:</span> {type ?? <span style={{color: "red"}}>{'Information Not Available'}</span>}
+          <span className="underline">Genus:</span> 
+          { type ?? <span style={{color: "red"}}>{'Information Not Available'}</span> }
         </p>
         <p style={{width: "50%", textAlign: "center", color: "white", fontSize: "130%"}}>
           Diseased: {diseaseData?.diseased?.BOOL?.toString() || "Loading .."} <br/><br/>Label: {diseaseData?.label.S || "Loading .."}</p>
+          {diseaseData && treatmentPlan(diseaseData?.label?.S)}
       </header>
       <div className="modal-body rounded">
         <img src={imageSrc} alt={imageAlt} className="border-8 border-sky-500 hover:border-double rounded"/>
@@ -164,6 +166,24 @@ function Subject({ id, disease, state, name, imageSrc, imageAlt, type, sun,
         <div className="col-span-2"></div>
         </div>
   );
+}
+
+function treatmentPlan(diseaseLabel) {
+  switch (diseaseLabel) {
+    case "Mosaic Disease":
+      return <div><p>Remove Plant from garden</p></div>
+    case 'Bacterial Blight':
+      return <div>
+        <p>Pestidce: Copper fungicides are labeled for control of bacterial blight on soybeans but need to be applied early in the disease cycle to be effective.</p><br/>
+        <p>Orgainc: https://wenkegardencenter.com/home-remedies-plant-disease/</p>
+      </div>
+    case 'Green Mite':
+      return <div><p>https://www.almanac.com/pest/aphids</p></div>
+    case 'Unknown':
+      return <div><p>Not sure whats wrong with this plant</p></div>
+    default:
+      return <div><p>Plant is looking good!</p></div>
+  }
 }
 
 export default Subject;
