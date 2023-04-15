@@ -10,7 +10,7 @@ const dynamoDB = new AWS.DynamoDB({
   apiVersion: "2012-08-10",
 });
 
-function Subject({ id, disease, state, name, imageSrc, imageAlt, type, sun, 
+function Subject({ id, scan, state, name, imageSrc, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
   propMethods, otherMethods, containers, link }) {
     
