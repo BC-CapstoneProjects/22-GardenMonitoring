@@ -126,7 +126,7 @@ function Garden() {
           <button className="chart" onClick={toggleChart}>Toggle { selectedGarden } Chart</button>
             {chartVisible && <BarChart />}
         </div>
-          {PlantDescriptions.map(({ id, disease, state, name, imageSrc, imageAlt }) => (
+          {PlantDescriptions.map(({ id, state, name, imageSrc, imageAlt }) => (
             <Link
               key={id}
               to={`/view/${id}`}
