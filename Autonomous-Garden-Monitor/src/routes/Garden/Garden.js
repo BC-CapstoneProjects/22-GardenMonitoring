@@ -33,6 +33,27 @@ function Garden() {
   const { subjectID } = useParams();
   console.log("ID", subjectID);
 
+  // get most recent drone scan data from api for every id in PlantDescriptions
+  const [scans, setScans] = useState([]);
+
+  const fetchScans = async () => {
+    const scanResults = [];
+
+    for (const plant of PlantDescriptions) {
+      const response = await fetch(`http://localhost:9000/getScans/plant/${plant.id}`);
+      const data = await response.json();
+      scanResults.push(data);
+    }
+
+    return scanResults;
+  };
+
+  useEffect(() => {
+    fetchScans().then((scanResults) => {
+      setScans(scanResults);
+    });
+  }, []);
+
   useEffect(() => {
     // we could add more code here to be executed when the refreshKey state changes...
     // i.e. the 'Brand' component is clicked

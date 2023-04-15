@@ -1,7 +1,7 @@
 import sys
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ProfileNotFound
 import os, time, logging
 from time import gmtime, strftime
 from config.definitions import ROOT_DIR
@@ -295,6 +295,11 @@ def menu():
     print("2. Create a new garden")
     print("3. Sync garden data")
     print("4. Start garden monitoring\n\n enter 'q' to exit")
+
+    credentials = session.get_credentials()
+    credentials_source = credentials.method
+
+    print("Credentials are coming from:", credentials_source)
 
 
 # upload file to active S3 in 'garden'
