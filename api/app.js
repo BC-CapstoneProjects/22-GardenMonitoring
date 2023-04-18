@@ -25,7 +25,7 @@ import { getImage } from './routes/getImage.js';
 // import publicDir from "./public";
 import { getScans } from './routes/getScans.js';
 import { getPlantJson } from './routes/getPlantJson.js';
-
+import { getGardenNames } from './routes/getGardenNames.js';
 
 //define cronjobs
 import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
@@ -54,6 +54,7 @@ app.use('/testAPI', testAPI);
 app.use('/getImage', getImage);
 app.use("/getScans", getScans);
 app.use('/getPlantJson', getPlantJson);
+app.use('/getGardenNames', getGardenNames);
 
 // app.use(express.static('./public'));
 
