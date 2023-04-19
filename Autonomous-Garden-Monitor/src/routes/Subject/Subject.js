@@ -211,8 +211,8 @@ export default Subject;
 // const dynamoDB = new AWS.DynamoDB({
 //   apiVersion: "2012-08-10",
 //   region: "us-west-2",
-//   accessKeyId: "AKIAXCHIDAXBA4JRU2KJ",
-//   secretAccessKey: "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",
+//   accessKeyId: "",
+//   secretAccessKey: "",
 // });
 
 // function Subject({ id, scan, state, name, imageSrc, imageAlt, type, sun, 
