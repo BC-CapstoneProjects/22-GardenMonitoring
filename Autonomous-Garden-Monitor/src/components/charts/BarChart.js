@@ -17,7 +17,7 @@ const countDiseaseOccurrences = (diseaseLabels) => {
   return diseaseCount;
 };
 
-const BarChart = ({ data }) => {
+const BarChart = ({ data, selectedGarden }) => {
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const BarChart = ({ data }) => {
         labels: Object.keys(diseaseCount),
         datasets: [
           {
-            label: "Disease Occurrences",
+            label: `Disease Occurrences for ${selectedGarden}`,
             data: Object.values(diseaseCount).map(({ count }) => count),
             backgroundColor: "rgba(75, 192, 192, 0.6)",
             borderColor: "rgba(75, 192, 192, 1)",
@@ -40,7 +40,7 @@ const BarChart = ({ data }) => {
 
       setChartData(chartData);
     }
-  }, [data]);
+  }, [data, selectedGarden]);
 
   return (
     <div className="bar-chart">

@@ -18,17 +18,25 @@ import { useState, useEffect } from "react";
 
 
 function Garden() {
+  // State variable to check if the page is loading images from API
+  const [isLoading, setIsLoading] = useState(false);
+
+  // State variable to hold updated image URLs for the plant cards in the grid
+  const [imageUrls, setImageUrls] = useState([]);
+
   // state variable for show/hide dropdown in select garden button 
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   // state variable to track if a garden is selected from the dropdown
-  const [isGardenSelected, setIsGardenSelected] = useState(false);
+  // check for non null item in selectedGarden from local storage
+  const [isGardenSelected, setIsGardenSelected] = useState(localStorage.getItem('selectedGarden') !== null);
 
   // state variable to get list of garden names from api
   const [gardenFolders, setGardenFolders] = useState([]);
 
   // updates select garden button to selected garden from dropdown
-  const [selectedGarden, setSelectedGarden] = useState("Select Garden");
+  // check for last selected garden from localStorage 
+  const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
 
   // show/hide chart state variable
   const [chartVisible, setChartVisible] = useState(false);
@@ -68,6 +76,37 @@ function Garden() {
     }
   }, [refreshKey]);
 
+  useEffect(() => {
+    fetchGardenFolders();
+
+    // load images if a garden was already selected before page reloads
+    if (localStorage.getItem('selectedGarden')) {
+      handleGardenSelection(localStorage.getItem('selectedGarden'));
+    }
+  }, []);
+
+  useEffect(() => {
+    const circleAnimation = document.querySelector("#eye-animation");
+    if (selectedGarden !== "Select Garden") {
+      if (circleAnimation) {
+        circleAnimation.beginElement();
+      }
+    } else {
+      if (circleAnimation) {
+        circleAnimation.endElement();
+      }
+    }
+  }, [selectedGarden]);
+  
+  useEffect(() => {
+    if (selectedGarden !== "Select Garden") {
+      const circleAnimation = document.querySelector("#eye-animation");
+      if (circleAnimation) {
+        circleAnimation.beginElement();
+      }
+    }
+  }, []);
+  
   const refreshPage = () => {
      setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
      // ensures that we are working with the most up-to-date state value 
@@ -84,21 +123,34 @@ function Garden() {
     }
   };
 
-  useEffect(() => {
-    fetchGardenFolders();
-  }, []);
-
   const toggleChart = () => {
     setChartVisible(!chartVisible);
   };
 
   // handles garden selection from the dropdown menu
-  const handleGardenSelection = (gardenName) => {
+  const handleGardenSelection = async (gardenName) => {
     setSelectedGarden(gardenName); // set selected garden name
+    localStorage.setItem('selectedGarden', gardenName); // Save selected garden localStorage 
     setIsGardenSelected(true); // sets isGardenSelected state variable to true, can view barchart
     setDropdownVisible(false); // hide dropdown menu
-  };
+  
+    setIsLoading(true);
 
+    try {
+      // Call getImage route from the API using the selected 'gardenName'
+      const response = await fetch(`http://localhost:9000/getImage/${gardenName}`); // Add "http://" to the URL
+      const result = await response.json();
+      console.log("API Result:", result);
+  
+      // Update the imageUrls state with the complete URLs for each image
+      setImageUrls(result.filenames.map((filename) => `http://localhost:9000/images/${filename}`));
+      console.log("Updated imageUrls:", imageUrls);
+    } catch (error) {
+      console.log("Error fetching images:", error);
+    }
+    setIsLoading(false);
+  };
+  
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
@@ -119,18 +171,31 @@ function Garden() {
     return (subjectID === value.id.toString())
   });
 
+  const renderSvgCircle = () => (
+    <circle
+      cx="32"
+      cy="32"
+      r="5"
+      fill="currentColor"
+      className={selectedGarden !== "Select Garden" ? "eye-moving" : ""}
+    />
+  );
+  
+  
+  
+  
+
   return (
     <main id="garden-monitor">
 
       <header>
       
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-          <path fill="currentColor" d="M32,15C18,15,5,24,5,32s13,17,27,17s27-8,27-17S46,15,32,15z M32,45c-10,0-19-6-22-12
-            c3-6,11-12,22-12s19,6,22,12C51,39,42,45,32,45z"/>
-            <circle cx="32" cy="32" r="5" fill="currentColor">
-              <animate attributeName="cx" values="16;48;32" dur="1s" begin="0s" repeatCount="1" fill="freeze" />
-            </circle>
-        </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+        <path fill="currentColor" d="M32,15C18,15,5,24,5,32s13,17,27,17s27-8,27-17S46,15,32,15z M32,45c-10,0-19-6-22-12
+        c3-6,11-12,22-12s19,6,22,12C51,39,42,45,32,45z"/>
+        {renderSvgCircle(isLoading)}
+      </svg>
+
         <Brand alt="Autonomous Garden Monitoring" onClick={refreshPage}/>
         <Menu>
           <Link to="/settings">Settings</Link>
@@ -150,22 +215,26 @@ function Garden() {
         <div className="grid">
         <div className="chart-container">
           <button className="chart" onClick={toggleChart} disabled={!isGardenSelected}>Toggle Chart</button>
-            {chartVisible && <BarChart data={ scans } />}
+          {chartVisible && <BarChart data={ scans } selectedGarden={selectedGarden} />}
         </div>
-          {PlantDescriptions.map(({ id, state, name, imageSrc, imageAlt }) => (
-            <Link
-              key={id}
-              to={`/view/${id}`}
-              className="card group"
-              data-state={state}
-            >
-              <Card
-                title={name}
-                src={imageSrc}
-                alt={imageAlt}
-              />
-            </Link>
-          ))}
+        {PlantDescriptions.map(({ id, state, name, imageSrc, imageAlt }, index) => (
+          <Link
+            key={id}
+            to={`/view/${id}`}
+            className="card group"
+            data-state={state}
+          >
+            <Card
+              title={name}
+              src={imageUrls[index] || `http://localhost:9000/images/${imageSrc}`} // Use imageUrls if available, otherwise use the original imageSrc
+              alt={imageAlt}
+            />
+
+
+        
+          </Link>
+        ))}
+
         </div>
       </section>
       <input type="checkbox" id="my-modal-5" checked={!!subjectID} onChange={onModalStateChange} className="modal-toggle" />
