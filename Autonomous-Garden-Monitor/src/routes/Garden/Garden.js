@@ -18,6 +18,9 @@ import { useState, useEffect } from "react";
 
 
 function Garden() {
+  // State variable to handle the animation and trigger it when the images are loading.
+  const [animateEye, setAnimateEye] = useState(false);
+
   // State variable to check if the page is loading images from API
   const [isLoading, setIsLoading] = useState(false);
 
@@ -86,27 +89,15 @@ function Garden() {
   }, []);
 
   useEffect(() => {
-    const circleAnimation = document.querySelector("#eye-animation");
-    if (selectedGarden !== "Select Garden") {
-      if (circleAnimation) {
-        circleAnimation.beginElement();
-      }
-    } else {
-      if (circleAnimation) {
-        circleAnimation.endElement();
-      }
+  if (selectedGarden !== "Select Garden") {
+    const circle = document.querySelector("#garden-monitor circle animate");
+    if (circle) {
+      circle.beginElement();
     }
-  }, [selectedGarden]);
-  
-  useEffect(() => {
-    if (selectedGarden !== "Select Garden") {
-      const circleAnimation = document.querySelector("#eye-animation");
-      if (circleAnimation) {
-        circleAnimation.beginElement();
-      }
-    }
-  }, []);
-  
+  }
+}, [selectedGarden]);
+
+
   const refreshPage = () => {
      setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
      // ensures that we are working with the most up-to-date state value 
@@ -123,6 +114,8 @@ function Garden() {
     }
   };
 
+  
+
   const toggleChart = () => {
     setChartVisible(!chartVisible);
   };
@@ -135,6 +128,7 @@ function Garden() {
     setDropdownVisible(false); // hide dropdown menu
   
     setIsLoading(true);
+    setAnimateEye(true);
 
     try {
       // Call getImage route from the API using the selected 'gardenName'
@@ -149,6 +143,7 @@ function Garden() {
       console.log("Error fetching images:", error);
     }
     setIsLoading(false);
+    setAnimateEye(false);
   };
   
   const toggleDropdown = () => {
@@ -171,20 +166,35 @@ function Garden() {
     return (subjectID === value.id.toString())
   });
 
-  const renderSvgCircle = () => (
-    <circle
-      cx="32"
-      cy="32"
-      r="5"
-      fill="currentColor"
-      className={selectedGarden !== "Select Garden" ? "eye-moving" : ""}
-    />
-  );
+  const renderSvgCircle = () => {
+    if (animateEye) {
+      return (
+        <circle
+          cx="32"
+          cy="32"
+          r="5"
+          fill="currentColor"
+        >
+          <animate
+            attributeName="cx"
+            values="16;48;32;16"
+            dur="1s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      );
+    } else {
+      return (
+        <circle
+          cx="32"
+          cy="32"
+          r="5"
+          fill="currentColor"
+        />
+      );
+    }
+  };
   
-  
-  
-  
-
   return (
     <main id="garden-monitor">
 
