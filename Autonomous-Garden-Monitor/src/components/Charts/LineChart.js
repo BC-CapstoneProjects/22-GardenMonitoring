@@ -2,6 +2,7 @@
 import React from "react";
 import Chart from "chart.js/auto";
 import { Line } from "react-chartjs-2";
+import plants from '../Plants/PlantDescriptions';
 
 // Chart.defaults.color = () => {
 // 	debugger;
@@ -24,10 +25,13 @@ const LineChart = () => {
             }
           }]
         }     
-      }
+      };
+
+    const timestamps = plants.map((plant) => plant.timestamp);
+
     const data = {
         
-        labels: ['Drone Timestamp1', 'Drone Timestamp2', 'Drone Timestamp3', 'Drone Timestamp4', 'Drone Timestamp5', 'Drone Timestamp6'],
+        labels: [timestamps],
         datasets: [
             {
               label: 'Mosaic Disease',

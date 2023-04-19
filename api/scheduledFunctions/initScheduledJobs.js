@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 
 
 export const initScheduledJobs = () => {
-  const scheduledJobFunction = CronJob.schedule("*/120 * * * * *", async function() {
+  const scheduledJobFunction = CronJob.schedule("*/480 * * * * *", async function() {
     console.log("Downloading garden images");
     const response = await fetch('http://localhost:9000/getImage');
     const body = await response.json();
