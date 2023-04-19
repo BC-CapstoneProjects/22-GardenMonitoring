@@ -80,6 +80,8 @@ function Garden() {
   }, [refreshKey]);
 
   useEffect(() => {
+    // first we populate the /public/gardens folder (probably not a good idea to have the client change the API like this?)
+    fetchAndCreateGardenFolders();
     fetchGardenFolders();
 
     // load images if a garden was already selected before page reloads
@@ -107,14 +109,13 @@ function Garden() {
     try {
       const response = await fetch('http://localhost:9000/getGardenNames/folders');
       const folderNames = await response.json();
+      console.log('Fetched garden folders:', folderNames)
       setGardenFolders(folderNames);
     }
     catch (error) {
       console.error("Error fetching garden folders:", error);
     }
   };
-
-  
 
   const toggleChart = () => {
     setChartVisible(!chartVisible);
@@ -194,7 +195,17 @@ function Garden() {
       );
     }
   };
-  
+
+  // Call API to fetch S3 garden names (list all bucket names)
+  const fetchAndCreateGardenFolders = async () => {
+    try {
+      await fetch('http://localhost:9000/getGardenNames');
+    }
+    catch (error) {
+      console.error('Error fetching and creating garden folders:', error);
+    }
+  }
+
   return (
     <main id="garden-monitor">
 
