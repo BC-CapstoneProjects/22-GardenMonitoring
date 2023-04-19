@@ -212,7 +212,8 @@ function Garden() {
         </Menu>
       </header>
       <section className="content">
-        <button className="name" onClick={(e) => toggleDropdown(e)}>{ selectedGarden }</button>
+      <button className="name" onClick={(e) => toggleDropdown(e)}>{selectedGarden}</button>
+
           { dropdownVisible && (
             <ul className="dropdown">
             { gardenFolders.map((gardenName, index) => (
