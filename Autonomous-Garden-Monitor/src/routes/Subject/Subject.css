@@ -1,0 +1,55 @@
+#subject-page > header {
+
+    @apply col-start-1 col-span-2;
+    @apply flex flex-row;
+    @apply p-6;
+
+    @apply cursor-default;
+    @apply m-2;
+    @apply border-primary rounded;
+    @apply shadow-xl;
+    @apply bg-primary;
+}
+
+/* Style for the 'bad' class */
+#subject-page > p.bad {
+    @apply bg-error rounded;
+  }
+  
+  /* Style for the 'bad' treatment plan */
+  #subject-page div p.bad {
+    @apply bg-error rounded;
+    @apply text-white text-lg text-center font-bold;
+    @apply p-3;
+  }
+  
+  /* Style for the 'good' treatment plan */
+  #subject-page div p.good {
+    @apply bg-primary rounded;
+    @apply bg-secondary text-lg text-center font-bold;
+    @apply p-3;
+  }
+
+  #subject-page div a:hover {
+    color: green;
+    text-decoration: underline;
+  }
+
+#subject-page > section.table {
+    @apply text-center cursor-default;
+    @apply pt-16;
+}
+
+#subject-page > section.table > h2.name {
+
+    @apply bg-primary rounded;
+    @apply w-auto py-3 px-6;
+    @apply text-2xl font-semibold rounded;
+}
+
+#subject-page td {
+    /* @apply border-slate-600;
+    @apply p-3;
+    @apply text-primary text-lg text-center font-bold; */
+    white-space: normal;
+}

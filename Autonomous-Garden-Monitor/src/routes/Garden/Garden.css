@@ -1,0 +1,66 @@
+#garden-monitor > header {
+  @apply flex flex-row items-center justify-between;
+  @apply p-4;
+  @apply cursor-default;
+  @apply bg-gray-100;
+  @apply border;
+  @apply shadow;
+}
+
+#garden-monitor > section.content {
+  @apply text-center cursor-default;
+  @apply pt-16;
+  
+}
+
+#garden-monitor > section.content > button.name {
+  @apply inline-block;
+  @apply bg-primary rounded;
+  @apply hover:bg-gray-300;
+  @apply w-auto py-3 px-6;
+  @apply text-2xl font-semibold rounded;
+}
+
+#garden-monitor > section.content > .grid {
+  @apply bg-base-300;
+  @apply m-6 p-6;
+  @apply grid-cols-1 gap-6 sm:grid-cols-4;
+  @apply text-center rounded;
+  @apply cursor-default;
+  @apply shadow-xl;
+}
+
+#garden-monitor > section.content > .grid .chart-container {
+  grid-column: span 4; /* Adjust the span value to control how many columns the chart occupies */
+  width: 50%; /* Adjust the percentage to control the width of the chart */
+  height: 50%; /* Adjust the percentage to control the height of the chart */
+  margin: 0 auto; /* Center the chart horizontally */
+}
+
+#garden-monitor > section.content > .grid .chart-container button.chart {
+  @apply inline-block;
+  @apply bg-neutral-300 rounded;
+  @apply hover:bg-gray-400;
+  @apply w-auto py-3 px-6;
+  @apply text-xl font-semibold rounded;
+}
+
+#garden-monitor > section.content > .dropdown {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+#garden-monitor > section.content > .dropdown li {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+#garden-monitor > section.content > .dropdown li:hover {
+  background-color: #f5f5f5;
+}
