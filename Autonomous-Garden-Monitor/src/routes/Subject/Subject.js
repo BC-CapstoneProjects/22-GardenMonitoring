@@ -4,58 +4,62 @@ import AWS from "aws-sdk";
 
 import { useEffect, useState } from "react";
 
-AWS.config.update({ region: "us-west-2" }); // Set the region
+// Retrieve disease label from the json of a given plant's 'scan' url from PlantDescriptions
+async function fetchDiseaseLabel(scanUrl) {
+  try {
+    const response = await fetch(scanUrl);
+    const json = await response.json();
+    return json[0].disease; // Fetch only the first disease label (most recent)
+  }
+  catch (error) {
+    console.error("Error fetching disease label for Garden chart:", error)
+    return null;
+  }
+}
 
-const dynamoDB = new AWS.DynamoDB({
-  apiVersion: "2012-08-10",
-});
-
-function Subject({ id, scan, state, name, imageSrc, imageAlt, type, sun, 
+function Subject({ id, scan, name, imageSrc, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
   propMethods, otherMethods, containers, link }) {
     
   const [diseaseData, setDiseaseData] = useState(null);
 
   useEffect(() => {
-    if (id !== undefined) {
-      const params = {
-        TableName: "Garden",
-        Key: {
-          "PlantID": { S: id.toString() }
-        }
-      };
-      
-      console.log("Getting Disease Record:", params);
-      dynamoDB.getItem(params, function(err, data) {
-        if (err) console.error("Error:", err, err.stack);
-        else {
-          console.info("Found Disease Record:", data);
-          setDiseaseData(data.Item);
-        }
+    // Fetch the disease label only for the given 'scan' prop
+    fetchDiseaseLabel(scan).then(diseaseLabel => {
+      setDiseaseData({
+        diseased: diseaseLabel !== 'Healthy',
+        label: diseaseLabel,
       });
-    }
-  }, [id]);
+    });
+  }, [id, scan]);
 
   console.log("Disease Data: ", id, diseaseData);
 
   return (
     <div id="subject-page" data-key="subject" className="grid grid-cols-2">
-      <header className="rounded">
-        <p style={{textAlign: "center", color: "white", fontSize: "130%", width: "50%"}}>
-          <span className="underline">Common plant-name:</span> {name + " \n\n" ?? "name not found "}
-          <span className="underline">Genus:</span> 
-          { type ?? <span style={{color: "red"}}>{'Information Not Available'}</span> }
-        </p>
+    <header className="rounded">
+      <p style={{textAlign: "center", color: "white", fontSize: "130%", width: "50%"}}>
+        <span className="underline">Common plant-name:</span> {name + " \n\n" ?? "name not found "}
+        <span className="underline">Genus:</span> 
+        { type ?? <span style={{color: "red"}}>{'Information Not Available'}</span> }
+      </p>
+      <p style={{textAlign: "center", color: "white", fontSize: "130%", width: "50%"}}>
+      </p>
+      {diseaseData ? (
         <p style={{width: "50%", textAlign: "center", color: "white", fontSize: "130%"}}>
-          Diseased: {diseaseData?.diseased?.BOOL?.toString() || "Loading .."} <br/><br/>Label: {diseaseData?.label.S || "Loading .."}</p>
-          {diseaseData && treatmentPlan(diseaseData?.label?.S)}
-      </header>
+          Diseased: {diseaseData.diseased.toString()} <br/><br/>Label: {diseaseData.label}
+        </p>
+      ) : (
+        <p style={{width: "50%", textAlign: "center", color: "white", fontSize: "130%"}}>
+          Loading ...
+        </p>
+      )}
+      {diseaseData && treatmentPlan(diseaseData.label)}
+    </header>
       <div className="modal-body rounded">
         <img src={imageSrc} alt={imageAlt} className="border-8 border-sky-500 hover:border-double rounded"/>
         <p className="border-primary rounded">
-
           <LineChart />
-
         </p>
       </div>
       <div >
@@ -171,18 +175,20 @@ function Subject({ id, scan, state, name, imageSrc, imageAlt, type, sun,
 function treatmentPlan(diseaseLabel) {
   switch (diseaseLabel) {
     case "Mosaic Disease":
-      return <div><p>Remove Plant from garden</p></div>
+      return <div><p id="bad" className="bad">Remove Plant from garden</p></div>
     case 'Bacterial Blight':
       return <div>
-        <p>Pestidce: Copper fungicides are labeled for control of bacterial blight on soybeans but need to be applied early in the disease cycle to be effective.</p><br/>
-        <p>Orgainc: https://wenkegardencenter.com/home-remedies-plant-disease/</p>
+        <p id="bad" className="bad">Pesticide: Copper fungicides</p><br/>
+        <p id="bad" className="bad">Organic: <a href="https://wenkegardencenter.com/home-remedies-plant-disease/">https://wenkegardencenter.com/home-remedies-plant-disease/</a></p>
       </div>
     case 'Green Mite':
-      return <div><p>https://www.almanac.com/pest/aphids</p></div>
+      return <div><p id="bad" className="bad"><a href="https://www.thespruce.com/control-aphids-on-houseplants-1902889">https://www.thespruce.com/control-aphids-on-houseplants-1902889</a></p></div>
+    case 'Brown Streak Disease':
+      return <div><p id="bad" className="bad">Cut off affected leaves and let your plant's soil dry out</p></div>
     case 'Unknown':
-      return <div><p>Not sure whats wrong with this plant</p></div>
+      return <div><p id="bad" className="bad">Not sure whats wrong with this plant</p></div>
     default:
-      return <div><p>Plant is looking good!</p></div>
+      return <div><p id="good" className="good">Plant is looking good!</p></div>
   }
 }
 
