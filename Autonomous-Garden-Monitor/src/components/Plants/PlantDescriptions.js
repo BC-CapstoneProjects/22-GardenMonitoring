@@ -146,4 +146,48 @@ const plants = [
   },
 ];
 
+// This function takes the plant object as an argument and
+// returns a Promise that resolves with the updated imageSrc.
+async function updateImageSrc(plant) {
+  // List of supported image extensions.
+  const extensions = ['.jpg', '.jpeg', '.png', '.avif'];
+
+  // Iterate over each extension.
+  for (const ext of extensions) {
+    // Replace the current extension in imageSrc with the new extension.
+    const newImageSrc = plant.imageSrc.replace(/\.\w+$/, ext);
+
+    try {
+      // Fetch the image with the updated URL.
+      const response = await fetch(newImageSrc);
+
+      // If the response is ok (status 200), update the imageSrc in the plant object.
+      if (response.ok) {
+        plant.imageSrc = newImageSrc;
+        break;
+      }
+    } catch (error) {
+      // If there's an error fetching the image, log the error and continue with the next extension.
+      console.error(`Error fetching image with extension ${ext}:`, error);
+    }
+  }
+
+  // Return the plant object with the updated imageSrc.
+  return plant;
+}
+
+// This function updates the imageSrc for all plant objects in the plants array.
+async function updateAllImageSrcs(plants) {
+  // Use Promise.all to wait for all plants' imageSrc to be updated.
+  const updatedPlants = await Promise.all(plants.map(updateImageSrc));
+
+  // Return the updated plants array.
+  return updatedPlants;
+}
+
+// Update the imageSrc for all plants and reassign the updated array to the plants variable.
+updateAllImageSrcs(plants).then((updatedPlants) => {
+  plants = updatedPlants;
+});
+
 export default plants;

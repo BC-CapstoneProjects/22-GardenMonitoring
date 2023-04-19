@@ -64,3 +64,19 @@
 #garden-monitor > section.content > .dropdown li:hover {
   background-color: #f5f5f5;
 }
+
+@keyframes eye-move {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(32px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.eye-moving {
+  animation: eye-move 1s linear infinite;
+}
