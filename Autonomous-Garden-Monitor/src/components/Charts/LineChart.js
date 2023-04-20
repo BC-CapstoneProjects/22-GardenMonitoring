@@ -16,16 +16,16 @@ import plants from '../Plants/PlantDescriptions';
 // healthy='Healthy',
 // unknown='Unknown'
 const LineChart = () => {
-    const options = {
-        scales: {
-          yAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: '%'
-            }
-          }]
-        }     
-      };
+  const options = {
+    scales: {
+      y: {
+        scaleLabel: {
+          display: true,
+          labelString: '%'
+        }
+      }
+    }     
+  };  
 
     const timestamps = plants.map((plant) => plant.timestamp);
 
