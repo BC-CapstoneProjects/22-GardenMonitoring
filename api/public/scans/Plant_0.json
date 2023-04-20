@@ -1,0 +1,22 @@
+[
+  {
+    "time_stamp": "Sun-26-Feb-202302:08:23+0000",
+    "probability": 15,
+    "disease": "Green Mite"
+  },
+  {
+    "time_stamp": "Sat-25-Feb-202302:08:23+0000",
+    "probability": 15,
+    "disease": "Mosaic Disease"
+  },
+  {
+    "time_stamp": "Sat-18-Feb-202302:08:23+0000",
+    "probability": 30,
+    "disease": "Mosaic Disease"
+  },
+  {
+    "time_stamp": "Sat-11-Feb-202302:08:23+0000",
+    "probability": 10,
+    "disease": "Green Mite"
+  }
+]

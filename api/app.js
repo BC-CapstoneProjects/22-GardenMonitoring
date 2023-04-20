@@ -23,6 +23,9 @@ import { testAPI } from './routes/testAPI.js';
 import { getImage } from './routes/getImage.js';
 // var publicDir = require('path').join(__dirname,'/public');
 // import publicDir from "./public";
+import { getScans } from './routes/getScans.js';
+import { getPlantJson } from './routes/getPlantJson.js';
+import { getGardenNames } from './routes/getGardenNames.js';
 
 //define cronjobs
 import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
@@ -30,7 +33,7 @@ import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
 var app = express();
 
 // Call scheduled job functions
-initScheduledJobs();
+//initScheduledJobs();
 
 // view engine setup
 app.set('views', './views');
@@ -49,6 +52,9 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/testAPI', testAPI);
 app.use('/getImage', getImage);
+app.use("/getScans", getScans);
+app.use('/getPlantJson', getPlantJson);
+app.use('/getGardenNames', getGardenNames);
 
 // app.use(express.static('./public'));
 

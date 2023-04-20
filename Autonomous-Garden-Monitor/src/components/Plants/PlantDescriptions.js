@@ -18,8 +18,7 @@ const plants = [
     otherMethods: 'Offsets',
     containers: 'Suitable in 1 gallon, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/',
-    disease: '0'
-    
+    scan: 'http://localhost:9000/getPlantJson/plant/0',
   },
   {
     id: 1,
@@ -29,19 +28,14 @@ const plants = [
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
     state: "success",
     sun: 'Full Sun to Partial Shade',
-   
-   
-    leaves: 'Unusual foliage color, Fragrant',
-    
+    leaves: 'Unusual foliage color, Fragrant', 
     flowers: 'Showy, Fragrant',
-    
     suitableLocations: 'Bog gardening',
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Division, Stolons and runners',
     containers: 'Suitable in 1 gallon, Suitable in 3 gallon or larger',
     link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/',
-    disease: '4'
-    
+    scan: 'http://localhost:9000/getPlantJson/plant/1',
   },
   {
     id: 2,
@@ -52,14 +46,13 @@ const plants = [
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
     state: "success",
     sun: 'Full Sun',
-    
     soil: 'Moderately acid (5.6 – 6.0) Slightly acid (6.1 – 6.5) Neutral (6.6 – 7.3) Slightly alkaline (7.4 – 7.8)',
     leaves: 'Deciduous',
     flowers: 'Showy',
     propMethods: 'Cuttings: Stem',
     otherMethods: 'Cuttings: Tip',
     link: 'https://garden.org/plants/view/181506/Roses-Rosa/',
-    disease: '3'
+    scan: 'http://localhost:9000/getPlantJson/plant/2',
   },
   {
     id: 3,
@@ -76,7 +69,7 @@ const plants = [
     suitableLocations: 'Houseplant',
     containers: 'Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/',
-    disease: '0'
+    scan: 'http://localhost:9000/getPlantJson/plant/3',
   },
   {
     id: 4,
@@ -95,7 +88,7 @@ const plants = [
     otherMethods: 'Division',
     containers: 'Suitable in 3 gallon or larger, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/',
-    disease: '6'
+    scan: 'http://localhost:9000/getPlantJson/plant/4',
   },
   {
     id: 5,
@@ -112,7 +105,7 @@ const plants = [
     flowerTime: 'Spring, Summer, Fall',
     suitableLocations: 'Xeriscapic',
     link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/',
-    disease: '5'
+    scan: 'http://localhost:9000/getPlantJson/plant/5',
   },
   {
     id: 6,
@@ -126,16 +119,13 @@ const plants = [
     flowerColor: 'White, Other: Creamy white spathe, pale yellow spadix.',
     suitableLocations: 'Houseplant',
     propMethods: 'Division',
-    
     imageSrc: 'http://localhost:9000/images/plant7.avif',
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
     state: "error",
-    
     water: 'Mesic',
     containers: 'Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',
-    disease: '2'
-    
+    scan: 'http://localhost:9000/getPlantJson/plant/6',    
   },
   {
     id: 7,
@@ -152,8 +142,52 @@ const plants = [
     propMethods: 'Division',
     containers: 'Suitable for hanging baskets, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/',
-    disease: '3'
+    scan: 'http://localhost:9000/getPlantJson/plant/7',
   },
 ];
+
+// This function takes the plant object as an argument and
+// returns a Promise that resolves with the updated imageSrc.
+async function updateImageSrc(plant) {
+  // List of supported image extensions.
+  const extensions = ['.jpg', '.jpeg', '.png', '.avif'];
+
+  // Iterate over each extension.
+  for (const ext of extensions) {
+    // Replace the current extension in imageSrc with the new extension.
+    const newImageSrc = plant.imageSrc.replace(/\.\w+$/, ext);
+
+    try {
+      // Fetch the image with the updated URL.
+      const response = await fetch(newImageSrc);
+
+      // If the response is ok (status 200), update the imageSrc in the plant object.
+      if (response.ok) {
+        plant.imageSrc = newImageSrc;
+        break;
+      }
+    } catch (error) {
+      // If there's an error fetching the image, log the error and continue with the next extension.
+      console.error(`Error fetching image with extension ${ext}:`, error);
+    }
+  }
+
+  // Return the plant object with the updated imageSrc.
+  return plant;
+}
+
+// This function updates the imageSrc for all plant objects in the plants array.
+async function updateAllImageSrcs(plants) {
+  // Use Promise.all to wait for all plants' imageSrc to be updated.
+  const updatedPlants = await Promise.all(plants.map(updateImageSrc));
+
+  // Return the updated plants array.
+  return updatedPlants;
+}
+
+// Update the imageSrc for all plants and reassign the updated array to the plants variable.
+updateAllImageSrcs(plants).then((updatedPlants) => {
+  plants = updatedPlants;
+});
 
 export default plants;
