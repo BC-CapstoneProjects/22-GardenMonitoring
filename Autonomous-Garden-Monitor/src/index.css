@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   margin: 0;
   font-family:
@@ -11,7 +10,8 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans',
     'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  color: white;
+  color: #333;
+  background-color: #f5f5f5; /* Add a light background color here. */
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
