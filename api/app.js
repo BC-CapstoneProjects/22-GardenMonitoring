@@ -33,7 +33,7 @@ import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
 var app = express();
 
 // Call scheduled job functions
-initScheduledJobs();
+//initScheduledJobs();
 
 // view engine setup
 app.set('views', './views');
