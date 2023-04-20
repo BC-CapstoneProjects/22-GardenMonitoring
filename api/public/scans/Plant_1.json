@@ -1,0 +1,12 @@
+[
+  {
+    "time_stamp": "Sat-15-Feb-202302:08:23+0000",
+    "probability": 50,
+    "disease": "Green Mite"
+  },
+  {
+    "time_stamp": "Sat-08-Feb-202302:08:23+0000",
+    "probability": 15,
+    "disease": "Green Mite"
+  }
+]

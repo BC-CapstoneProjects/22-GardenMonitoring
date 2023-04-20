@@ -4,6 +4,7 @@ nav[data-menu] {
   @apply text-right;
 }
 nav[data-menu] a {
+  @apply btn btn-ghost normal-case text-xl;
   @apply inline-block;
   @apply bg-primary rounded;
   @apply py-3 px-6;
