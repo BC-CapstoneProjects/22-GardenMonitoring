@@ -11,6 +11,25 @@
     @apply bg-primary;
 }
 
+/* Style for the 'bad' class */
+#subject-page > p.bad {
+    @apply bg-error rounded;
+  }
+  
+  /* Style for the 'bad' treatment plan */
+  #subject-page div p.bad {
+    @apply bg-error rounded;
+    @apply text-white text-lg text-center font-bold;
+    @apply p-3;
+  }
+  
+  /* Style for the 'good' treatment plan */
+  #subject-page div p.good {
+    @apply bg-primary rounded;
+    @apply bg-secondary text-lg text-center font-bold;
+    @apply p-3;
+  }
+
 #subject-page > section.table {
     @apply text-center cursor-default;
     @apply pt-16;
