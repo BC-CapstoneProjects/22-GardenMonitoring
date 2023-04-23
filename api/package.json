@@ -1,0 +1,28 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.310.0",
+    "@aws-sdk/client-s3": "^3.257.0",
+    "@aws-sdk/lib-dynamodb": "^3.310.0",
+    "aws-sdk": "^2.1361.0",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "fetch": "^1.1.0",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "node-cron": "^3.0.2",
+    "node-fetch": "^3.3.0"
+  },
+  "type": "module",
+  "bin": {
+    "www": ".\\bin\\www.mjs"
+  }
+}
