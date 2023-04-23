@@ -1,9 +1,10 @@
 import "./Brand.css";
 
-function Brand({ children }) {
+function Brand({ alt, children, onClick }) {
+
   return (
-    <div className="brand">
-      <h1>{children}</h1>
+    <div className="brand" onClick={onClick}>
+      {children ?? <h1>{alt}</h1>}
     </div>
   );
 }

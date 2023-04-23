@@ -5,9 +5,9 @@ module.exports = {
   ],
 
   daisyui: {
-    themes: [
+    themes: ["garden",
       {
-        mytheme: {
+        autogarden: {
           "primary": "#39ddef",
           "secondary": "#ffa89b",
           "accent": "#d483e2",
