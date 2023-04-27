@@ -1,7 +1,6 @@
 import { Component } from "react";
 import { Link } from "react-router-dom";
-import Switch from "react-switch"
-import "./notifications.css";
+// import "./notifications.css";
 
 class Notifications extends Component {
   render() {
@@ -68,7 +67,6 @@ class Notifications extends Component {
                       <button className="button">Off</button>
                     </div> */}
                     <div class="col">
-                      <Switch></Switch>
                     </div>
                   </div>
 

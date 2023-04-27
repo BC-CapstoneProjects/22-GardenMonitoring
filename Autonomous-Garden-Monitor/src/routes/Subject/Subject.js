@@ -1,5 +1,6 @@
 import "./Subject.css";
 import LineChart from "../../components/Charts/LineChart";
+import Typography from '@mui/material/Typography';
 import AWS from "aws-sdk";
 
 import { useEffect, useState } from "react";
@@ -37,33 +38,40 @@ function Subject({ id, scan, name, imageSrc, imageAlt, type, sun,
 
   return (
     <div id="subject-page" data-key="subject" className="grid grid-cols-2">
-    <header className="rounded">
-      <p style={{textAlign: "center", color: "white", fontSize: "130%", width: "50%"}}>
-        <span className="underline">Common plant-name:</span> {name + " \n\n" ?? "name not found "}
-        <span className="underline">Genus:</span> 
-        { type ?? <span style={{color: "red"}}>{'Information Not Available'}</span> }
-      </p>
-      <p style={{textAlign: "center", color: "white", fontSize: "130%", width: "50%"}}>
-      </p>
-      {diseaseData ? (
-        <p style={{width: "50%", textAlign: "center", color: "white", fontSize: "130%"}}>
-          Diseased: {diseaseData.diseased.toString()} <br/><br/>Label: {diseaseData.label}
-        </p>
-      ) : (
-        <p style={{width: "50%", textAlign: "center", color: "white", fontSize: "130%"}}>
-          Loading ...
-        </p>
-      )}
-      {diseaseData && treatmentPlan(diseaseData.label)}
-    </header>
+    <header className="modal-header rounded">
+  <div style={{ textAlign: "center", color: "black", fontSize: "120%", width: "50%"}}>
+    <Typography variant="h5" component="span" className="underline" sx={{ fontWeight: "bold" }}>Plant Name: </Typography> 
+    <Typography variant="h5" component="span" >{name ?? "name not found "}</Typography>
+    <br />
+    <Typography variant="h5" component="span" className="underline" sx={{ fontWeight: "bold" }} >Genus: </Typography>
+    <Typography variant="h5" component="span" >
+      {type ?? <span style={{ color: "red" }}>{'Information Not Available'}</span>}
+    </Typography>
+    <br />
+    {diseaseData && treatmentPlan(diseaseData.label)}
+  </div>
+  <div style={{ textAlign: "center", color: "black", fontSize: "120%", width: "50%" }}></div>
+  {diseaseData ? (
+    <div style={{ width: "50%", textAlign: "center", color: "black", fontSize: "120%" }}>
+      <Typography variant="h5" component="span" sx={{ fontWeight: "bold" }}>
+        Diseased: </Typography> {diseaseData.diseased.toString()}  <br /> <Typography variant="h5" sx={{ fontWeight: "bold" }}>Label: </Typography>{diseaseData.label}
+      
+    </div>
+  ) : (
+    <div style={{ width: "50%", textAlign: "center", color: "black", fontSize: "120%" }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold" }}>Loading ...</Typography>
+    </div>
+  )}
+</header>
+
       <div className="modal-body rounded">
-        <img src={imageSrc} alt={imageAlt} className="border-8 border-sky-500 hover:border-double rounded"/>
+        <img src={imageSrc} alt={imageAlt} className="subject-image border-8 border-sky-500 hover:border-double rounded"/>
         <p className="border-primary rounded">
           <LineChart />
         </p>
       </div>
       <div >
-      <h2 className="w-1/2 py-1/2 px-1/2 text-center text-2xl font-semibold rounded bg-primary rounded">
+      <h2 className="w-1/2 py-1/2 px-1/2 text-center text-2xl font-semibold bg-primary rounded">
         Tips and Tricks
       </h2>
       <section className="table table-fixed">

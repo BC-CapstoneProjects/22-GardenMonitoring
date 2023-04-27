@@ -5,192 +5,43 @@ import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
 import Subject from "../../routes/Subject/Subject";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import ProgressCircle from "../../components/ProgressCircle";
-import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
 
 const Garden = () => {
-
-  // State variable to handle the animation and trigger it when the images are loading.
-  const [animateEye, setAnimateEye] = useState(false);
-  // State variable to check if the page is loading images from API
-  const [isLoading, setIsLoading] = useState(false);
-  // State variable to hold updated image URLs for the plant cards in the grid
-  const [imageUrls, setImageUrls] = useState([]);
-  // state variable to track if a garden is selected from the dropdown
-  // check for non null item in selectedGarden from local storage
-  const [isGardenSelected, setIsGardenSelected] = useState(localStorage.getItem('selectedGarden') !== null);
-  // state variable to get list of garden names from api
-  const [gardenFolders, setGardenFolders] = useState([]);
-  // updates select garden button to selected garden from dropdown
-  // check for last selected garden from localStorage 
-  const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
-  // show/hide chart state variable
-  const [chartVisible, setChartVisible] = useState(false);
-  // refreshKey state variable
-  const [refreshKey, setRefreshKey] = useState(0);
-  // state variable for show/hide dropdown in select garden button
-  const [dropdownVisible, setDropdownVisible] = useState(false); 
-  // const { subjectID } = useParams();
-  // get most recent drone scan data from api for every id in PlantDescriptions
-  const [scans, setScans] = useState([]);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [dropdownVisible, setDropdownVisible] = useState(false); // state variable for show/hide dropdown in select garden button
+  const [selectedGarden, setSelectedGarden] = useState("Select Garden"); // updates select garden button to selected garden from dropdown
+  const [chartVisible, setChartVisible] = useState(false); // show/hide chart state variable
+  const [refreshKey, setRefreshKey] = useState(0); // refreshKey state variable
+  const [subjectID, setSubjectID] = useState(null);
 
 
-  useEffect(() => {
-    fetchScans().then((scanResults) => {
-      setScans(scanResults);
-    });
-  }, []);
+  
+  // Add state variables for modal visibility and selected plant information
+  const [modalOpen, setModalOpen] = useState(false); 
+  const [selectedPlant, setSelectedPlant] = useState(null);
 
-  useEffect(() => {
-    // we could add more code here to be executed when the refreshKey state changes...
-    // i.e. the 'Brand' component is clicked
-    if (refreshKey > 0) {
-      window.location.reload();
-    }
-  }, [refreshKey]);
-
-  useEffect(() => {
-    // first we populate the /public/gardens folder (probably not a good idea to have the client change the API like this?)
-    fetchAndCreateGardenFolders();
-    fetchGardenFolders();
-
-    // load images if a garden was already selected before page reloads
-    if (localStorage.getItem('selectedGarden')) {
-      handleGardenSelection(localStorage.getItem('selectedGarden'));
-    }
-  }, []);
-
-  useEffect(() => {
-  if (selectedGarden !== "Select Garden") {
-    const circle = document.querySelector("#garden-monitor circle animate");
-    if (circle) {
-      circle.beginElement();
-    }
-  }
-}, [selectedGarden]);
-
-  const refreshPage = () => {
-     setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
-     // ensures that we are working with the most up-to-date state value 
-  };
-
-  const fetchGardenFolders = async () => {
-    try {
-      const response = await fetch('http://localhost:9000/getGardenNames/folders');
-      const folderNames = await response.json();
-      console.log('Fetched garden folders:', folderNames)
-      setGardenFolders(folderNames);
-    }
-    catch (error) {
-      console.error("Error fetching garden folders:", error);
-    }
-  };
+  //min
+  const [showTitleButton, setShowTitleButton] = useState(true);
+  
 
   const toggleChart = () => {
     setChartVisible(!chartVisible);
   };
-
-  
-  //API
-  const fetchScans = async () => {
-    const scanResults = [];
-
-    for (const plant of PlantDescriptions) {
-      const response = await fetch(`http://localhost:9000/getScans/plant/${plant.id}`);
-      const data = await response.json();
-      scanResults.push(data);
-    }
-
-    return scanResults;
+  const handleGardenSelection = (gardenName) => {
+    setSelectedGarden(gardenName);
+    setDropdownVisible(false);
+    setShowTitleButton(false);
   };
-
-  const handleGardenSelection = async (gardenName) => {
-    setSelectedGarden(gardenName); // set selected garden name
-    localStorage.setItem('selectedGarden', gardenName); // Save selected garden localStorage 
-    setIsGardenSelected(true); // sets isGardenSelected state variable to true, can view barchart
-    setDropdownVisible(false); // hide dropdown menu
-    setShowGardenButton(false);
-    setIsLoading(true);
-    setAnimateEye(true);
-
-    try {
-      // Call getImage route from the API using the selected 'gardenName'
-      const response = await fetch(`http://localhost:9000/getImage/${gardenName}`); // Add "http://" to the URL
-      const result = await response.json();
-      console.log("API Result:", result);
-  
-      // Update the imageUrls state with the complete URLs for each image
-      setImageUrls(result.filenames.map((filename) => `http://localhost:9000/images/${filename}`));
-      console.log("Updated imageUrls:", imageUrls);
-    } catch (error) {
-      console.log("Error fetching images:", error);
-    }
-    setIsLoading(false);
-    setAnimateEye(false);
-  };
-
-  // Call API to fetch S3 garden names (list all bucket names)
-  const fetchAndCreateGardenFolders = async () => {
-    try {
-      await fetch('http://localhost:9000/getGardenNames');
-    }
-    catch (error) {
-      console.error('Error fetching and creating garden folders:', error);
-    }
-  }
-
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
 
-  const renderSvgCircle = () => {
-    if (animateEye) {
-      return (
-        <circle
-          cx="32"
-          cy="32"
-          r="5"
-          fill="currentColor"
-        >
-          <animate
-            attributeName="cx"
-            values="16;48;32;16"
-            dur="1s"
-            repeatCount="indefinite"
-          />
-        </circle>
-      );
-    } else {
-      return (
-        <circle
-          cx="32"
-          cy="32"
-          r="5"
-          fill="currentColor"
-        />
-      );
-    }
-  };
-
-
-  //Min
-  const [subjectID, setSubjectID] = useState(null);
-  const [showGardenButton, setShowGardenButton] = useState(true);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const navigate = useNavigate();
-
-  // Add state variables for modal visibility and selected plant information
-  const [modalOpen, setModalOpen] = useState(false); 
-  const [selectedPlant, setSelectedPlant] = useState(null);
   
+  console.log("PlantDescriptions:", PlantDescriptions);
+
+
   // Add a function to handle plant clicks
   const handlePlantClick = (plant) => {
     setSelectedPlant(plant);
@@ -198,13 +49,10 @@ const Garden = () => {
     setSubjectID(plant.id);
   };
 
-  // Navigate to Sign
-  const redirectToSign = () => {
-    navigate("/");
-  }
+  console.log("subjectID:", subjectID);
 
 
-  const GardenButton = () => {
+  const TitleButton = () => {
     return (
       <>
         <Button
@@ -268,13 +116,35 @@ const Garden = () => {
       </>
     );
   };
+
+  /*
+  useEffect(() => { // could add more code here to be executed when the refreshKey state changes  
+    if (refreshKey > 0) {
+      window.location.reload();
+    }
+  }, [refreshKey]);
+
+  const refreshPage = () => {
+    setRefreshKey((prevKey) => prevKey + 1); // increments the previous value of refreshKey state before updating
+    // ensures that we are working with the most up-to-date state value
+  };
+
+  const navigate = useNavigate();
+  const onModalStateChange = () => {
+    console.log("test");
+    navigate("/garden");
+  };
+  */
   
+
+  
+
   return (
     <Box m="15px" paddingBottom="150px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" paddingLeft="50px">
-        <Box sx={{ flexGrow: 1, marginRight: "20px"}}><Header title={<Box marginRight="40px"><GardenButton /></Box>}  subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" ></Header></Box>
-        </Box> 
+        <Box sx={{ flexGrow: 1, marginRight: "20px" }}><Header title={<Box marginRight="40px"><TitleButton /></Box>}  subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" /></Box>
+    
         {/* <Box>
           <Button
             sx={{
@@ -290,6 +160,7 @@ const Garden = () => {
           </Button>
         </Box>
         */}
+
     {/* <Box
       display="flex"
       justifyContent="flex-end"
@@ -298,8 +169,10 @@ const Garden = () => {
       m={2}
       className="chart-container"
     > */}
-    {/* </Box> */}
       
+    {/* </Box> */}
+      </Box> 
+
       <Box   
       sx={{
         width: '85%', // Reduce the width of each container to 80%
@@ -349,6 +222,7 @@ const Garden = () => {
         </Box>
       </Box>
       }
+      
 
       {/* GRID & CHARTS */}
       <Box>
@@ -361,10 +235,7 @@ const Garden = () => {
         
         {/* Box Test */}
 {PlantDescriptions.map(
-  ({ id, name, type,  imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-    propMethods, otherMethods, containers, link, scan }, index) => (
-
-    
+  ({ id, disease, state, name, imageSrc, imageAlt }) => (
     <Box
       gridColumn="span 3"
       display="flex"
@@ -397,8 +268,7 @@ const Garden = () => {
           borderTopRightRadius: '5px', // Add borderRadius here
         }}
         onClick={() =>
-          handlePlantClick({ id, name, type,  imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-            propMethods, otherMethods, containers, link, scan }, index)
+          handlePlantClick({ id, disease, state, name, imageSrc, imageAlt })
         }
       />
       <Box
@@ -430,8 +300,7 @@ const Garden = () => {
           state={state}
           increase={new Date().toLocaleDateString('en-US')}
           onClick={() =>
-            handlePlantClick({ id, name, type,  imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-              propMethods, otherMethods, containers, link, scan }, index)
+            handlePlantClick({ id, disease, state, name, imageSrc, imageAlt })
           }
         />
       </Box>
@@ -449,18 +318,26 @@ const Garden = () => {
           {selectedPlant && (
             <>
               <DialogTitle id="plant-dialog-title">
-                {selectedPlant.name} Status
+                {selectedPlant.name}
               </DialogTitle>
+              <DialogContent
+                sx={{
+                  width: "100%",
+                  maxWidth: "800px",
+                }}
+              >
                 {/* Pass the subject data as props to the Subject component */}
-                <DialogContent>
-                <Subject {...selectedPlant} />
-                </DialogContent>
+                <Subject id={subjectID} />
+              </DialogContent>
               <DialogActions>
                 <Button onClick={() => setModalOpen(false)}>Close</Button>
               </DialogActions>
             </>
           )}
         </Dialog>
+
+
+
       </Box>
     </Box>
   );

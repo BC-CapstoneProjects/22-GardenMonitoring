@@ -1,3 +1,102 @@
+/* Sign.css */
+.Auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.Auth-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.Auth-form-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.link-primary {
+  cursor: pointer;
+  color: #007bff;
+}
+
+.link-primary:hover {
+  color: #0056b3;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.text-blue-500 {
+  color: #4299e1;
+}
+
+.hover\:text-blue-700:hover {
+  color: #2b6cb0;
+}
+
+.focus\:outline-none:focus {
+  outline: 0;
+}
+
+.d-grid gap-2 mt-3 {
+  display: flex;
+  justify-content: center;
+}
+
+/* 
 .App {
     background-color: white;
   }
@@ -38,10 +137,6 @@
     color: rgb(34, 34, 34);
   }
   
-  
-  
-  
-  
   .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -75,4 +170,4 @@
     to {
       transform: rotate(360deg);
     }
-  }
+  } */
