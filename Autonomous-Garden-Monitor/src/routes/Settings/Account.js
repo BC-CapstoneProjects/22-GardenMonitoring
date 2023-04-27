@@ -1,7 +1,5 @@
 import { Component } from "react";
 import { Link } from "react-router-dom";
-import Switch from "react-switch"
-import "./account.css";
 
 class  Account extends Component {
   render() {

@@ -48,3 +48,10 @@
     @apply text-primary text-lg text-center font-bold; */
     white-space: normal;
 }
+
+
+.subject-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}

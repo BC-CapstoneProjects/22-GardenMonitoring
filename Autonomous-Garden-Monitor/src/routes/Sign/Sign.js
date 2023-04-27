@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import "./Sign.css";
-
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { Box, Button, IconButton, Typography, useTheme, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Garden } from "../../routes/Garden"
+ 
 function Signin(props) {
   let [authMode, setAuthMode] = useState("signin");
-
+  const theme = useTheme();
+  const navigate = useNavigate();
+  
   function handleForgotPasswordClick() {
     // Add your logic here for handling the "Forgot password?" click event.
     console.log("Forgot password clicked");
@@ -15,6 +18,13 @@ function Signin(props) {
     setAuthMode(authMode === "signin" ? "signup" : "signin");
   };
 
+
+  function Submit() {
+    // Add your logic here for handling the "Submit" click event.
+    navigate("/garden");
+  }
+
+  
   if (authMode === "signin") {
     return (
       <div className="Auth-form-container">
@@ -27,7 +37,7 @@ function Signin(props) {
                 Sign Up
               </span>
             </div>
-
+            <br/>
             <div className="form-group mt-3">
               <label>Email address</label>
               <input
@@ -44,20 +54,34 @@ function Signin(props) {
                 placeholder="Enter password"
               />
             </div>
-            <div className="d-grid gap-2 mt-3">
-              <Link to="/garden" className="btn btn-primary">
-                Submit
-              </Link>
+            <div style={{display: 'flex', justifyContent: 'center'}} >            
+          <Button 
+          sx={{
+            
+            fontWeight: "bold",
+            borderStyle: "groove",
+            borderWidth: "2px",
+            borderColor: "colors.grey[300]"//"#4caf50",
+          }}
+          onClick={Submit}
+        >
+          <Typography 
+            sx={{
+            fontSize: "15px",
+            fontWeight: "bold",
+            color: theme.palette.primary.main,}}
+          >
+              Submit
+          </Typography>
+        </Button>
+        </div>
+            <br/>
+            <div className="text-center">
+            Forgot{" "}
+              <span className="link-primary" onClick={handleForgotPasswordClick}>
+              password?
+              </span>
             </div>
-            <p className="text-center mt-2">
-              Forgot{" "}
-              <button
-                className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                onClick={handleForgotPasswordClick}
-              >
-                password?
-              </button>
-            </p>
           </div>
         </form>
       </div>
@@ -69,12 +93,6 @@ function Signin(props) {
       <form className="Auth-form">
         <div className="Auth-form-content">
           <h3 className="Auth-form-title">Sign Up</h3>
-          <div className="text-center">
-            Already registered?{" "}
-            <span className="link-primary" onClick={changeAuthMode}>
-              Sign In
-            </span>
-          </div>
           <div className="form-group mt-3">
             <label>First Name</label>
             <input
@@ -152,20 +170,34 @@ function Signin(props) {
             </select>
           </div>
           */}
-          <div className="d-grid gap-2 mt-3">
-            <Link to="/garden" className="btn btn-primary">
+          <div style={{display: 'flex', justifyContent: 'center'}} >            
+          <Button 
+          sx={{
+            
+            fontWeight: "bold",
+            borderStyle: "groove",
+            borderWidth: "2px",
+            borderColor: "colors.grey[300]"//"#4caf50",
+          }}
+          onClick={changeAuthMode}
+        >
+          <Typography 
+            sx={{
+            fontSize: "15px",
+            fontWeight: "bold",
+            color: theme.palette.primary.main,}}
+          >
               Submit
-            </Link>
+          </Typography>
+        </Button>
+        </div>
+        <br/>
+          <div className="text-center">
+            Already registered?{" "}
+            <span className="link-primary" onClick={changeAuthMode}>
+              Sign In
+            </span>
           </div>
-          <p className="text-center mt-2">
-            Forgot{" "}
-            <button
-              className="text-blue-500 hover:text-blue-700 focus:outline-none"
-              onClick={handleForgotPasswordClick}
-            >
-              password?
-            </button>
-          </p>
         </div>
       </form>
     </div>
