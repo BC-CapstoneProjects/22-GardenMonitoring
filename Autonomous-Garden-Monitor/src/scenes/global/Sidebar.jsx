@@ -192,7 +192,7 @@ const Sidebar = () => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="/bar"
+              to="/bar"  //import Bar from "./scenes/bar";
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

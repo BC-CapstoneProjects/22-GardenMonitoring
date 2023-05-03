@@ -1,4 +1,3 @@
-import React from "react";
 import Garden from "./routes/Garden/Garden";
 import Settings from "./routes/Settings";
 import Account from "./routes/Settings/Account";
@@ -7,7 +6,7 @@ import Sign from './routes/Sign'
 import "./index.css";
 
 //min
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
@@ -35,6 +34,18 @@ function App() {
   const location = useLocation();
   const isSignPage = location.pathname === "/";
 
+  // Add useState hook for selectedGarden
+  const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
+  // Add useEffect hook to update localStorage when selectedGarden changes
+  useEffect(() => {
+    localStorage.setItem('selectedGarden', selectedGarden);
+  }, [selectedGarden]);
+
+  // get most recent drone scan data from api for every id in PlantDescriptions
+  const [scans, setScans] = useState([]);
+
+  
+
   // const handleSignOut = async () => {
   //   try {
   //     await Auth.signOut();
@@ -44,31 +55,39 @@ function App() {
   // };
 
   return (
-      <ColorModeContext.Provider value={colorMode}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div className="app">
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="app">
           {!isSignPage && <Sidebar isSidebar={isSidebar} />}
           <main className="content">
             {!isSignPage && <Topbar setIsSidebar={setIsSidebar} />}
-              <Routes>
-                <Route path="/" element={<Sign />} />
-                <Route path="/form" element={<Form />} />
-                <Route path="/bar" element={<Bar />} />
-                <Route path="/pie" element={<Pie />} />
-                <Route path="/line" element={<Line />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/geography" element={<Geography />} />
-                <Route path="/garden" element={<Garden />} />
-                <Route path="/view/:subjectID" element={<Garden />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/notifications" element={<Notifications />} />
-              </Routes>
-            </main>
-          </div>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
+            <Routes>
+              <Route
+                path="/garden"
+                element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+              />
+              <Route
+                path="/view/:subjectID"
+                element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+              />
+              <Route path="/" element={<Sign />} />
+              <Route path="/form" element={<Form />} />
+              <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
+              <Route path="/pie" element={<Pie />} />
+              <Route path="/line" element={<Line />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/geography" element={<Geography />} />
+              {/* <Route path="/garden" element={<Garden />} />
+              <Route path="/view/:subjectID" element={<Garden />} /> */}
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/notifications" element={<Notifications />} />
+            </Routes>
+          </main>
+        </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 
