@@ -14,8 +14,12 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ProgressCircle from "../../components/ProgressCircle";
 import LineChart from "../../components/LineChart";
 import GeographyChart from "../../components/GeographyChart";
+import Card from '@mui/material/Card';
+import CardMedia from '@mui/material/CardMedia';
+import SidebarBarChart from "../../scenes/bar/index";
 
-const Garden = () => {
+
+const Garden = ( { setScans, setSelectedGarden } ) => {
 
   // State variable to handle the animation and trigger it when the images are loading.
   const [animateEye, setAnimateEye] = useState(false);
@@ -29,17 +33,28 @@ const Garden = () => {
   // state variable to get list of garden names from api
   const [gardenFolders, setGardenFolders] = useState([]);
   // updates select garden button to selected garden from dropdown
-  // check for last selected garden from localStorage 
-  const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
   // show/hide chart state variable
   const [chartVisible, setChartVisible] = useState(false);
   // refreshKey state variable
   const [refreshKey, setRefreshKey] = useState(0);
   // state variable for show/hide dropdown in select garden button
-  const [dropdownVisible, setDropdownVisible] = useState(false); 
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   // const { subjectID } = useParams();
-  // get most recent drone scan data from api for every id in PlantDescriptions
-  const [scans, setScans] = useState([]);
+  // // check for last selected garden from localStorage 
+  // const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
+  // // get most recent drone scan data from api for every id in PlantDescriptions
+  // const [scans, setScans] = useState([]);
+  
+
+
+  //Min
+  const [subjectID, setSubjectID] = useState(null);
+  const [showGardenButton, setShowGardenButton] = useState(true);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
+  const [barData, setBarData] = useState(null);
+  
 
 
   useEffect(() => {
@@ -68,17 +83,17 @@ const Garden = () => {
   }, []);
 
   useEffect(() => {
-  if (selectedGarden !== "Select Garden") {
-    const circle = document.querySelector("#garden-monitor circle animate");
-    if (circle) {
-      circle.beginElement();
+    if (selectedGarden !== "Select Garden") {
+      const circle = document.querySelector("#garden-monitor circle animate");
+      if (circle) {
+        circle.beginElement();
+      }
     }
-  }
-}, [selectedGarden]);
+  }, [selectedGarden]);
 
   const refreshPage = () => {
-     setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
-     // ensures that we are working with the most up-to-date state value 
+    setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
+    // ensures that we are working with the most up-to-date state value 
   };
 
   const fetchGardenFolders = async () => {
@@ -97,7 +112,7 @@ const Garden = () => {
     setChartVisible(!chartVisible);
   };
 
-  
+
   //API
   const fetchScans = async () => {
     const scanResults = [];
@@ -108,6 +123,7 @@ const Garden = () => {
       scanResults.push(data);
     }
 
+    console.log('scan:', scanResults);
     return scanResults;
   };
 
@@ -120,12 +136,20 @@ const Garden = () => {
     setIsLoading(true);
     setAnimateEye(true);
 
+    setScans={scans}
+    setSelectedGarden={selectedGarden}
+
+
     try {
       // Call getImage route from the API using the selected 'gardenName'
       const response = await fetch(`http://localhost:9000/getImage/${gardenName}`); // Add "http://" to the URL
       const result = await response.json();
       console.log("API Result:", result);
-  
+
+      const barData2 = { data: scans, selectedGarden: selectedGarden }; // create barData object here
+      setBarData(barData2);
+      
+
       // Update the imageUrls state with the complete URLs for each image
       setImageUrls(result.filenames.map((filename) => `http://localhost:9000/images/${filename}`));
       console.log("Updated imageUrls:", imageUrls);
@@ -180,17 +204,12 @@ const Garden = () => {
   };
 
 
-  //Min
-  const [subjectID, setSubjectID] = useState(null);
-  const [showGardenButton, setShowGardenButton] = useState(true);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const navigate = useNavigate();
-
-  // Add state variables for modal visibility and selected plant information
-  const [modalOpen, setModalOpen] = useState(false); 
-  const [selectedPlant, setSelectedPlant] = useState(null);
   
+  //Min
+  // Add state variables for modal visibility and selected plant information
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPlant, setSelectedPlant] = useState(null);
+
   // Add a function to handle plant clicks
   const handlePlantClick = (plant) => {
     setSelectedPlant(plant);
@@ -218,6 +237,15 @@ const Garden = () => {
           {selectedGarden}
         </Button>
         {dropdownVisible && (
+          <ul className="dropdown">
+            {gardenFolders.map((gardenName, index) => (
+              <li key={index} onClick={() => handleGardenSelection(gardenName)}>
+                {gardenName}
+              </li>
+            ))}
+          </ul>
+        )}
+        {/* {dropdownVisible && (
           <Box
             display="flex"
             flexDirection="column"
@@ -264,18 +292,18 @@ const Garden = () => {
               </Button>
             )}
           </Box>
-        )}
+        )} */}
       </>
     );
   };
-  
+
   return (
     <Box m="15px" paddingBottom="150px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" paddingLeft="50px">
-        <Box sx={{ flexGrow: 1, marginRight: "20px"}}><Header title={<Box marginRight="40px"><GardenButton /></Box>}  subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" ></Header></Box>
-        </Box> 
-        {/* <Box>
+        <Box sx={{ flexGrow: 1, marginRight: "20px" }}><Header title={<Box marginRight="40px"><GardenButton /></Box>} subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" ></Header></Box>
+      </Box>
+      {/* <Box>
           <Button
             sx={{
               backgroundColor: colors.blueAccent[700],
@@ -290,7 +318,7 @@ const Garden = () => {
           </Button>
         </Box>
         */}
-    {/* <Box
+      {/* <Box
       display="flex"
       justifyContent="flex-end"
       alignItems="center"
@@ -298,147 +326,173 @@ const Garden = () => {
       m={2}
       className="chart-container"
     > */}
-    {/* </Box> */}
-      
-      <Box   
-      sx={{
-        width: '85%', // Reduce the width of each container to 80%
-        marginLeft: 'auto', // Add marginLeft only to the first box
-        marginRight: 'auto',        
-      }}>
-      <Box display="flex" justifyContent="flex-end" marginBottom="20px" >
-      
-      {selectedGarden !== "Select Garden" && (
-        <Button 
-          sx={{
-            fontWeight: "bold",
-            borderStyle: "groove",
-            borderWidth: "3px",
-            borderColor: "colors.grey[300]"//"#4caf50",
-          }}
-          onClick={toggleChart}
-        >
-          <Typography 
-            sx={{
-            fontSize: "15px",
-            fontWeight: "bold",
-            color: theme.palette.primary.main,}}
-          >
-            Weekly Report
-          </Typography>
-        </Button>
-      )}
-      </Box>
-      
-      {chartVisible && 
+      {/* </Box> */}
+
       <Box
-      gridColumn="span 4"
-      gridRow="span 2"
-      backgroundColor={colors.primary[400]}
-      >
-        <Typography
+        sx={{
+          width: '85%', // Reduce the width of each container to 80%
+          marginLeft: 'auto', // Add marginLeft only to the first box
+          marginRight: 'auto',
+        }}>
+        <Box display="flex" justifyContent="flex-end" marginBottom="20px" >
+          {selectedGarden !== "Select Garden" && (
+            <Button
+              sx={{
+                fontWeight: "bold",
+                borderStyle: "groove",
+                borderWidth: "3px",
+                borderColor: "colors.grey[300]"//"#4caf50",
+              }}
+              onClick={toggleChart}
+            >
+              <Typography
+                sx={{
+                  fontSize: "15px",
+                  fontWeight: "bold",
+                  color: theme.palette.primary.main,
+                }}
+              >
+                Weekly Report
+              </Typography>
+            </Button>
+          )}
+        </Box>
+
+        {chartVisible &&
+          <Box
+            gridColumn="span 4"
+            gridRow="span 2"
+            backgroundColor={colors.primary[400]}
+          >
+            <Typography
               variant="h5"
               fontWeight="600"
               sx={{ padding: "30px 30px 0 30px" }}
             >
               {selectedGarden !== "Select Garden" && (`${selectedGarden} Bar Chart`)}
               {/* {selectedGarden} Weekly Report */}
-        </Typography>
-        <Box height="250px" mt="-20px">
-              <BarChart isDashboard={true} />
+            </Typography>
+            <Box height="250px" mt="-20px">
+              <BarChart isDashboard={true} data={scans} selectedGarden={selectedGarden} />
+            </Box>
+          </Box>
+        }
+
+        {/* GRID & CHARTS */}
+        <Box>
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(12, 1fr)"
+            gridAutoRows="auto"
+            gap="40px"
+          >
+
+            {/* Box Test */}
+            {PlantDescriptions.map(
+              ({ id, name, type, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
+                propMethods, otherMethods, containers, link, scan }, index) => (
+
+
+                <Box
+                  gridColumn="span 3"
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{
+                    width: '100%', // Reduce the width of each container to 80%
+                    marginLeft: 'auto', // Add marginLeft and marginRight to create space between the containers
+                    marginRight: 'auto',
+                  }}
+                >
+                  <Card
+                    sx={{
+                      width: '100%',
+                      border: 2,
+                      borderColor:
+                        state === 'success'
+                          ? '#4caf50'
+                          : state === 'warning'
+                            ? '#ffc107'
+                            : '#f44336',
+                      borderBottom: 0,
+                      borderTopLeftRadius: '5px', // Add borderRadius here
+                      borderTopRightRadius: '5px', // Add borderRadius here
+                    }}
+                    onClick={() =>
+                      handlePlantClick(
+                        {
+                          id,
+                          name,
+                          type,
+                          imageSrc,
+                          imageAlt,
+                          state,
+                          soil,
+                          minColdHard,
+                          leaves,
+                          sun,
+                          flowers,
+                          flowerColor,
+                          bloomSize,
+                          suitableLocations,
+                          propMethods,
+                          otherMethods,
+                          containers,
+                          link,
+                          scan,
+                        },
+                        index
+                      )
+                    }
+                  >
+                    <CardMedia
+                      component="img"
+                      height="180px"
+                      image={imageUrls[index] || `http://localhost:9000/images/${imageSrc}`} // Use imageUrls if available, otherwise use the original imageSrc
+                      alt={imageAlt}
+                    />
+                  </Card>
+                  <Box
+                    backgroundColor={colors.primary[400]}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    border={3}
+                    borderColor={
+                      state === 'success'
+                        ? '#4caf50'
+                        : state === 'warning'
+                          ? '#ffc107'
+                          : '#f44336'
+                    }
+                    sx={{
+                      position: 'relative',
+                      width: '100%', // Set the width of each StatBox container
+                      height: '90px', // Set the height of each StatBox container
+                      borderBottomLeftRadius: '5px', // Add borderRadius here
+                      borderBottomRightRadius: '5px', // Add borderRadius here
+                    }}
+                  >
+                    <StatBox
+                      className="card group"
+                      data-state={state}
+                      title={name}
+                      subtitle={state}
+                      state={state}
+                      increase={new Date().toLocaleDateString('en-US')}
+                      onClick={() =>
+                        handlePlantClick({
+                          id, name, type, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
+                          propMethods, otherMethods, containers, link, scan
+                        }, index)
+                      }
+                    />
+                  </Box>
+                </Box>
+              ))}
+          </Box>
         </Box>
-      </Box>
-      }
-
-      {/* GRID & CHARTS */}
-      <Box>
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="auto"
-        gap="40px"
-      >
-        
-        {/* Box Test */}
-{PlantDescriptions.map(
-  ({ id, name, type,  imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-    propMethods, otherMethods, containers, link, scan }, index) => (
-
-    
-    <Box
-      gridColumn="span 3"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      sx={{
-        width: '100%', // Reduce the width of each container to 80%
-        marginLeft: 'auto', // Add marginLeft and marginRight to create space between the containers
-        marginRight: 'auto',        
-      }}
-    >
-      <Box
-      border={2}
-      borderColor={
-        state === 'success'
-          ? '#4caf50'
-          : state === 'warning'
-          ? '#ffc107'
-          : '#f44336'
-      }
-        sx={{
-          width: '100%',
-          height: '180px', // Set the height for the image container
-          backgroundImage: `url(${imageSrc})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          borderBottom: 0,
-          borderTopLeftRadius: '5px', // Add borderRadius here
-          borderTopRightRadius: '5px', // Add borderRadius here
-        }}
-        onClick={() =>
-          handlePlantClick({ id, name, type,  imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-            propMethods, otherMethods, containers, link, scan }, index)
-        }
-      />
-      <Box
-        backgroundColor={colors.primary[400]}
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        border={3}
-        borderColor={
-          state === 'success'
-            ? '#4caf50'
-            : state === 'warning'
-            ? '#ffc107'
-            : '#f44336'
-        }
-        sx={{
-          position: 'relative',
-          width: '100%', // Set the width of each StatBox container
-          height: '90px', // Set the height of each StatBox container
-          borderBottomLeftRadius: '5px', // Add borderRadius here
-          borderBottomRightRadius: '5px', // Add borderRadius here
-        }}
-      >
-        <StatBox
-          className="card group"
-          data-state={state}
-          title={name}
-          subtitle={state}
-          state={state}
-          increase={new Date().toLocaleDateString('en-US')}
-          onClick={() =>
-            handlePlantClick({ id, name, type,  imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-              propMethods, otherMethods, containers, link, scan }, index)
-          }
-        />
-      </Box>
-    </Box>
-))}
-</Box>
-</Box>
         <Dialog
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -451,10 +505,10 @@ const Garden = () => {
               <DialogTitle id="plant-dialog-title">
                 {selectedPlant.name} Status
               </DialogTitle>
-                {/* Pass the subject data as props to the Subject component */}
-                <DialogContent>
+              {/* Pass the subject data as props to the Subject component */}
+              <DialogContent>
                 <Subject {...selectedPlant} />
-                </DialogContent>
+              </DialogContent>
               <DialogActions>
                 <Button onClick={() => setModalOpen(false)}>Close</Button>
               </DialogActions>
