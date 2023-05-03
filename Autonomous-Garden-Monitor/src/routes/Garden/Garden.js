@@ -19,7 +19,7 @@ import CardMedia from '@mui/material/CardMedia';
 import SidebarBarChart from "../../scenes/bar/index";
 
 
-const Garden = ( { setScans, setSelectedGarden } ) => {
+const Garden = ({ setScans, setSelectedGarden }) => {
 
   // State variable to handle the animation and trigger it when the images are loading.
   const [animateEye, setAnimateEye] = useState(false);
@@ -39,12 +39,17 @@ const Garden = ( { setScans, setSelectedGarden } ) => {
   const [refreshKey, setRefreshKey] = useState(0);
   // state variable for show/hide dropdown in select garden button
   const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  // Add useState hooks for scans and selectedGarden
+  const [scans, setLocalScans] = useState([]);
+  const [selectedGarden, setLocalSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
+
   // const { subjectID } = useParams();
   // // check for last selected garden from localStorage 
   // const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
   // // get most recent drone scan data from api for every id in PlantDescriptions
   // const [scans, setScans] = useState([]);
-  
+
 
 
   //Min
@@ -54,11 +59,12 @@ const Garden = ( { setScans, setSelectedGarden } ) => {
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const [barData, setBarData] = useState(null);
-  
+
 
 
   useEffect(() => {
     fetchScans().then((scanResults) => {
+      setLocalScans(scanResults);
       setScans(scanResults);
     });
   }, []);
@@ -136,8 +142,9 @@ const Garden = ( { setScans, setSelectedGarden } ) => {
     setIsLoading(true);
     setAnimateEye(true);
 
-    setScans={scans}
-    setSelectedGarden={selectedGarden}
+    // Update the selectedGarden state in Garden.js and the parent state in App.js
+    setLocalSelectedGarden(gardenName);
+    setSelectedGarden(gardenName);
 
 
     try {
@@ -148,7 +155,7 @@ const Garden = ( { setScans, setSelectedGarden } ) => {
 
       const barData2 = { data: scans, selectedGarden: selectedGarden }; // create barData object here
       setBarData(barData2);
-      
+
 
       // Update the imageUrls state with the complete URLs for each image
       setImageUrls(result.filenames.map((filename) => `http://localhost:9000/images/${filename}`));
@@ -204,7 +211,7 @@ const Garden = ( { setScans, setSelectedGarden } ) => {
   };
 
 
-  
+
   //Min
   // Add state variables for modal visibility and selected plant information
   const [modalOpen, setModalOpen] = useState(false);
