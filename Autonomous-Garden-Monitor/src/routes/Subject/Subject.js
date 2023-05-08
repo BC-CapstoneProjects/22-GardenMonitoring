@@ -5,7 +5,7 @@ import AWS from "aws-sdk";
 
 import { useEffect, useState } from "react";
 
-// Retrieve disease label from the json of a given plant's 'scan' url from PlantDescriptions
+// Retrieve disease label from the json of a given plant's 'scan' url from PlantDescriptions 
 async function fetchDiseaseLabel(scanUrl) {
   try {
     const response = await fetch(scanUrl);
@@ -43,7 +43,7 @@ function Subject({ id, scan, name, imageSrc, imageAlt, type, sun,
     <div id="subject-page" data-key="subject" className="grid grid-cols-2">
     <header className="modal-header rounded">
   <div style={{ textAlign: "center", color: "black", fontSize: "120%", width: "50%"}}>
-    <Typography variant="h5" component="span" className="underline" sx={{ fontWeight: "bold" }}>Plant Name: </Typography> 
+    <Typography variant="h5" component="span" className="underline" sx={{ fontWeight: "bold" }}>Plant Name: </Typography>
     <Typography variant="h5" component="span" >{name ?? "name not found "}</Typography>
     <br />
     <Typography variant="h5" component="span" className="underline" sx={{ fontWeight: "bold" }} >Genus: </Typography>

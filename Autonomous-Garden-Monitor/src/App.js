@@ -25,7 +25,7 @@ import Calendar from "./scenes/calendar/calendar";
 //import { withAuthenticator } from '@aws-amplify/ui-react';
 //import awsExports from './aws-exports';
 //import { Amplify }  from 'aws-amplify';
-//import { Auth } from 'aws-amplify';
+//import { Auth } from 'aws-amplify';  
 
 
 function App() {
