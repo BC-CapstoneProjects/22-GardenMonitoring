@@ -40,6 +40,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   // state variable for show/hide dropdown in select garden button
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
+
   // Add useState hooks for scans and selectedGarden
   const [scans, setLocalScans] = useState([]);
   const [selectedGarden, setLocalSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
@@ -53,12 +54,11 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
 
   //Min
-  const [subjectID, setSubjectID] = useState(null);
-  const [showGardenButton, setShowGardenButton] = useState(true);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const [barData, setBarData] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState();
 
 
 
@@ -138,9 +138,9 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     localStorage.setItem('selectedGarden', gardenName); // Save selected garden localStorage 
     setIsGardenSelected(true); // sets isGardenSelected state variable to true, can view barchart
     setDropdownVisible(false); // hide dropdown menu
-    setShowGardenButton(false);
-    setIsLoading(true);
-    setAnimateEye(true);
+    // setShowGardenButton(false);
+    // setIsLoading(true);
+    // setAnimateEye(true);
 
     // Update the selectedGarden state in Garden.js and the parent state in App.js
     setLocalSelectedGarden(gardenName);
@@ -218,10 +218,13 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [selectedPlant, setSelectedPlant] = useState(null);
 
   // Add a function to handle plant clicks
-  const handlePlantClick = (plant) => {
+  const handlePlantClick = (plant,index) => {
     setSelectedPlant(plant);
     setModalOpen(true);
-    setSubjectID(plant.id);
+    //setSubjectID(plant.id);
+    setSelectedIndex(index);
+
+    console.log("plantIndex",selectedIndex)
   };
 
   // Navigate to Sign
@@ -252,54 +255,6 @@ const Garden = ({ setScans, setSelectedGarden }) => {
             ))}
           </ul>
         )}
-        {/* {dropdownVisible && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            position="absolute"
-            zIndex="10"
-            bgcolor={theme.palette.background.paper}
-          >
-            {selectedGarden !== "Garden 1 🌱" && (
-              <Button
-                sx={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  padding: "15px 30px",
-                }}
-                onClick={() => handleGardenSelection("Garden 1 🌱")}
-              >
-                Garden 1
-              </Button>
-            )}
-            {selectedGarden !== "Garden 2 🌱" && (
-              <Button
-                sx={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  padding: "15px 30px",
-                }}
-                onClick={() => handleGardenSelection("Garden 2 🌱")}
-              >
-                Garden 2
-              </Button>
-            )}
-            {selectedGarden !== "Garden 3 🌱" && (
-              <Button
-                sx={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  padding: "15px 30px",
-                }}
-                onClick={() => handleGardenSelection("Garden 3 🌱")}
-              >
-                Garden 3
-              </Button>
-            )}
-          </Box>
-        )} */}
       </>
     );
   };
@@ -427,30 +382,10 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                       borderTopRightRadius: '5px', // Add borderRadius here
                     }}
                     onClick={() =>
-                      handlePlantClick(
-                        {
-                          id,
-                          name,
-                          type,
-                          imageSrc,
-                          imageAlt,
-                          state,
-                          soil,
-                          minColdHard,
-                          leaves,
-                          sun,
-                          flowers,
-                          flowerColor,
-                          bloomSize,
-                          suitableLocations,
-                          propMethods,
-                          otherMethods,
-                          containers,
-                          link,
-                          scan,
-                        },
-                        index
-                      )
+                      handlePlantClick({
+                        id, name, type, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
+                        propMethods, otherMethods, containers, link, scan, imageUrls
+                      }, index)
                     }
                   >
                     <CardMedia
@@ -491,7 +426,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                       onClick={() =>
                         handlePlantClick({
                           id, name, type, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-                          propMethods, otherMethods, containers, link, scan
+                          propMethods, otherMethods, containers, link, scan, imageUrls
                         }, index)
                       }
                     />
@@ -514,7 +449,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
               </DialogTitle>
               {/* Pass the subject data as props to the Subject component */}
               <DialogContent>
-                <Subject {...selectedPlant} />
+                <Subject {...selectedPlant} index={selectedIndex} />
               </DialogContent>
               <DialogActions>
                 <Button onClick={() => setModalOpen(false)}>Close</Button>
