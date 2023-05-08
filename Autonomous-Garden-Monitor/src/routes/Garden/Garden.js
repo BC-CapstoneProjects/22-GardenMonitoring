@@ -139,7 +139,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     setIsGardenSelected(true); // sets isGardenSelected state variable to true, can view barchart
     setDropdownVisible(false); // hide dropdown menu
     // setShowGardenButton(false);
-    // setIsLoading(true);
+    // setIsLoading(true);;
     // setAnimateEye(true);
 
     // Update the selectedGarden state in Garden.js and the parent state in App.js
