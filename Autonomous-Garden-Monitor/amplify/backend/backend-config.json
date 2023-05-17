@@ -1,0 +1,101 @@
+{
+  "auth": {
+    "agmamplify51b24d8f": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_agmamplify51b24d8f_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify51b24d8f_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify51b24d8f"
+        }
+      ]
+    }
+  }
+}

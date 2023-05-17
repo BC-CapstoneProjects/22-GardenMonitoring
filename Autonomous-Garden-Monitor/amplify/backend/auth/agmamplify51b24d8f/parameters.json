@@ -1,0 +1,29 @@
+{
+  "authSelections": "identityPoolAndUserPool",
+  "resourceName": "agmamplify51b24d8f",
+  "serviceType": "imported",
+  "region": "us-west-2",
+  "aliasAttributes": [
+    "email",
+    "preferred_username"
+  ],
+  "authProvidersUserPool": [],
+  "requiredAttributes": [
+    "name",
+    "preferred_username",
+    "email",
+    "phone_number",
+    "address"
+  ],
+  "passwordPolicyMinLength": 6,
+  "passwordPolicyCharacters": [
+    "Requires Lowercase",
+    "Requires Numbers",
+    "Requires Symbols"
+  ],
+  "mfaConfiguration": "OFF",
+  "autoVerifiedAttributes": [
+    "email"
+  ],
+  "mfaTypes": []
+}

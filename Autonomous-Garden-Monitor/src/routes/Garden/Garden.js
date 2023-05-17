@@ -221,7 +221,6 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const handlePlantClick = (plant,index) => {
     setSelectedPlant(plant);
     setModalOpen(true);
-    //setSubjectID(plant.id);
     setSelectedIndex(index);
 
     console.log("plantIndex",selectedIndex)
