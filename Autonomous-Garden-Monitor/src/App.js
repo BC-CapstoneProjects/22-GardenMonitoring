@@ -3,7 +3,8 @@ import Settings from "./routes/Settings";
 import Account from "./routes/Settings/Account";
 import Notifications from "./routes/Settings/Notifications";
 import Sign from './routes/Sign'
-import "./index.css";
+// import "./index.css";
+import '@aws-amplify/ui-react/styles.css';
 
 //min
 import React, { useState, useEffect } from "react";
@@ -21,12 +22,13 @@ import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 
 
-//AWS Cognito
-//import { withAuthenticator } from '@aws-amplify/ui-react';
-//import awsExports from './aws-exports';
-//import { Amplify }  from 'aws-amplify';
-//import { Auth } from 'aws-amplify';  
+// AWS Cognito
+import { withAuthenticator } from '@aws-amplify/ui-react';
+import awsconfig from './aws-exports';
+import { Amplify }  from 'aws-amplify';
+import { Auth } from 'aws-amplify';
 
+Amplify.configure(awsconfig)
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -46,13 +48,13 @@ function App() {
 
   
 
-  // const handleSignOut = async () => {
-  //   try {
-  //     await Auth.signOut();
-  //   } catch (error) {
-  //     console.log('Error signing out: ', error);
-  //   }
-  // };
+  const handleSignOut = async () => {
+    try {
+      await Auth.signOut();
+    } catch (error) {
+      console.log('Error signing out: ', error);
+    }
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -71,7 +73,7 @@ function App() {
                 path="/view/:subjectID"
                 element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
               />
-              <Route path="/" element={<Sign />} />
+              {/* <Route path="/" element={<Sign />} /> */}
               <Route path="/form" element={<Form />} />
               <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
               <Route path="/pie" element={<Pie />} />
@@ -91,5 +93,4 @@ function App() {
   );
 }
 
-//export default withAuthenticator(App);
-export default App;
+export default withAuthenticator(App);
