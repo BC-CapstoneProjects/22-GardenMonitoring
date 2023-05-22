@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-agm-dev-195653-authRole",
+      "UnauthRoleArn": "arn:aws:iam::286336465435:role/amplify-agm-dev-195653-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::286336465435:role/amplify-agm-dev-195653-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-agm-dev-195653-deployment",
+      "UnauthRoleName": "amplify-agm-dev-195653-unauthRole",
+      "StackName": "amplify-agm-dev-195653",
+      "StackId": "arn:aws:cloudformation:us-west-2:286336465435:stack/amplify-agm-dev-195653/7ae8e560-f45e-11ed-868e-0a8855089c7b",
+      "AmplifyAppId": "d1p7v5edl95tkq"
+    },
+    "categories": {
+      "auth": {
+        "agm3f03f600": {
+          "userPoolId": "us-west-2_ZOpUrcl4i",
+          "userPoolName": "agmCognito",
+          "webClientId": "47g5ist23f0lbrb1m4r62tmoc6",
+          "nativeClientId": "47g5ist23f0lbrb1m4r62tmoc6",
+          "identityPoolId": "us-west-2:f07a651e-4c46-4ac1-81e2-d2357ae42d3a",
+          "identityPoolName": "agmIdentityPool",
+          "allowUnauthenticatedIdentities": false,
+          "authRoleArn": "arn:aws:iam::286336465435:role/Cognito_agmIdentityPoolAuth_Role",
+          "authRoleName": "Cognito_agmIdentityPoolAuth_Role",
+          "unauthRoleArn": "arn:aws:iam::286336465435:role/Cognito_agmIdentityPoolUnauth_Role",
+          "unauthRoleName": "Cognito_agmIdentityPoolUnauth_Role"
+        }
+      }
+    }
+  }
+}
