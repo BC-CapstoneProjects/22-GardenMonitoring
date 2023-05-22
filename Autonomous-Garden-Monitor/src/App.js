@@ -20,21 +20,122 @@ import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
+import { useNavigate } from "react-router-dom";
 
 
 // AWS Cognito
-import { withAuthenticator } from '@aws-amplify/ui-react';
+import { Authenticator } from '@aws-amplify/ui-react';
+import { View, Button, Text, Image, useTheme } from '@aws-amplify/ui-react';
 import awsconfig from './aws-exports';
-import { Amplify }  from 'aws-amplify';
+import { Amplify } from 'aws-amplify';
 import { Auth } from 'aws-amplify';
 
 Amplify.configure(awsconfig)
 
+
+
+// const services = {
+//   handleSignUp : async (formData, navigate) => {
+  
+
+//     let { username, password, attributes } = formData;
+//     // custom username
+//     username = username.toLowerCase();
+//     attributes.email = attributes.email.toLowerCase();
+  
+//     // phone_number validation
+//     const phoneNumberRegex = /^\d{10}$/;
+//     if (!phoneNumberRegex.test(attributes.phone_number)) {
+//       alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
+//       return false
+//     }
+//     else {
+//       return Auth.signUp({
+//         username,
+//         password,
+//         attributes,
+//       });
+//     }
+//   }
+// };
+
+
+const components = {
+  Header() {
+    const { tokens } = useTheme();
+
+    const handleClick = () => {
+      window.open('https://www.bellevuecollege.edu/', '_blank');
+    };
+
+    return (
+      <View textAlign="center" padding={tokens.space.large}>
+        <Button onClick={handleClick}
+        style={{ 
+          backgroundImage: 'url(/assets/gardenBackground2.png)', 
+          backgroundSize: 'cover', 
+          opacity: 0.8,
+          color: 'transparent' 
+        }}>
+        <Image
+          alt="Sign up plant"
+          src="/assets/signUpPlant3.png"
+        />
+        </Button>
+        <Text onClick={handleClick}>
+          Click Here to Sign Up!
+        </Text>
+        
+      </View>
+    );
+  },
+
+  Footer() {
+    const { tokens } = useTheme();
+
+    return (
+      <View textAlign="center" padding={tokens.space.large}>
+        <Text>
+          &copy; All Rights Reserved
+        </Text>
+      </View>
+    );
+  },
+
+  ResetPassword: {
+    Header() {
+      const { tokens } = useTheme();
+    },
+  },
+};
+
+const formFields = {
+  signIn: {
+    username: {
+      placeholder: 'Enter your email or username',
+    },
+  },
+    // preferred_username: {
+    //   label: 'Password:',
+    //   placeholder: 'Enter your Password:',
+    //   isRequired: false,
+    //   order: 2,
+    // },
+  
+};
+
+
 function App() {
+
+
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
   const isSignPage = location.pathname === "/";
+
+
+  
+
 
   // Add useState hook for selectedGarden
   const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
@@ -46,7 +147,7 @@ function App() {
   // get most recent drone scan data from api for every id in PlantDescriptions
   const [scans, setScans] = useState([]);
 
-  
+
 
   const handleSignOut = async () => {
     try {
@@ -57,13 +158,14 @@ function App() {
   };
 
   return (
+    <Authenticator hideSignUp={true} components={components} formFields= {formFields} >
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-          {!isSignPage && <Sidebar isSidebar={isSidebar} />}
+          <Sidebar isSidebar={isSidebar} />
           <main className="content">
-            {!isSignPage && <Topbar setIsSidebar={setIsSidebar} />}
+            <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
               <Route
                 path="/garden"
@@ -90,7 +192,8 @@ function App() {
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
+    </Authenticator>
   );
 }
 
-export default withAuthenticator(App);
+export default App;

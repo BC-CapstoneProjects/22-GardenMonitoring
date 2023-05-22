@@ -1,10 +1,11 @@
 {
   "authSelections": "identityPoolAndUserPool",
-  "resourceName": "agmamplify51b24d8f",
+  "resourceName": "agm3f03f600",
   "serviceType": "imported",
   "region": "us-west-2",
   "aliasAttributes": [
-    "email"
+    "email",
+    "preferred_username"
   ],
   "authProvidersUserPool": [],
   "requiredAttributes": [

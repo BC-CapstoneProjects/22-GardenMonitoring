@@ -11,6 +11,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
+import { Auth } from 'aws-amplify';
+
 
 const Topbar = () => {
   const theme = useTheme();
@@ -20,7 +22,14 @@ const Topbar = () => {
 
   // Navigate to Sign
   const redirectToSign = () => {
-    navigate("/");
+    Auth.signOut()
+      .then( ()=> {
+        console.log("Successfully signed out");
+        navigate("/");
+      })
+      .catch( (error) => {
+          console.log("Error signing out: ", error);
+      } ) 
   }
 
   // Navigate to NotificationPage

@@ -28,5 +28,35 @@
         }
       }
     }
+  },
+  "amplifyenv": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-agmamplify-amplifyenv-162910-authRole",
+      "UnauthRoleArn": "arn:aws:iam::286336465435:role/amplify-agmamplify-amplifyenv-162910-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::286336465435:role/amplify-agmamplify-amplifyenv-162910-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-agmamplify-amplifyenv-162910-deployment",
+      "UnauthRoleName": "amplify-agmamplify-amplifyenv-162910-unauthRole",
+      "StackName": "amplify-agmamplify-amplifyenv-162910",
+      "StackId": "arn:aws:cloudformation:us-west-2:286336465435:stack/amplify-agmamplify-amplifyenv-162910/20869850-f766-11ed-895b-0a1f02d1dc87",
+      "AmplifyAppId": "d1dutiswv4735w"
+    },
+    "categories": {
+      "auth": {
+        "agmamplify51b24d8f": {
+          "userPoolId": "us-west-2_nR4yX6i3t",
+          "userPoolName": "agm",
+          "webClientId": "1d1gqlo5kq0betuu30qtcbp3lp",
+          "nativeClientId": "1d1gqlo5kq0betuu30qtcbp3lp",
+          "identityPoolId": "us-west-2:f07a651e-4c46-4ac1-81e2-d2357ae42d3a",
+          "identityPoolName": "agmIdentityPool",
+          "allowUnauthenticatedIdentities": true,
+          "authRoleArn": "arn:aws:iam::286336465435:role/Cognito_agmIdentityPoolAuth_Role",
+          "authRoleName": "Cognito_agmIdentityPoolAuth_Role",
+          "unauthRoleArn": "arn:aws:iam::286336465435:role/Cognito_agmIdentityPoolUnauth_Role",
+          "unauthRoleName": "Cognito_agmIdentityPoolUnauth_Role"
+        }
+      }
+    }
   }
 }
