@@ -252,54 +252,6 @@ const Garden = ({ setScans, setSelectedGarden }) => {
             ))}
           </ul>
         )}
-        {/* {dropdownVisible && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            position="absolute"
-            zIndex="10"
-            bgcolor={theme.palette.background.paper}
-          >
-            {selectedGarden !== "Garden 1 🌱" && (
-              <Button
-                sx={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  padding: "15px 30px",
-                }}
-                onClick={() => handleGardenSelection("Garden 1 🌱")}
-              >
-                Garden 1
-              </Button>
-            )}
-            {selectedGarden !== "Garden 2 🌱" && (
-              <Button
-                sx={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  padding: "15px 30px",
-                }}
-                onClick={() => handleGardenSelection("Garden 2 🌱")}
-              >
-                Garden 2
-              </Button>
-            )}
-            {selectedGarden !== "Garden 3 🌱" && (
-              <Button
-                sx={{
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  padding: "15px 30px",
-                }}
-                onClick={() => handleGardenSelection("Garden 3 🌱")}
-              >
-                Garden 3
-              </Button>
-            )}
-          </Box>
-        )} */}
       </>
     );
   };

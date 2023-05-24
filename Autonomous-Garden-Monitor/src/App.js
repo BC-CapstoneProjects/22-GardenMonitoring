@@ -1,4 +1,5 @@
 import Garden from "./routes/Garden/Garden";
+import Home from "./routes/Home/Home";
 import Settings from "./routes/Settings";
 import Account from "./routes/Settings/Account";
 import Notifications from "./routes/Settings/Notifications";
@@ -21,6 +22,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
+import './logo.css'
 
 
 // AWS Cognito
@@ -29,6 +31,7 @@ import { View, Button, Text, Image, useTheme } from '@aws-amplify/ui-react';
 import awsconfig from './aws-exports';
 import { Amplify } from 'aws-amplify';
 import { Auth } from 'aws-amplify';
+import { linearGradientDef } from "@nivo/core";
 
 Amplify.configure(awsconfig)
 
@@ -36,13 +39,13 @@ Amplify.configure(awsconfig)
 
 // const services = {
 //   handleSignUp : async (formData, navigate) => {
-  
+
 
 //     let { username, password, attributes } = formData;
 //     // custom username
 //     username = username.toLowerCase();
 //     attributes.email = attributes.email.toLowerCase();
-  
+
 //     // phone_number validation
 //     const phoneNumberRegex = /^\d{10}$/;
 //     if (!phoneNumberRegex.test(attributes.phone_number)) {
@@ -65,28 +68,26 @@ const components = {
     const { tokens } = useTheme();
 
     const handleClick = () => {
-      window.open('https://www.bellevuecollege.edu/', '_blank');
+      window.open('https://forms.gle/b7hRbszFyCcC3hsq6', '_blank');
     };
 
     return (
-      <View textAlign="center" padding={tokens.space.large}>
-        <Button onClick={handleClick}
-        style={{ 
-          backgroundImage: 'url(/assets/gardenBackground2.png)', 
-          backgroundSize: 'cover', 
-          opacity: 0.8,
-          color: 'transparent' 
-        }}>
-        <Image
-          alt="Sign up plant"
-          src="/assets/signUpPlant3.png"
-        />
-        </Button>
-        <Text onClick={handleClick}>
-          Click Here to Sign Up!
-        </Text>
-        
-      </View>
+      <div style={{}}>
+        <View textAlign="center" padding={tokens.space.large}>
+          <Button
+            style={{ border: 'none', borderRadius: '20%', backgroundImage: `linear-gradient(#66d288, #0fd850)`, }}>
+            <Image onClick={handleClick}
+              alt="Sign up plant"
+              src="/assets/1.png"
+              style={{
+                width: '400px',
+                height: '230px',
+                borderRadius: '20%',
+              }}
+            />
+          </Button>
+        </View>
+      </div>
     );
   },
 
@@ -115,13 +116,17 @@ const formFields = {
       placeholder: 'Enter your email or username',
     },
   },
-    // preferred_username: {
-    //   label: 'Password:',
-    //   placeholder: 'Enter your Password:',
-    //   isRequired: false,
-    //   order: 2,
-    // },
-  
+  // preferred_username: {
+  //   label: 'Password:',
+  //   placeholder: 'Enter your Password:',
+  //   isRequired: false,
+  //   order: 2,
+  // },
+  resetPassword: {
+    username: {
+      placeholder: 'Enter your email or username',
+    },
+  }
 };
 
 
@@ -134,7 +139,7 @@ function App() {
   const isSignPage = location.pathname === "/";
 
 
-  
+
 
 
   // Add useState hook for selectedGarden
@@ -168,7 +173,7 @@ function App() {
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
               <Route
-                path="/garden"
+                path="/"
                 element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
               />
               <Route
@@ -184,7 +189,7 @@ function App() {
               <Route path="/geography" element={<Geography />} />
               {/* <Route path="/garden" element={<Garden />} />
               <Route path="/view/:subjectID" element={<Garden />} /> */}
-              <Route path="/settings" element={<Settings />} />
+
               <Route path="/account" element={<Account />} />
               <Route path="/notifications" element={<Notifications />} />
             </Routes>
@@ -196,4 +201,113 @@ function App() {
   );
 }
 
+
 export default App;
+
+// function HomePage() {
+
+//   return (
+
+//     <Routes>
+//       <Route
+//         path="/"
+//         element={<Home />}
+//       />
+//     </Routes>
+
+//   );
+// }
+
+
+// function AuthenticatedApp() {
+
+
+
+//   // Add useState hook for selectedGarden
+//   const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
+//   // Add useEffect hook to update localStorage when selectedGarden changes
+//   useEffect(() => {
+//     localStorage.setItem('selectedGarden', selectedGarden);
+//   }, [selectedGarden]);
+
+//   // get most recent drone scan data from api for every id in PlantDescriptions
+//   const [scans, setScans] = useState([]);
+
+
+
+//   const handleSignOut = async () => {
+//     try {
+//       await Auth.signOut();
+//     } catch (error) {
+//       console.log('Error signing out: ', error);
+//     }
+//   };
+
+//   return (
+
+//     <Routes>
+//       <Route
+//         path="/garden"
+//         element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+//       />
+//       <Route
+//         path="/view/:subjectID"
+//         element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+//       />
+//       {/* <Route path="/" element={<Sign />} /> */}
+//       <Route path="/form" element={<Form />} />
+//       <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
+//       <Route path="/pie" element={<Pie />} />
+//       <Route path="/line" element={<Line />} />
+//       <Route path="/calendar" element={<Calendar />} />
+//       <Route path="/geography" element={<Geography />} />
+//       {/* <Route path="/garden" element={<Garden />} />
+//               <Route path="/view/:subjectID" element={<Garden />} /> */}
+
+//       <Route path="/account" element={<Account />} />
+//       <Route path="/notifications" element={<Notifications />} />
+//     </Routes>
+
+//   );
+// }
+
+// function App() {
+
+
+//   const [theme, colorMode] = useMode();
+//   const [isSidebar, setIsSidebar] = useState(true);
+//   const location = useLocation();
+//   const isSignPage = location.pathname === "/";
+
+
+//   return (
+//     <ColorModeContext.Provider value={colorMode}>
+//       <ThemeProvider theme={theme}>
+//         <CssBaseline />
+//         <div className="app">
+//           <Sidebar isSidebar={isSidebar} />
+//           <main className="content">
+//             <Topbar setIsSidebar={setIsSidebar} />
+//             <Routes>
+//               <Route
+//                 path="/*"
+//                 element={<HomePage />}
+//               />
+//               <Route
+//                 path="/*"
+//                 element={
+//                   <Authenticator hideSignUp={true} components={components} formFields={formFields}>
+//                     <AuthenticatedApp />
+//                   </Authenticator>
+//                 }
+//               />
+//             </Routes>
+
+//           </main>
+//         </div>
+//       </ThemeProvider>
+//     </ColorModeContext.Provider>
+//   );
+// }
+
+// export default App;

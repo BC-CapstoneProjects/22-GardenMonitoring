@@ -29,6 +29,7 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^4.6.2",
     "@aws-sdk/credential-provider-ini": "^3.306.0",
+    "@builder.io/react": "^3.0.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@fullcalendar/core": "^5.11.3",
