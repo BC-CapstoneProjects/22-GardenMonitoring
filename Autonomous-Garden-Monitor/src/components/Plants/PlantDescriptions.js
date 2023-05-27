@@ -3,7 +3,7 @@ const plants = [
     id: 0,
     name: 'Succulent',
     type: 'Echeveria',
-    imageSrc: 'http://localhost:9000/images/plant1.avif', //'/assets/Succulent.jpg', 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
     state: "success",
     soil: 'Moderately acid (5.6 – 6.0) Slightly acid (6.1 – 6.5) Neutral (6.6 – 7.3) Slightly alkaline (7.4 – 7.8)',
@@ -24,7 +24,7 @@ const plants = [
     id: 1,
     name: 'Pepppermint',
     type: 'Mentha x piperita',
-    imageSrc: 'http://localhost:9000/images/plant2.avif', // '/assets/Peppermint.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
     state: "success",
     sun: 'Full Sun to Partial Shade',
@@ -42,7 +42,7 @@ const plants = [
     name: 'Rose',
     type: 'Rosa',
     
-    imageSrc: 'http://localhost:9000/images/plant3.avif', // '/assets/Rose.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
     state: "success",
     sun: 'Full Sun',
@@ -58,7 +58,7 @@ const plants = [
     id: 3,
     name: 'Prayer Plant',
     type: 'Goeppertia orbifolia',
-    imageSrc: 'http://localhost:9000/images/plant4.avif', // '/assets/Prayer.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
     state: "warning",
     sun: 'Partial or Dappled Shade',
@@ -75,7 +75,7 @@ const plants = [
     id: 4,
     name: 'African Daisy',
     type: 'Gerbera',
-    imageSrc: 'http://localhost:9000/images/plant5.avif', // '/assets/AfricanDaisy.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
     state: "success",
     sun: 'Full Sun',
@@ -94,7 +94,7 @@ const plants = [
     id: 5,
     name: 'Shasta Daisy',
     type: 'Leucanthemum × superbum',
-    imageSrc: 'http://localhost:9000/images/plant6.avif', // '/assets/ShastaDaisy.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
     state: "warning",
     sun: 'Full Sun, Full Sun to Partial Shade',
@@ -119,7 +119,7 @@ const plants = [
     flowerColor: 'White, Other: Creamy white spathe, pale yellow spadix.',
     suitableLocations: 'Houseplant',
     propMethods: 'Division',
-    imageSrc: 'http://localhost:9000/images/plant7.avif', // '/assets/PeaceLily.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
     state: "error",
     water: 'Mesic',
@@ -131,7 +131,7 @@ const plants = [
     id: 7,
     name: 'Southern Maidenhair Fern',
     type: 'Adiantum capillus-veneris',
-    imageSrc: 'http://localhost:9000/images/plant8.avif', // '/assets/Fern.jpg' 
+    imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
     state: "success",
     sun: 'Partial or Dappled Shade, Partial Shade to Full Shade',
@@ -154,8 +154,15 @@ async function updateImageSrc(plant) {
 
   // Iterate over each extension.
   for (const ext of extensions) {
-    // Replace the current extension in imageSrc with the new extension.
-    const newImageSrc = plant.imageSrc.replace(/\.\w+$/, ext);
+    let newImageSrc;
+    // Check if plant.imageSrc is a full URL
+    if (plant.imageSrc.startsWith('http')) {
+      // If it is, use it directly
+      newImageSrc = plant.imageSrc;
+    } else {
+      // If it's not, replace the current extension in imageSrc with the new extension.
+      newImageSrc = `http://localhost:9000/images/${plant.imageSrc.replace(/\.\w+$/, ext)}`;
+    }
 
     try {
       // Fetch the image with the updated URL.

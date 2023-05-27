@@ -1,75 +1,57 @@
-// var express = require('express');
 import express from 'express';
-import { ListBucketsCommand } from "@aws-sdk/client-s3";
+import { dynamoDbClient } from '../public/libs/dynamoDbClient.js';
+import { GetItemCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { CreateBucketCommand } from '@aws-sdk/client-s3';
 import { s3Client } from "../public/libs/s3Client.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from 'url';
 
 const router = express.Router();
 
-const nocache = (req, res, next) => {
-  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-  res.header('Expires', '-1');
-  res.header('Pragma', 'no-cache');
-  next();
-};
+router.get("/:userId", async (req,res,next) => { 
+  const userId = req.params.userId;
 
-const createFolder = (folderPath) => {
-  // only create the folder if it does not already exist
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true });
-  }
-}
-
-const listGardenFolders = () => {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const gardensFolderPath = path.join(__dirname, '..', '/public/gardens');
-  const folderNames = fs.readdirSync(gardensFolderPath, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
-  return folderNames;
-}
-
-router.get("/", async (req,res,next) => { 
-  // execute 'run' function, wait for return of mapped bucket data
-  console.log("Creating garden folders...");
-  
-  const bucketNames = await run();
-  console.log("Bucket names: ", bucketNames); // Check if bucket names are fetched
-  bucketNames.forEach(bucketName => {
-    // create path for bucket name in the 'gardens' folder in 'public'
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const folderPath = path.join(__dirname, '..', '/public/gardens', bucketName)
-    console.log("Creating folder: ", folderPath); // Check if folder path is correct
-    // use the bucket name to create a new folder
   try {
-    createFolder(folderPath);
+    const getParams = {
+        TableName: 'Bucket',
+        Key: {
+            'userId': { S: userId }
+        }
+    };
+
+    const userData = await dynamoDbClient.send(new GetItemCommand(getParams));
+
+    if (!userData.Item) {
+        // user does not exist, add to Bucket table
+        // create new item and bucket... userId: userId_BC_Garden
+        const bucketName = `${userId}-bc-garden`;
+
+        const putParams = {
+            TableName: 'Bucket',
+            Item: {
+                'userId': { S: userId },
+                'buckets': { SS: [bucketName] } 
+            }
+        };
+
+        await dynamoDbClient.send(new PutItemCommand(putParams));
+
+        // create a new bucket
+        await s3Client.send(
+          new CreateBucketCommand({
+              Bucket: bucketName,
+              ACL: 'private'
+          })
+        );
+        res.status(200).send(`Bucket "${bucketName}" created successfully.`);
+    } 
+    else {
+        // user exists, return bucket names
+        res.send(userData.Item.buckets.SS);
+    }
   } 
   catch (error) {
-    console.error("Error creating folder:", error);
+    console.error('Error getting bucket names:', error);
+    res.status(500).json({error: error.message});
   }
-  });
-  res.send("API for getting garden names is totally working properly, definitely got some data.");
 });
-
-router.get("/folders", nocache, async (req, res) => {
-  const folderNames = listGardenFolders();
-  res.send(folderNames);
-});
-
-export const run = async () => {
-  try {
-    // store all bucket names listed for the configured account
-    const data = await s3Client.send(new ListBucketsCommand({}));
-    console.log("S3 Buckets:", data.Buckets);
-    return data.Buckets.map(bucket => bucket.Name);
-  } 
-  catch (err) {
-    console.log("Error fetching bucket names:", err);
-  }
-};
 
 export { router as getGardenNames };

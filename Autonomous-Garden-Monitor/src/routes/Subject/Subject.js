@@ -18,7 +18,7 @@ async function fetchDiseaseLabel(scanUrl) {
   }
 }
 
-function Subject({ id, scan, name, imageSrc, imageAlt, type, sun, 
+function Subject({ id, scan, name, imageSrc, imageUrl, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
   propMethods, otherMethods, containers, link, imageUrls,index}) {
 
@@ -69,7 +69,7 @@ function Subject({ id, scan, name, imageSrc, imageAlt, type, sun,
 
       <div className="modal-body rounded">
       <img
-          src={imageUrls[index] || `http://localhost:9000/images/${imageSrc}`} // I want to use imageUrls state from garden.js 
+          src={imageUrl}
           alt={imageAlt}
           className="subject-image border-8 border-sky-500 hover:border-double rounded"
       />

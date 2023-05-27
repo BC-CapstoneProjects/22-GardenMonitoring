@@ -26,8 +26,9 @@ import { getImage } from './routes/getImage.js';
 import { getScans } from './routes/getScans.js';
 import { getPlantJson } from './routes/getPlantJson.js';
 import { getGardenNames } from './routes/getGardenNames.js';
-import { editLabel } from './routes/editLabel.js';
 import { updateLabel } from './routes/updateLabel.js';
+import { createGarden } from './routes/createGarden.js';
+import { deleteGarden } from './routes/deleteGarden.js';
 
 //define cronjobs
 //import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
@@ -58,9 +59,10 @@ app.use('/getImage', getImage);
 app.use("/getScans", getScans);
 app.use('/getPlantJson', getPlantJson);
 app.use('/getGardenNames', getGardenNames);
-app.use('/editLabel', editLabel);
 app.use('/updateLabel', updateLabel);
 app.use('/users', users);
+app.use('/createGarden', createGarden);
+app.use('/deleteGarden', deleteGarden);
 
 // app.use(express.static('./public'));
 
