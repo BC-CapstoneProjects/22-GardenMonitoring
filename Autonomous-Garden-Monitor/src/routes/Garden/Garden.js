@@ -17,6 +17,8 @@ import GeographyChart from "../../components/GeographyChart";
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import SidebarBarChart from "../../scenes/bar/index";
+import TextField from '@mui/material/TextField';
+import { Auth } from 'aws-amplify';
 
 
 const Garden = ({ setScans, setSelectedGarden }) => {
@@ -44,6 +46,9 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [scans, setLocalScans] = useState([]);
   const [selectedGarden, setLocalSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
 
+  // bucket ("garden") creation and deletion
+  const [newBucketName, setNewBucketName] = useState('');
+  const [deleteBucketName, setDeleteBucketName] = useState('');
   // const { subjectID } = useParams();
   // // check for last selected garden from localStorage 
   // const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
@@ -60,8 +65,11 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const navigate = useNavigate();
   const [barData, setBarData] = useState(null);
 
-
-
+  
+  useEffect(() => {
+    console.log("Updated imageUrls:", imageUrls);
+  }, [imageUrls]);
+  
   useEffect(() => {
     fetchScans().then((scanResults) => {
       setLocalScans(scanResults);
@@ -104,7 +112,12 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
   const fetchGardenFolders = async () => {
     try {
-      const response = await fetch('http://localhost:9000/getGardenNames/folders');
+      const user = await Auth.currentAuthenticatedUser();
+      const response = await fetch(`http://localhost:9000/getGardenNames/${user.username}`, {
+        headers: {
+          'Authorization': user.signInUserSession.idToken.jwtToken
+        }
+      });
       const folderNames = await response.json();
       console.log('Fetched garden folders:', folderNames)
       setGardenFolders(folderNames);
@@ -120,6 +133,38 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
 
   //API
+   // Function to handle the creation of a new bucket ("garden")
+   const createBucket = async () => {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      const response = await fetch(`http://localhost:9000/createGarden/${user.username}/${newBucketName}`, {
+        method: 'POST',
+      });
+
+      const result = await response.text();
+      console.log(result);
+      setNewBucketName(''); // Reset the input field after creation
+    } catch (error) {
+      console.error("Error creating a new bucket:", error);
+    }
+  };
+
+  // Function to handle the deletion of a bucket ("garden")
+  const deleteBucket = async () => {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      const response = await fetch(`http://localhost:9000/deleteGarden/${user.username}/${deleteBucketName}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.text();
+      console.log(result);
+      setDeleteBucketName(''); // Reset the input field after deletion
+    } catch (error) {
+      console.error("Error deleting a bucket:", error);
+    }
+  };
+
   const fetchScans = async () => {
     const scanResults = [];
 
@@ -152,25 +197,29 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       const response = await fetch(`http://localhost:9000/getImage/${gardenName}`); // Add "http://" to the URL
       const result = await response.json();
       console.log("API Result:", result);
-
+    
       const barData2 = { data: scans, selectedGarden: selectedGarden }; // create barData object here
       setBarData(barData2);
-
-
-      // Update the imageUrls state with the complete URLs for each image
-      setImageUrls(result.filenames.map((filename) => `http://localhost:9000/images/${filename}`));
+    
+      // Update the imageUrls state with the pre-signed URLs
+      setImageUrls(result.presignedUrls);
       console.log("Updated imageUrls:", imageUrls);
     } catch (error) {
       console.log("Error fetching images:", error);
     }
     setIsLoading(false);
-    setAnimateEye(false);
+    setAnimateEye(false);    
   };
 
   // Call API to fetch S3 garden names (list all bucket names)
   const fetchAndCreateGardenFolders = async () => {
     try {
-      await fetch('http://localhost:9000/getGardenNames');
+      const user = await Auth.currentAuthenticatedUser();
+      await fetch('http://localhost:9000/getGardenNames', {
+        headers: {
+          'Authorization': user.signInUserSession.idToken.jwtToken
+        }
+      });
     }
     catch (error) {
       console.error('Error fetching and creating garden folders:', error);
@@ -218,11 +267,15 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [selectedPlant, setSelectedPlant] = useState(null);
 
   // Add a function to handle plant clicks
-  const handlePlantClick = (plant) => {
-    setSelectedPlant(plant);
+  const handlePlantClick = (plant, index) => {
+    const imageUrl = imageUrls[index] || plant.imageSrc; // remove the hardcoded localhost URL
+    setSelectedPlant({
+      ...plant,
+      imageUrl,
+    });
     setModalOpen(true);
     setSubjectID(plant.id);
-  };
+};
 
   // Navigate to Sign
   const redirectToSign = () => {
@@ -238,7 +291,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
             fontSize: "23px",
             fontWeight: "bold",
             padding: "15px 30px",
-          }}
+           }}
           onClick={(e) => toggleDropdown(e)}
         >
           {selectedGarden}
@@ -246,7 +299,8 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         {dropdownVisible && (
           <ul className="dropdown">
             {gardenFolders.map((gardenName, index) => (
-              <li key={index} onClick={() => handleGardenSelection(gardenName)}>
+              <li key={index} onClick={() => handleGardenSelection(gardenName)}
+              className="p-2 cursor-pointer hover:bg-gray-200 hover:text-black">
                 {gardenName}
               </li>
             ))}
@@ -261,6 +315,22 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" paddingLeft="50px">
         <Box sx={{ flexGrow: 1, marginRight: "20px" }}><Header title={<Box marginRight="40px"><GardenButton /></Box>} subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" ></Header></Box>
+      </Box>
+
+      {/* Input fields for creating and deleting buckets */}
+      <Box display="flex" justifyContent="center" alignItems="center" paddingLeft="50px">
+        <TextField 
+          value={newBucketName}
+          onChange={e => setNewBucketName(e.target.value)}
+          label="Enter new garden name"
+        />
+        <Button onClick={createBucket}>Create Garden</Button>
+        <TextField 
+          value={deleteBucketName}
+          onChange={e => setDeleteBucketName(e.target.value)}
+          label="Enter garden name to delete"
+        />
+        <Button onClick={deleteBucket}>Delete Garden</Button>
       </Box>
       {/* <Box>
           <Button
@@ -384,6 +454,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                           id,
                           name,
                           type,
+                          imageUrls,
                           imageSrc,
                           imageAlt,
                           state,
@@ -408,7 +479,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                     <CardMedia
                       component="img"
                       height="180px"
-                      image={imageUrls[index] || `http://localhost:9000/images/${imageSrc}`} // Use imageUrls if available, otherwise use the original imageSrc
+                      image={imageUrls[index] || imageSrc}
                       alt={imageAlt}
                     />
                   </Card>
@@ -442,7 +513,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                       increase={new Date().toLocaleDateString('en-US')}
                       onClick={() =>
                         handlePlantClick({
-                          id, name, type, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
+                          id, name, type, imageUrls, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
                           propMethods, otherMethods, containers, link, scan
                         }, index)
                       }
