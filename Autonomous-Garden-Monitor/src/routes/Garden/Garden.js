@@ -194,7 +194,8 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
     try {
       // Call getImage route from the API using the selected 'gardenName'
-      const response = await fetch(`http://localhost:9000/getImage/${gardenName}`); // Add "http://" to the URL
+      const user = await Auth.currentAuthenticatedUser();
+      const response = await fetch(`http://localhost:9000/getImage/${user.username}/${gardenName}`); // Add "http://" to the URL
       const result = await response.json();
       console.log("API Result:", result);
     
