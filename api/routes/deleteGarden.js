@@ -34,7 +34,7 @@ router.delete("/:userId/:bucketName", async (req, res) => {
             ReturnValues: "ALL_NEW"
         };
 
-        const updatedUserData = await dynamoDbClient.send(new UpdateItemCommand)
+        const updatedUserData = await dynamoDbClient.send(new UpdateItemCommand(updateParams));
 
         // check if user has no more buckets, delete userId item from Bucket table
         if (!updatedUserData.Attributes.buckets.length) {
@@ -62,7 +62,7 @@ router.delete("/:userId/:bucketName", async (req, res) => {
   } 
   catch (error) {
     console.error('Error deleting bucket:', error);
-    res.status(500).send(error);
+    res.status(500).json({error: error.message});
   }
 });
 
