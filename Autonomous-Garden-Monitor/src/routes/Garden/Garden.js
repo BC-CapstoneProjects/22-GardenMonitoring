@@ -4,7 +4,6 @@ import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import { plants as PlantDescriptions, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
-//import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Subject from "../../routes/Subject/Subject";
@@ -42,6 +41,9 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   // state variable for show/hide dropdown in select garden button
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  // state variable to track changes of 'state' in PlantDescriptions.js
+  const [plants, setPlants] = useState(PlantDescriptions);
+  
 
   // Add useState hooks for scans and selectedGarden
   const [scans, setLocalScans] = useState([]);
@@ -66,6 +68,10 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const navigate = useNavigate();
   const [barData, setBarData] = useState(null);
 
+  // listens for changes of the 'plants' state and logs it to the console
+  useEffect(() => {
+    console.log("Updated plants:", plants);
+  }, [plants]);
   
   useEffect(() => {
     console.log("Updated imageUrls:", imageUrls);
@@ -179,6 +185,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     return scanResults;
   };
 
+  // function that updates data after a user selects a garden from the dropdown
   const handleGardenSelection = async (gardenName) => {
     setSelectedGarden(gardenName); // set selected garden name
     localStorage.setItem('selectedGarden', gardenName); // Save selected garden localStorage 
@@ -211,9 +218,12 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       }
       
       // Update plant health
-      updatePlantHealth(PlantDescriptions, gardenName).then((updatedPlants) => {
+      updatePlantHealth(plants, gardenName).then((updatedPlants) => {
         // Now the plants have updated health, update their state
-        PlantDescriptions = updatedPlants.map(updatePlantState);
+        const plantsWithUpdatedState = updatedPlants.map(updatePlantState);
+        
+        // update the plants state in the PlantDescriptions component
+        setPlants(plantsWithUpdatedState);
       });
     } 
     catch (error) {
@@ -223,7 +233,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     setAnimateEye(false);    
   };
 
-  // Call API to fetch S3 garden names (list all bucket names)
+  // Call API to fetch S3 garden names (list all bucket names) for the current user
   const fetchAndCreateGardenFolders = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
@@ -431,7 +441,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
             {/* Box Test */}
             {PlantDescriptions.map(
               ({ id, name, type, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-                propMethods, otherMethods, containers, link, scan }, index) => (
+                propMethods, otherMethods, containers, link, disease }, index) => (
 
 
                 <Box
@@ -482,7 +492,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                           otherMethods,
                           containers,
                           link,
-                          scan,
+                          disease,
                         },
                         index
                       )
@@ -526,7 +536,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                       onClick={() =>
                         handlePlantClick({
                           id, name, type, imageUrls, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
-                          propMethods, otherMethods, containers, link, scan
+                          propMethods, otherMethods, containers, link, disease
                         }, index)
                       }
                     />
