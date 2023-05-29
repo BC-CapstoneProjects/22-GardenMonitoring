@@ -19,6 +19,9 @@ const plants = [
     containers: 'Suitable in 1 gallon, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/111967/Echeveria-Perle-von-Nurnberg/',
     scan: 'http://localhost:9000/getPlantJson/plant/0',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
   {
     id: 1,
@@ -36,12 +39,14 @@ const plants = [
     containers: 'Suitable in 1 gallon, Suitable in 3 gallon or larger',
     link: 'https://garden.org/plants/view/144515/Peppermint-Mentha-x-piperita/',
     scan: 'http://localhost:9000/getPlantJson/plant/1',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
   {
     id: 2,
     name: 'Rose',
     type: 'Rosa',
-    
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
     state: "success",
@@ -53,6 +58,9 @@ const plants = [
     otherMethods: 'Cuttings: Tip',
     link: 'https://garden.org/plants/view/181506/Roses-Rosa/',
     scan: 'http://localhost:9000/getPlantJson/plant/2',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
   {
     id: 3,
@@ -70,6 +78,9 @@ const plants = [
     containers: 'Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/333848/Prayer-Plant-Goeppertia-orbifolia/',
     scan: 'http://localhost:9000/getPlantJson/plant/3',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
   {
     id: 4,
@@ -89,6 +100,9 @@ const plants = [
     containers: 'Suitable in 3 gallon or larger, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/712791/African-Daisy-Osteospermum-ecklonis-Serenity-Blue-Eyed-Beauty/',
     scan: 'http://localhost:9000/getPlantJson/plant/4',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
   {
     id: 5,
@@ -106,6 +120,9 @@ const plants = [
     suitableLocations: 'Xeriscapic',
     link: 'https://garden.org/plants/view/530761/Shasta-Daisy-Leucanthemum-x-superbum-Daisy-May/',
     scan: 'http://localhost:9000/getPlantJson/plant/5',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
   {
     id: 6,
@@ -125,7 +142,10 @@ const plants = [
     water: 'Mesic',
     containers: 'Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',
-    scan: 'http://localhost:9000/getPlantJson/plant/6',    
+    scan: 'http://localhost:9000/getPlantJson/plant/6',  
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',  
   },
   {
     id: 7,
@@ -143,8 +163,52 @@ const plants = [
     containers: 'Suitable for hanging baskets, Needs excellent drainage in pots',
     link: 'https://garden.org/plants/view/75129/Southern-Maidenhair-Fern-Adiantum-capillus-veneris/',
     scan: 'http://localhost:9000/getPlantJson/plant/7',
+    disease: 'N/A',
+    probability: 'N/A',
+    timestamp: 'N/A',
   },
 ];
+
+// this function updates the disease, probability, and timestamp for each plant 
+async function updatePlantHealth(plants, bucketName) {
+  const user = await Auth.currentAuthenticatedUser();
+
+  for (const plant of plants) {
+    const response = await fetch(`http://localhost:9000/getScans/${user}/${bucketName}/${plant.id}`);
+    const data = await response.json();
+
+    // If there are any scans, update the plant with the most recent scan
+    if (data[0].length > 0) {
+      const mostRecentScan = data[0][0];
+      plant.disease = mostRecentScan.disease;
+      plant.probability = mostRecentScan.probability;
+      plant.timestamp = mostRecentScan.time_stamp;
+    }
+  }
+
+  // Return the updated plants array
+  return plants;
+}
+
+
+// this function updates the state of each plant based on it's disease labal
+function updatePlantState(plants) {
+  for (const plant of plants) {
+    switch (plant.disease) {
+      case 'Healthy':
+        plant.state = "success";
+        break;
+      case 'Unknown':
+        plant.state = "warning";
+        break;
+      default:
+        plant.state = "error";
+    }
+  }
+
+  // Return the updated plants array
+  return plants;
+}
 
 // This function takes the plant object as an argument and
 // returns a Promise that resolves with the updated imageSrc.
@@ -197,4 +261,4 @@ updateAllImageSrcs(plants).then((updatedPlants) => {
   plants = updatedPlants;
 });
 
-export default plants;
+export { plants, updatePlantHealth };
