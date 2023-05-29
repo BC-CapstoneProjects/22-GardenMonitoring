@@ -3,6 +3,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
+import { plants, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
 import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
