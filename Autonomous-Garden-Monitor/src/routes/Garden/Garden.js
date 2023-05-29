@@ -3,8 +3,8 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import { plants, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
-import PlantDescriptions from "../../components/Plants/PlantDescriptions";
+import { plants as PlantDescriptions, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
+//import PlantDescriptions from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Subject from "../../routes/Subject/Subject";
@@ -187,26 +187,36 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     setShowGardenButton(false);
     setIsLoading(true);
     setAnimateEye(true);
-
+  
     // Update the selectedGarden state in Garden.js and the parent state in App.js
     setLocalSelectedGarden(gardenName);
     setSelectedGarden(gardenName);
-
-
+  
     try {
       // Call getImage route from the API using the selected 'gardenName'
       const user = await Auth.currentAuthenticatedUser();
-      const response = await fetch(`http://localhost:9000/getImage/${user.username}/${gardenName}`); // Add "http://" to the URL
+      const response = await fetch(`http://localhost:9000/getImage/${user.username}/${gardenName}`); 
       const result = await response.json();
       console.log("API Result:", result);
     
       const barData2 = { data: scans, selectedGarden: selectedGarden }; // create barData object here
       setBarData(barData2);
     
-      // Update the imageUrls state with the pre-signed URLs
-      setImageUrls(result.presignedUrls);
-      console.log("Updated imageUrls:", imageUrls);
-    } catch (error) {
+      // Check that result.presignedUrls is defined and is an array before updating state
+      if (Array.isArray(result.presignedUrls)) {
+        setImageUrls(result.presignedUrls);
+        console.log("Updated imageUrls:", result.presignedUrls);
+      } else {
+        console.error("Unexpected result for presignedUrls:", result.presignedUrls);
+      }
+      
+      // Update plant health
+      updatePlantHealth(PlantDescriptions, gardenName).then((updatedPlants) => {
+        // Now the plants have updated health, update their state
+        PlantDescriptions = updatedPlants.map(updatePlantState);
+      });
+    } 
+    catch (error) {
       console.log("Error fetching images:", error);
     }
     setIsLoading(false);

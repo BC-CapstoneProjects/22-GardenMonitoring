@@ -1,3 +1,5 @@
+import { Auth } from 'aws-amplify';
+
 const plants = [
   {
     id: 0,
@@ -174,7 +176,7 @@ async function updatePlantHealth(plants, bucketName) {
   const user = await Auth.currentAuthenticatedUser();
 
   for (const plant of plants) {
-    const response = await fetch(`http://localhost:9000/getScans/${user}/${bucketName}/${plant.id}`);
+    const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
     const data = await response.json();
 
     // If there are any scans, update the plant with the most recent scan
@@ -261,4 +263,4 @@ updateAllImageSrcs(plants).then((updatedPlants) => {
   plants = updatedPlants;
 });
 
-export { plants, updatePlantHealth };
+export { plants, updatePlantHealth, updatePlantState };
