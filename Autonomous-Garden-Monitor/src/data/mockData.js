@@ -1,6 +1,5 @@
 import { tokens } from "../theme";
-import plants from '../components/Plants/PlantDescriptions';
-
+import { plants } from '../components/Plants/PlantDescriptions';
 
 const labels = ["Mosaic Disease", "Bacterial Blight", "Green Mite", "Brown Streak Disease", "Healthy", "Unknown"];
   

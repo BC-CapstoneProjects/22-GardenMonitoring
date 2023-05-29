@@ -2,7 +2,7 @@
 import React from "react";
 import Chart from "chart.js/auto";
 import { Line } from "react-chartjs-2";
-import plants from '../Plants/PlantDescriptions';
+import { plants } from '../Plants/PlantDescriptions';
 
 // Chart.defaults.color = () => {
 // 	debugger;

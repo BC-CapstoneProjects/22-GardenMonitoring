@@ -3,7 +3,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import PlantDescriptions from "../../components/Plants/PlantDescriptions";
+import { plants as PlantDescriptions, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
 import Subject from "../../routes/Subject/Subject";
 
