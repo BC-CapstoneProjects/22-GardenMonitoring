@@ -36,25 +36,23 @@ const BarChart = ({ isDashboard = false, data, selectedGarden }) => {
     return `${year}-${months[month]}-${day}`;
   }
 
-  data.forEach(diseaseArray => {
-    diseaseArray.forEach(diseaseInfo => {
-      const date = formatDate(diseaseInfo.time_stamp);
-      const disease = diseaseInfo.disease;
-
-      if (!dateDiseaseCounts[date]) {
-        dateDiseaseCounts[date] = {
-          "Mosaic Disease": 0,
-          "Bacterial Blight": 0,
-          "Green Mite": 0,
-          "Brown Streak Disease": 0,
-          "Healthy": 0,
-          "Unknown": 0
-        };
-      }
-
-      dateDiseaseCounts[date][disease]++;
-    });
-  });
+  data.forEach(diseaseInfo => {
+    const date = formatDate(diseaseInfo.timestamp);
+    const disease = diseaseInfo.disease;
+  
+    if (!dateDiseaseCounts[date]) {
+      dateDiseaseCounts[date] = {
+        "Mosaic Disease": 0,
+        "Bacterial Blight": 0,
+        "Green Mite": 0,
+        "Brown Streak Disease": 0,
+        "Healthy": 0,
+        "Unknown": 0
+      };
+    }
+  
+    dateDiseaseCounts[date][disease]++;
+  });  
 
   console.log('dateDiseaseCounts', dateDiseaseCounts);
 
