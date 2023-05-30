@@ -79,10 +79,47 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   
   useEffect(() => {
     fetchScans().then((scanResults) => {
+      
       setLocalScans(scanResults);
       setScans(scanResults);
+      const transformedData = transformDataForChart(scanResults);
+      updateBarData(transformedData);
     });
-  }, []);
+  }, [selectedGarden]);
+
+  // counts the number of occurrences of each disease in the scan results
+  // prepares the data for the bar chart.
+  const updateBarData = (scanResults) => {
+    const diseaseCounts = scanResults.reduce((acc, curr) => {
+      if (!curr.disease) {
+        return acc;
+      }
+      if (!acc[curr.disease]) {
+        acc[curr.disease] = 1;
+      }
+      else {
+        acc[curr.disease]++;
+      }
+      return acc;
+    }, {});
+
+    const newBarData = Object.keys(diseaseCounts).map(disease => {
+      return { name: disease, count: diseaseCounts[disease] };
+    });
+    setBarData(newBarData);
+  };
+
+  // returns an array of objects
+  const transformDataForChart = (scanResults) => {
+    const transformedData = scanResults.map(plant => {
+      return {
+        time_stamp: plant.timestamp,
+        disease: plant.disease || 'Unknown'
+      };
+    });
+
+    return transformedData;
+  };
 
   useEffect(() => {
     // we could add more code here to be executed when the refreshKey state changes...
@@ -173,15 +210,8 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   };
 
   const fetchScans = async () => {
-    const scanResults = [];
-
-    for (const plant of PlantDescriptions) {
-      const response = await fetch(`http://localhost:9000/getScans/plant/${plant.id}`);
-      const data = await response.json();
-      scanResults.push(data);
-    }
-
-    console.log('scan:', scanResults);
+    const scanResults = await updatePlantHealth(PlantDescriptions, selectedGarden);
+    console.log("scan results... results:", scanResults);
     return scanResults;
   };
 
@@ -219,6 +249,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       
       // Update plant health
       updatePlantHealth(plants, gardenName).then((updatedPlants) => {
+        console.log('handleGardenSelection updatedPlants:', updatedPlants);
         // Now the plants have updated health, update their state
         const plantsWithUpdatedState = updatedPlants.map(updatePlantState);
         

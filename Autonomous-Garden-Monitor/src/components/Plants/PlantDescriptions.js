@@ -3,7 +3,7 @@ import { Auth } from 'aws-amplify';
 const plants = [
   {
     id: 0,
-    name: 'Succulent',
+    name: 'Plant_0',
     type: 'Echeveria',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
@@ -26,7 +26,7 @@ const plants = [
   },
   {
     id: 1,
-    name: 'Pepppermint',
+    name: 'Plant_1',
     type: 'Mentha x piperita',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
@@ -45,7 +45,7 @@ const plants = [
   },
   {
     id: 2,
-    name: 'Rose',
+    name: 'Plant_2',
     type: 'Rosa',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
@@ -63,7 +63,7 @@ const plants = [
   },
   {
     id: 3,
-    name: 'Prayer Plant',
+    name: 'Plant_3',
     type: 'Goeppertia orbifolia',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
@@ -82,7 +82,7 @@ const plants = [
   },
   {
     id: 4,
-    name: 'African Daisy',
+    name: 'Plant_4',
     type: 'Gerbera',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
@@ -103,7 +103,7 @@ const plants = [
   },
   {
     id: 5,
-    name: 'Shasta Daisy',
+    name: 'Plant_5',
     type: 'Leucanthemum × superbum',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
@@ -122,7 +122,7 @@ const plants = [
   },
   {
     id: 6,
-    name: 'Peace Lily',
+    name: 'Plant_6',
     type: 'Herb',
     sun: 'Partial or Dappled Shade',
     soil: 'Slightly acid (6.1 – 6.5) Neutral (6.6 – 7.3)',
@@ -144,7 +144,7 @@ const plants = [
   },
   {
     id: 7,
-    name: 'Southern Maidenhair Fern',
+    name: 'Plant_7',
     type: 'Adiantum capillus-veneris',
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
@@ -165,6 +165,8 @@ const plants = [
 
 // this function updates the disease, probability, and timestamp for each plant 
 async function updatePlantHealth(plants, bucketName) {
+  console.log('updatePlantHealth input:', plants);
+
   const user = await Auth.currentAuthenticatedUser();
 
   for (const plant of plants) {
@@ -181,27 +183,33 @@ async function updatePlantHealth(plants, bucketName) {
   }
 
   // Return the updated plants array
-  return plants;
+  console.log('updatePlantHealth output:', plants);
+
+  const updatedPlants = plants.map(updatePlantState);
+
+  return updatedPlants;
 }
 
 
-// this function updates the state of each plant based on it's disease labal
-function updatePlantState(plants) {
-  for (const plant of plants) {
-    switch (plant.disease) {
-      case 'Healthy':
-        plant.state = "success";
-        break;
-      case 'Unknown':
-        plant.state = "warning";
-        break;
-      default:
-        plant.state = "error";
-    }
+// this function updates a the 'state' field for the given plant based on it's disease label
+function updatePlantState(plant) {
+  console.log('updatePlantState input:', plant);
+
+  switch (plant.disease) {
+    case 'Healthy' && 'N/A':
+      plant.state = "success";
+      break;
+    case 'Unknown':
+     plant.state = "warning";
+      break;
+    default:
+      plant.state = "error";
   }
+  
 
   // Return the updated plants array
-  return plants;
+  console.log('updatePlantState output:', plant);
+  return plant;
 }
 
 // This function takes the plant object as an argument and
