@@ -1,10 +1,9 @@
 import Garden from "./routes/Garden/Garden";
-import Home from "./routes/Home/Home";
 import Settings from "./routes/Settings";
 import Account from "./routes/Settings/Account";
 import Notifications from "./routes/Settings/Notifications";
 import Sign from './routes/Sign'
-// import "./index.css";
+import "./index.css";
 import '@aws-amplify/ui-react/styles.css';
 
 //min
@@ -22,7 +21,6 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
-import './logo.css'
 import { I18n } from 'aws-amplify';
 import { translations } from '@aws-amplify/ui-react';
 
@@ -102,14 +100,15 @@ const components = {
     return (
       <div style={{}}>
         <View textAlign="center" padding={tokens.space.large}>
-          <Button
-            style={{ border: 'none', borderRadius: '20%', backgroundImage: `linear-gradient(#66d288, #0fd850)`, }}>
+          <Button style={{ border: 'none', borderRadius: '20%'}}>
+            {/* style={{ border: 'none', borderRadius: '20%', backgroundImage: `linear-gradient(#66d288, #0fd850)`, }}> */}
+            
             <Image onClick={handleClick}
               alt="Sign up plant"
-              src="/assets/1.png"
+              src="/assets/logo4.png"
               style={{
-                width: '400px',
-                height: '230px',
+                width: '160px',
+                height: '160px',
                 borderRadius: '20%',
               }}
             />
