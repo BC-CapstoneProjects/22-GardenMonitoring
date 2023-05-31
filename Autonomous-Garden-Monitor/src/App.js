@@ -108,7 +108,7 @@ const components = {
               alt="Sign up plant"
               src="/assets/logo4.png"
               style={{
-                width: '400px',
+                width: '200x',
                 height: '230px',
                 borderRadius: '20%',
               }}
@@ -145,7 +145,7 @@ const components = {
           padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
           level={3}
         >
-          Enter Information:ssss
+          Enter Information:
         </Heading>  
       );
       handleSignOut();
