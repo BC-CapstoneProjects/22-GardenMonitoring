@@ -1,5 +1,4 @@
 import Garden from "./routes/Garden/Garden";
-import Home from "./routes/Home/Home";
 import Settings from "./routes/Settings";
 import Account from "./routes/Settings/Account";
 import Notifications from "./routes/Settings/Notifications";
@@ -22,7 +21,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
-import './logo.css'
+import logo from './logo.css';
 import { I18n } from 'aws-amplify';
 import { translations } from '@aws-amplify/ui-react';
 
@@ -62,7 +61,7 @@ const services = {
     const phoneNumberRegex = /^\d{10}$/;
     if (!phoneNumberRegex.test(attributes.phone_number)) {
       alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
-      return false
+      return;
     }
     else {
       return Auth.signUp({
@@ -96,20 +95,20 @@ const components = {
     const { tokens } = useTheme();
 
     const handleClick = () => {
-      window.open('https://forms.gle/b7hRbszFyCcC3hsq6', '_blank');
+      window.open('https://www.bellevuecollege.edu/sustainability/food-backup/garden/', '_blank');
     };
 
     return (
       <div style={{}}>
         <View textAlign="center" padding={tokens.space.large}>
           <Button
-            style={{ border: 'none', borderRadius: '20%', backgroundImage: `linear-gradient(#66d288, #0fd850)`, }}>
+            style={{ border: 'none',}}>
             <Image onClick={handleClick}
               alt="Sign up plant"
               src="/assets/logo4.png"
               style={{
-                width: '200x',
-                height: '230px',
+                width: '160x',
+                height: '160px',
                 borderRadius: '20%',
               }}
             />
