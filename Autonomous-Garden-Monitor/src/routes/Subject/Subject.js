@@ -5,20 +5,7 @@ import AWS from "aws-sdk";
 
 import { useEffect, useState } from "react";
 
-// Retrieve disease label from the json of a given plant's 'scan' url from PlantDescriptions 
-async function fetchDiseaseLabel(scanUrl) {
-  try {
-    const response = await fetch(scanUrl);
-    const json = await response.json();
-    return json[0].disease; // Fetch only the first disease label (most recent)
-  }
-  catch (error) {
-    console.error("Error fetching disease label for Garden chart:", error)
-    return null;
-  }
-}
-
-function Subject({ id, scan, name, imageSrc, imageUrl, imageAlt, type, sun, 
+function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
   propMethods, otherMethods, containers, link, imageUrls,index}) {
 
@@ -28,14 +15,12 @@ function Subject({ id, scan, name, imageSrc, imageUrl, imageAlt, type, sun,
   const [diseaseData, setDiseaseData] = useState(null);
 
   useEffect(() => {
-    // Fetch the disease label only for the given 'scan' prop
-    fetchDiseaseLabel(scan).then(diseaseLabel => {
-      setDiseaseData({
-        diseased: diseaseLabel !== 'Healthy',
-        label: diseaseLabel,
-      });
+    // Set disease data directly from props
+    setDiseaseData({
+      diseased: disease !== 'Healthy' && disease !== 'N/A',
+      label: disease,
     });
-  }, [id, scan]);
+  }, [id, disease]);
 
   console.log("Disease Data: ", id, diseaseData);
 
