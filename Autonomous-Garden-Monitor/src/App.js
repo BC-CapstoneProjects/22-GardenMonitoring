@@ -106,7 +106,7 @@ const components = {
             style={{ border: 'none', borderRadius: '20%', backgroundImage: `linear-gradient(#66d288, #0fd850)`, }}>
             <Image onClick={handleClick}
               alt="Sign up plant"
-              src="/assets/1.png"
+              src="/assets/logo4.png"
               style={{
                 width: '400px',
                 height: '230px',
