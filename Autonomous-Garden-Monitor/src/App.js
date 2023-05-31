@@ -23,44 +23,72 @@ import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import { useNavigate } from "react-router-dom";
 import './logo.css'
+import { I18n } from 'aws-amplify';
+import { translations } from '@aws-amplify/ui-react';
 
 
 // AWS Cognito
 import { Authenticator } from '@aws-amplify/ui-react';
-import { View, Button, Text, Image, useTheme } from '@aws-amplify/ui-react';
+import { View, Button, Text, Image, useTheme, Heading } from '@aws-amplify/ui-react';
 import awsconfig from './aws-exports';
 import { Amplify } from 'aws-amplify';
 import { Auth } from 'aws-amplify';
 import { linearGradientDef } from "@nivo/core";
+import { AmplifyConfirmSignUp, AuthState } from '@aws-amplify/ui-react';
+
 
 Amplify.configure(awsconfig)
 
 
+const handleSignOut = async () => {
+  try {
+    await Auth.signOut();
+  } catch (error) {
+    console.log('Error signing out: ', error);
+  }
+};
 
-// const services = {
-//   handleSignUp : async (formData, navigate) => {
+
+const services = {
+  handleSignUp: async (formData, navigate) => {
 
 
-//     let { username, password, attributes } = formData;
-//     // custom username
-//     username = username.toLowerCase();
-//     attributes.email = attributes.email.toLowerCase();
+    let { username, password, attributes } = formData;
+    // custom username
+    username = username.toLowerCase();
+    attributes.email = attributes.email.toLowerCase();
 
-//     // phone_number validation
-//     const phoneNumberRegex = /^\d{10}$/;
-//     if (!phoneNumberRegex.test(attributes.phone_number)) {
-//       alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
-//       return false
-//     }
-//     else {
-//       return Auth.signUp({
-//         username,
-//         password,
-//         attributes,
-//       });
-//     }
-//   }
-// };
+    // phone_number validation
+    const phoneNumberRegex = /^\d{10}$/;
+    if (!phoneNumberRegex.test(attributes.phone_number)) {
+      alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
+      return false
+    }
+    else {
+      return Auth.signUp({
+        username,
+        password,
+        attributes,
+      });
+    }
+  }
+};
+
+
+// I18n.putVocabularies(translations);
+// I18n.setLanguage('fr');
+
+// I18n.putVocabularies({
+//   fr: {
+//     'Sign In': 'Se connecter',
+//     'Sign Up': "S'inscrire",
+//   },
+//   es: {
+//     'Sign In': 'Registrarse',
+//     'Sign Up': 'Regístrate',
+//   },
+// });
+
 
 
 const components = {
@@ -108,6 +136,28 @@ const components = {
       const { tokens } = useTheme();
     },
   },
+
+  ConfirmSignUp: {
+    Header() {
+      const { tokens } = useTheme();
+      return (
+        <Heading
+          padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+          level={3}
+        >
+          Enter Information:ssss
+        </Heading>  
+      );
+      handleSignOut();
+    },
+    Footer() {
+      return <Text>Footer Information</Text>;
+    },
+  },
+
+
+
+
 };
 
 const formFields = {
@@ -126,7 +176,34 @@ const formFields = {
     username: {
       placeholder: 'Enter your email or username',
     },
-  }
+  },
+  signUp: {
+    preferred_username: {
+      label: 'Garden Name:',
+      placeholder: 'Enter your Garden Name:',
+      // isRequired: false,
+      // order: 2,
+    },
+    address: {
+      label: 'Address:',
+      placeholder: 'Enter your Address:',
+    },
+  },
+
+  forceNewPassword: {
+    password: {
+      placeholder: 'Enter your Password:',
+    },
+  },
+
+  confirmSignUp: {
+    confirmation_code: {
+      hidden: true,
+      placeholder: 'Enter your Password:',
+      labelHidden: true
+    },
+  },
+
 };
 
 
@@ -138,7 +215,7 @@ function App() {
   const location = useLocation();
   const isSignPage = location.pathname === "/";
 
-
+  
 
 
 
@@ -154,49 +231,42 @@ function App() {
 
 
 
-  const handleSignOut = async () => {
-    try {
-      await Auth.signOut();
-    } catch (error) {
-      console.log('Error signing out: ', error);
-    }
-  };
 
   return (
-    <Authenticator hideSignUp={true} components={components} formFields= {formFields} >
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="app">
-          <Sidebar isSidebar={isSidebar} />
-          <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
-            <Routes>
-              <Route
-                path="/"
-                element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
-              />
-              <Route
-                path="/view/:subjectID"
-                element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
-              />
-              {/* <Route path="/" element={<Sign />} /> */}
-              <Route path="/form" element={<Form />} />
-              <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
-              <Route path="/pie" element={<Pie />} />
-              <Route path="/line" element={<Line />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/geography" element={<Geography />} />
-              {/* <Route path="/garden" element={<Garden />} />
+    <Authenticator components={components} formFields={formFields} >
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div className="app">
+            <Sidebar isSidebar={isSidebar} />
+            <main className="content">
+              <Topbar setIsSidebar={setIsSidebar} />
+              <Routes>
+                <Route
+                  path="/"
+                  element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+                />
+                <Route
+                  path="/view/:subjectID"
+                  element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+                />
+                {/* <Route path="/" element={<Sign />} /> */}
+                <Route path="/form" element={<Form />} />
+                <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
+                <Route path="/pie" element={<Pie />} />
+                <Route path="/line" element={<Line />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/geography" element={<Geography />} />
+                {/* <Route path="/garden" element={<Garden />} />
               <Route path="/view/:subjectID" element={<Garden />} /> */}
 
-              <Route path="/account" element={<Account />} />
-              <Route path="/notifications" element={<Notifications />} />
-            </Routes>
-          </main>
-        </div>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+                <Route path="/account" element={<Account />} />
+                <Route path="/notifications" element={<Notifications />} />
+              </Routes>
+            </main>
+          </div>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </Authenticator>
   );
 }
