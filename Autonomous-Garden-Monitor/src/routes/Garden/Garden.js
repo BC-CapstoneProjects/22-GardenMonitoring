@@ -349,7 +349,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         >
           {selectedGarden}
         </Button>
-        {dropdownVisible && (
+        {dropdownVisible && Array.isArray(gardenFolders) && (
           <ul className="dropdown">
             {gardenFolders.map((gardenName, index) => (
               <li key={index} onClick={() => handleGardenSelection(gardenName)}
