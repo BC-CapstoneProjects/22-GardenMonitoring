@@ -268,7 +268,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const fetchAndCreateGardenFolders = async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
-      await fetch('http://localhost:9000/getGardenNames', {
+      await fetch(`http://localhost:9000/getGardenNames/${user.username}`, {
         headers: {
           'Authorization': user.signInUserSession.idToken.jwtToken
         }
@@ -349,7 +349,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         >
           {selectedGarden}
         </Button>
-        {dropdownVisible && (
+        {dropdownVisible && Array.isArray(gardenFolders) && (
           <ul className="dropdown">
             {gardenFolders.map((gardenName, index) => (
               <li key={index} onClick={() => handleGardenSelection(gardenName)}
