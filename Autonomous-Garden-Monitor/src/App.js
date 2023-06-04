@@ -48,30 +48,30 @@ const handleSignOut = async () => {
 };
 
 
-const services = {
-  handleSignUp: async (formData, navigate) => {
+// const services = {
+//   handleSignUp: async (formData, navigate) => {
 
 
-    let { username, password, attributes } = formData;
-    // custom username
-    username = username.toLowerCase();
-    attributes.email = attributes.email.toLowerCase();
+//     let { username, password, attributes } = formData;
+//     // custom username
+//     username = username.toLowerCase();
+//     attributes.email = attributes.email.toLowerCase();
 
-    // phone_number validation
-    const phoneNumberRegex = /^\d{10}$/;
-    if (!phoneNumberRegex.test(attributes.phone_number)) {
-      alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
-      return;
-    }
-    else {
-      return Auth.signUp({
-        username,
-        password,
-        attributes,
-      });
-    }
-  }
-};
+//     // phone_number validation
+//     const phoneNumberRegex = /^\d{10}$/;
+//     if (!phoneNumberRegex.test(attributes.phone_number)) {
+//       alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
+//       return;
+//     }
+//     else {
+//       return Auth.signUp({
+//         username,
+//         password,
+//         attributes,
+//       });
+//     }
+//   }
+// };
 
 
 // I18n.putVocabularies(translations);
@@ -150,7 +150,7 @@ const components = {
       handleSignOut();
     },
     Footer() {
-      return <Text>Footer Information</Text>;
+      return <Text></Text>;
     },
   },
 
