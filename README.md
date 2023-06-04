@@ -5,7 +5,7 @@
 
 
 
-                        <Project Set Up GUIDELINE>
+                                        <Project Set Up GUIDELINE>
 
 ----------------------------Before you start--------------------------
 
@@ -74,4 +74,4 @@ Deployment completed.
 
 -------Project Set up Completed-------
 
-Now try to run "npm start"
+Now try to run "npm start"                          
