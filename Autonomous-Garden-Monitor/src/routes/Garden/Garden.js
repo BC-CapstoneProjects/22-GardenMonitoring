@@ -81,11 +81,12 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     fetchScans().then((scanResults) => {
       
       setLocalScans(scanResults);
-      setScans(scanResults);
+      //setScans(scanResults);
       const transformedData = transformDataForChart(scanResults);
       updateBarData(transformedData);
     });
   }, [selectedGarden]);
+  
 
   // counts the number of occurrences of each disease in the scan results
   // prepares the data for the bar chart.
