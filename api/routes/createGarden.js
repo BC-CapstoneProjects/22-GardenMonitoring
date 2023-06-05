@@ -8,62 +8,62 @@ const router = express.Router();
 
 router.post("/:userId/:bucketName", async (req, res) => {
   let bucketName = req.params.bucketName;
-  const userId = req.params.userId
+  const userId = req.params.userId;
 
-  try {
+  // Function to add or update the DynamoDB table
+  async function updateDynamoDb() {
     const getParams = {
-        TableName: 'Bucket',
-        Key: {
-            'userId': { S: userId }
-        }
+      TableName: 'Bucket',
+      Key: {
+        'userId': { S: userId }
+      }
     };
 
     const userData = await dynamoDbClient.send(new GetItemCommand(getParams));
 
-    // this should be a redundant check, but lets leave it in for now... 
     if (!userData.Item) {
-        // user does not exist, add to Bucket table
-        // create new item and bucket... userId: userId_BC_Garden
-        bucketName = `${userId}-bc-garden`;
+      bucketName = `${userId}-bc-garden`;
 
-        const putParams = {
-            TableName: 'Bucket',
-            Item: {
-                'userId': { S: userId },
-                'buckets': { SS: [bucketName] } 
-            }
-        };
+      const putParams = {
+        TableName: 'Bucket',
+        Item: {
+          'userId': { S: userId },
+          'buckets': { SS: [bucketName] }
+        }
+      };
 
-        await dynamoDbClient.send(new PutItemCommand(putParams));
+      await dynamoDbClient.send(new PutItemCommand(putParams));
+    } else {
+      const updateParams = {
+        TableName: 'Bucket',
+        Key: {
+          'userId': { S: userId }
+        },
+        UpdateExpression: 'ADD buckets :b',
+        ExpressionAttributeValues: {
+          ':b': { SS: [bucketName] }
+        },
+        ReturnValues: "ALL_NEW"
+      };
+
+      await dynamoDbClient.send(new UpdateItemCommand(updateParams));
     }
-    else {
-        // user already exists, update existing item in Bucket table
-        const updateParams = {
-            TableName: 'Bucket',
-            Key: {
-                'userId': { S: userId }
-            },
-            UpdateExpression: 'ADD buckets :b',
-            ExpressionAttributeValues: {
-                ':b': { SS: [bucketName] }
-            },
-            ReturnValues: "ALL_NEW"
-        };
+  }
 
-        await dynamoDbClient.send(new UpdateItemCommand(updateParams));
-    }
-
-    // create a new bucket
+  try {
+    // Try to create the bucket first
     await s3Client.send(
-        new CreateBucketCommand({
-            Bucket: bucketName,
-            ACL: 'private'
-        })
+      new CreateBucketCommand({
+        Bucket: bucketName,
+        ACL: 'private'
+      })
     );
 
+    // If bucket creation is successful, update DynamoDB
+    await updateDynamoDb();
+
     res.status(200).send(`Bucket "${bucketName}" created successfully.`);
-  } 
-  catch (error) {
+  } catch (error) {
     console.error('Error creating bucket:', error);
     res.status(500).json({error: error.message});
   }

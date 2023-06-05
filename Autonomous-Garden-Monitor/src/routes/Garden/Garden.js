@@ -131,7 +131,6 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
   useEffect(() => {
     // first we populate the /public/gardens folder (probably not a good idea to have the client change the API like this?)
-    fetchAndCreateGardenFolders();
     fetchGardenFolders();
 
     // load images if a garden was already selected before page reloads
@@ -260,24 +259,11 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     catch (error) {
       console.log("Error fetching images:", error);
     }
+    
     setIsLoading(false);
     setAnimateEye(false);    
-  };
 
-  // Call API to fetch S3 garden names (list all bucket names) for the current user
-  const fetchAndCreateGardenFolders = async () => {
-    try {
-      const user = await Auth.currentAuthenticatedUser();
-      await fetch('http://localhost:9000/getGardenNames', {
-        headers: {
-          'Authorization': user.signInUserSession.idToken.jwtToken
-        }
-      });
-    }
-    catch (error) {
-      console.error('Error fetching and creating garden folders:', error);
-    }
-  }
+  };
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -345,7 +331,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
             fontWeight: "bold",
             padding: "15px 30px",
            }}
-          onClick={(e) => toggleDropdown(e)}
+          onClick={async (e) => {await fetchGardenFolders(); toggleDropdown(e);}}
         >
           {selectedGarden}
         </Button>
