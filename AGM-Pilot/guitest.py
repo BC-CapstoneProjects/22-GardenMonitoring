@@ -1,11 +1,15 @@
 import os
 import tkinter as tk
+from tkinter import messagebox
 import tkinter.ttk as ttk
-
+import threading
+from ui import monitor, sync_garden
 import botocore
 from ttkthemes import ThemedTk
 import webbrowser
 import boto3
+import requests
+from aws_config import aws_exports
 
 # Just simply import the azure.tcl file
 
@@ -40,6 +44,10 @@ class App(ttk.Frame):
         # Create a client for the IAM service
         self.iam_client = boto3.client('iam')
 
+        # cognito client to authenticate user log in
+        self.cognito_idp_client = boto3.client('cognito-idp')
+        self.user_authenticated = False
+
         # Call the get_user method to retrieve the IAM user information
         self.user_info = self.iam_client.get_user()
 
@@ -56,6 +64,9 @@ class App(ttk.Frame):
             # existing s3 buckets will default to a non-active status
             if bucket.name not in self.gardens:
                 self.gardens[bucket.name] = "non-active"
+
+        # define selected_garden var as a string
+        self.selected_garden = tk.StringVar(value="Select Garden")
 
         # Make the app responsive
         for index in [0, 1, 2]:
@@ -83,8 +94,21 @@ class App(ttk.Frame):
         # Create widgets :)
         self.setup_widgets()
 
+    def update_tree(self, *args):
+        # Clear the tree
+        for i in self.treeview.get_children():
+            self.treeview.delete(i)
 
+        # Get the objects from the selected garden (bucket)
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(self.selected_garden.get())
+        for obj in bucket.objects.all():
+            # Insert the object into the tree
+            self.treeview.insert('', 'end', text=obj.key, values=obj.last_modified)
 
+    def start_monitoring(self):
+        monitor_thread = threading.Thread(target=monitor)
+        monitor_thread.start()
 
     def setup_widgets(self):
 
@@ -95,27 +119,46 @@ class App(ttk.Frame):
         )
 
         self.account_name = ttk.Label(
-            self.account_frame, text=str("username:      " + self.user_info['User']['UserName'])
+            self.account_frame, text=str("Username:")
         )
         self.account_name.grid(row=1, column=0, padx=5, pady=10, sticky="nsew")
 
-        self.account_email = ttk.Label(
-            self.account_frame, text=str("email:      " + self.email)
+        self.account_entry = ttk.Entry(
+            self.account_frame
         )
-        self.account_email.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
+        self.account_entry.grid(row=2, column=0, padx=5, pady=10, sticky="nsew")
+
+        self.password = ttk.Label(
+            self.account_frame, text=str("Password:")
+        )
+        self.password.grid(row=3, column=0, padx=5, pady=10, sticky="nsew")
+
+        self.password_entry = ttk.Entry(
+            self.account_frame
+        )
+        self.password_entry.grid(row=4, column=0, padx=5, pady=10, sticky="nsew")
+
+        # log in Button
+        self.login_button = ttk.Button(self.account_frame, text="Log In", command=self.authenticate_user)
+        self.login_button.grid(row=5, column=0, padx=5, pady=40, sticky="nsew")
+
+        # text gets updated after user logs in and is authenticated
+        self.username_label = ttk.Label(self.account_frame, text="")
+        self.username_label.grid(row=6, column=0, padx=5, pady=40, sticky="nsew")
 
         self.check_2 = ttk.Checkbutton(
             self.account_frame, text="Allow automatic uploads to AWS", variable=self.var_1
         )
-        self.check_2.grid(row=3, column=0, padx=5, pady=50, sticky="nsew")
+        self.check_2.grid(row=7, column=0, padx=5, pady=50, sticky="nsew")
 
         self.dashboard = ttk.Button(self.account_frame, style="Accent.TButton", text="Go to my AGM Dashboard",
                                     command=lambda: webbrowser.open("http://localhost:3000/garden"))
-        self.dashboard.grid(row=4, column=0, padx=5, pady=20, sticky="nsew")
+        self.dashboard.grid(row=8, column=0, padx=5, pady=20, sticky="nsew")
 
         # log out Button
-        self.button = ttk.Button(self.account_frame, text="Log out")
-        self.button.grid(row=6, column=0, padx=5, pady=20, sticky="nsew")
+        self.logout_button = ttk.Button(self.account_frame, text="Log out", command=self.logout)
+        self.logout_button.grid(row=9, column=0, padx=5, pady=20, sticky="nsew")
+        self.logout_button.grid_remove()  # initially hide the button
 
         # Create a Frame for input widgets
         self.widgets_frame = ttk.Frame(self, padding=(0, 0, 0, 10))
@@ -126,7 +169,7 @@ class App(ttk.Frame):
 
         # Entry
         self.garden_entry = ttk.Entry(self.widgets_frame)
-        self.garden_entry.insert(0, "Garden Name")
+        self.garden_entry.insert(0, "Enter new or existing garden name")
         self.garden_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0, 10), sticky="ew")
 
         # Add Garden Button
@@ -139,48 +182,19 @@ class App(ttk.Frame):
                                   command=lambda: self.remove_user_garden(self.garden_entry.get()))
         self.button3.grid(row=2, column=1, padx=5, pady=10, sticky="nsew")
 
-        # # Spinbox
-        # self.spinbox = ttk.Spinbox(self.widgets_frame, from_=0, to=100, increment=0.1)
-        # self.spinbox.insert(0, "Spinbox")
-        # self.spinbox.grid(row=1, column=0, padx=5, pady=10, sticky="ew")
-
-        # Combobox
-        # self.combobox = ttk.Combobox(self.widgets_frame, values=self.combo_list)
-        # self.combobox.current(0)
-        # self.combobox.grid(row=6, column=0, columnspan=2, padx=5, pady=10, sticky="ew")
-
-        # Read-only combobox
-        # self.readonly_combo = ttk.Combobox(
-        #     self.widgets_frame, state="readonly", values=self.readonly_combo_list
-        # )
-        # self.readonly_combo.current(0)
-        # self.readonly_combo.grid(row=3, column=0, columnspan=2, padx=5, pady=10, sticky="ew")
-
-        # Menu for the Menubutton
-        # self.menu = tk.Menu(self)
-        # self.menu.add_command(label="Menu item 1")
-        # self.menu.add_command(label="Menu item 2")
-        # self.menu.add_separator()
-        # self.menu.add_command(label="Menu item 3")
-        # self.menu.add_command(label="Menu item 4")
-
-        # # Menubutton
-        # self.menubutton = ttk.Menubutton(
-        #     self.widgets_frame, text="Menubutton", menu=self.menu, direction="below"
-        # )
-        # self.menubutton.grid(row=4, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
-
         # OptionMenu
         self.optionmenu = ttk.OptionMenu(
-            self.widgets_frame, self.var_4, *self.option_menu_list
+            self.widgets_frame, self.selected_garden, *self.option_menu_list
         )
         self.optionmenu.grid(row=5, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
         self.update_option_list()
 
-        # Accentbutton
+        # Accentbutton, uses 'monitoring' function imported from ui.py
         self.accentbutton = ttk.Button(
-            self.widgets_frame, text="Start Garden Monitoring", style="Accent.TButton"
+            self.widgets_frame, text="Start Garden Monitoring", style="Accent.TButton",
+            command=self.start_monitoring
         )
+
         self.accentbutton.grid(row=7, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
 
         # Togglebutton
@@ -224,38 +238,12 @@ class App(ttk.Frame):
         self.treeview.column(2, anchor="w", width=120)
 
         # Treeview headings
-        self.treeview.heading("#0", text="Garden Name", anchor="center")
-        self.treeview.heading(1, text="Status", anchor="center")
+        self.treeview.heading("#0", text="Plant ID", anchor="center")
+        self.treeview.heading(1, text="Date and time captured", anchor="center")
         # self.treeview.heading(2, text="Column 3", anchor="center")
 
-        # Define treeview data
-        treeview_data = [
-            ("", 1, f"Garden A", "Inactive"),
-            (1, 2, "plant1", "Not_Captured"),
-            (1, 3, "plant2", "Not_Captured"),
-            (1, 4, "plant3", "Not_Captured"),
-            (1, 5, "plant4", "Not_Captured"),
-            ("", 6, "Garden B", "Inactive"),
-            (6, 7, "plant", "Not_Captured"),
-            (6, 8, "Sub-Garden B", "Inactive"),
-            (8, 9, "plant", "Not_Captured"),
-            (8, 10, "plant", "Not_Captured"),
-            (8, 11, "plant", "Not_Captured"),
-            (6, 12, "plant", "Not_Captured"),
-            (6, 13, "plant", "Not_Captured")
-        ]
-
-        # Insert treeview data
-        for item in treeview_data:
-            self.treeview.insert(
-                parent=item[0], index="end", iid=item[1], text=item[2], values=item[3]
-            )
-            if item[0] == "" or item[1] in {8, 21}:
-                self.treeview.item(item[1], open=True)  # Open parents
-
-        # Select and scroll
-        self.treeview.selection_set(10)
-        self.treeview.see(7)
+        # Defines a callback function when the selected garden changes and updates the treeview
+        self.selected_garden.trace_add('write', self.update_tree)
 
         # Notebook, pane #2
         self.pane_2 = ttk.Frame(self.paned, padding=5)
@@ -271,16 +259,6 @@ class App(ttk.Frame):
             self.tab_1.columnconfigure(index=index, weight=1)
             self.tab_1.rowconfigure(index=index, weight=1)
         self.notebook.add(self.tab_1, text="Monitoring Progress")
-
-        # Scale
-        # self.scale = ttk.Scale(
-        #     self.tab_1,
-        #     from_=100,
-        #     to=0,
-        #     variable=self.var_5,
-        #     command=lambda event: self.var_5.set(self.scale.get()),
-        # )
-        # self.scale.grid(row=0, column=0, padx=(20, 10), pady=(20, 0), sticky="ew")
 
         # Progressbar
         self.progress = ttk.Progressbar(
@@ -299,19 +277,59 @@ class App(ttk.Frame):
 
         # Tab #2
         self.tab_2 = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_2, text="Garden 1 Images")
+        self.notebook.add(self.tab_2, text="Image preview")
 
         # Tab #3
-        self.tab_3 = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_3, text="Garden 2 Images")
-
-        # Tab #4
         self.logs = ttk.Frame(self.notebook)
         self.notebook.add(self.logs, text="Monitoring Logs")
 
         # Sizegrip
         self.sizegrip = ttk.Sizegrip(self)
         self.sizegrip.grid(row=100, column=100, padx=(0, 5), pady=(0, 5))
+
+    def authenticate_user(self):
+        username = self.account_entry.get()
+        password = self.password_entry.get()
+
+        try:
+            response = self.cognito_idp_client.initiate_auth(
+                AuthFlow='USER_PASSWORD_AUTH',
+                AuthParameters={
+                    'USERNAME': username,
+                    'PASSWORD': password
+                },
+                ClientId=aws_exports['ClientId']
+            )
+        except self.cognito_idp_client.exceptions.NotAuthorizedException:
+            messagebox.showerror("Error", "Invalid username or password")
+        except self.cognito_idp_client.exceptions.UserNotFoundException:
+            messagebox.showerror("Error", "User not found")
+        except Exception as e:
+            print("Error", f"Something went wrong: {e}")
+            messagebox.showerror("Error", f"Something went wrong: {e}")
+        else:
+            if response.get('AuthenticationResult').get('AccessToken'):
+                messagebox.showinfo("Success", "Logged in successfully")
+                self.user_authenticated = True
+                self.username_label.config(text=f'Welcome, {username}!')
+                self.logout_button.grid()  # Show logout button
+                # Hide these elements
+                self.account_name.grid_remove()
+                self.account_entry.grid_remove()
+                self.password.grid_remove()
+                self.password_entry.grid_remove()
+                self.login_button.grid_remove()
+
+    def logout(self):
+        # Display all hidden elements
+        self.user_authenticated = False
+        self.account_name.grid()
+        self.account_entry.grid()
+        self.password.grid()
+        self.password_entry.grid()
+        self.login_button.grid()
+        self.logout_button.grid_remove()  # hide the logout button
+        self.username_label.config(text="")  # clear the username label
 
     def update_option_list(self):
         # check for new bucket names not in gardens dictionary
