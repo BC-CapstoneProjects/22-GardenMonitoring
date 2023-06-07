@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 import tkinter.ttk as ttk
 import threading
-from ui import monitor, sync_garden
+from ui import monitor
 import botocore
 from ttkthemes import ThemedTk
 import webbrowser
@@ -47,23 +47,24 @@ class App(ttk.Frame):
         # cognito client to authenticate user log in
         self.cognito_idp_client = boto3.client('cognito-idp')
         self.user_authenticated = False
+        self.username = ""
 
         # Call the get_user method to retrieve the IAM user information
         self.user_info = self.iam_client.get_user()
 
-        self.gardens = {}
-        self.session = boto3.Session()
-        self.s3_client = self.session.client('s3')
-        self.s3 = self.session.resource('s3')
-        # Get the user's email (if available)
-        try:
-            self.email = self.user_info['User']['Email']
-        except KeyError:
-            self.email = 'Email not available'
-        for bucket in self.s3.buckets.all():
-            # existing s3 buckets will default to a non-active status
-            if bucket.name not in self.gardens:
-                self.gardens[bucket.name] = "non-active"
+
+        # self.session = boto3.Session()
+        # self.s3_client = self.session.client('s3')
+        # self.s3 = self.session.resource('s3')
+        # # Get the user's email (if available)
+        # try:
+        #     self.email = self.user_info['User']['Email']
+        # except KeyError:
+        #     self.email = 'Email not available'
+        # for bucket in self.s3.buckets.all():
+        #     # existing s3 buckets will default to a non-active status
+        #     if bucket.name not in self.gardens:
+        #         self.gardens[bucket.name] = "non-active"
 
         # define selected_garden var as a string
         self.selected_garden = tk.StringVar(value="Select Garden")
@@ -75,15 +76,16 @@ class App(ttk.Frame):
 
         # Create value lists
         self.option_menu_list = ["", "Select Garden"]
-        for i, (name, status) in enumerate(self.gardens.items()):
-            garden = {"name": name, "garden id": i + 1}
-            self.option_menu_list.append(garden)
+
+        # for i, (name, status) in enumerate(self.gardens.items()):
+        #     garden = {"name": name, "garden id": i + 1}
+        #     self.option_menu_list.append(garden)
 
         self.combo_list = ["Combobox", "Editable item 1", "Editable item 2"]
         self.readonly_combo_list = ["Readonly combobox", "Item 1", "Item 2"]
 
         # Create control variables
-        self.progress_percentage = 50.0
+        self.progress_percentage = 0
         self.var_0 = tk.BooleanVar()
         self.var_1 = tk.BooleanVar(value=False)
         self.var_2 = tk.BooleanVar()
@@ -149,11 +151,12 @@ class App(ttk.Frame):
         self.check_2 = ttk.Checkbutton(
             self.account_frame, text="Allow automatic uploads to AWS", variable=self.var_1
         )
-        self.check_2.grid(row=7, column=0, padx=5, pady=50, sticky="nsew")
+        self.check_2.grid(row=9, column=0, padx=5, pady=50, sticky="nsew")
 
         self.dashboard = ttk.Button(self.account_frame, style="Accent.TButton", text="Go to my AGM Dashboard",
                                     command=lambda: webbrowser.open("http://localhost:3000/garden"))
         self.dashboard.grid(row=8, column=0, padx=5, pady=20, sticky="nsew")
+        self.dashboard.grid_remove()  # initially hide the button
 
         # log out Button
         self.logout_button = ttk.Button(self.account_frame, text="Log out", command=self.logout)
@@ -187,7 +190,6 @@ class App(ttk.Frame):
             self.widgets_frame, self.selected_garden, *self.option_menu_list
         )
         self.optionmenu.grid(row=5, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
-        self.update_option_list()
 
         # Accentbutton, uses 'monitoring' function imported from ui.py
         self.accentbutton = ttk.Button(
@@ -311,8 +313,11 @@ class App(ttk.Frame):
             if response.get('AuthenticationResult').get('AccessToken'):
                 messagebox.showinfo("Success", "Logged in successfully")
                 self.user_authenticated = True
+                self.username = username
                 self.username_label.config(text=f'Welcome, {username}!')
-                self.logout_button.grid()  # Show logout button
+                self.dashboard.grid(row=7, column=0, padx=5, pady=20, sticky="nsew")
+                self.logout_button.grid(row=10, column=0, padx=5, pady=20, sticky="nsew")  # Show logout button
+                self.update_option_list()
                 # Hide these elements
                 self.account_name.grid_remove()
                 self.account_entry.grid_remove()
@@ -322,96 +327,64 @@ class App(ttk.Frame):
 
     def logout(self):
         # Display all hidden elements
+        print("Logout method called.")
         self.user_authenticated = False
+        self.username = ""
         self.account_name.grid()
         self.account_entry.grid()
         self.password.grid()
         self.password_entry.grid()
         self.login_button.grid()
-        self.logout_button.grid_remove()  # hide the logout button
+
+        #clear the options menu
+        self.option_menu_list.clear()
+        self.optionmenu['menu'].delete(0, 'end')
+
+        self.logout_button.grid_forget()  # hide the logout button
+        self.dashboard.grid_forget() # hide the dashboard button
         self.username_label.config(text="")  # clear the username label
 
     def update_option_list(self):
-        # check for new bucket names not in gardens dictionary
-        for bucket in self.s3.buckets.all():
-            # new buckets default to a non-active status
-            if bucket.name not in self.gardens:
-                self.gardens[bucket.name] = "non-active"
+        # Make API GET request to get garden names for the current user
+        response = requests.get(f'http://localhost:9000/getGardenNames/{self.username}')
+        # check response status code
+        if response.status_code != 200:
+            print(f"Error getting garden names for {self.username}: {response.text}")
+            return
+
+        garden_names_api = response.json()
+
+        # Refreshing the option menu
+        self.optionmenu['menu'].delete(0, 'end')
 
         # create a list of garden names
         # include dictionaries in the option_menu_list and then extract the "name" value from each dictionary
-        garden_names = [garden["name"] for garden in self.option_menu_list if isinstance(garden, dict)]
+        self.option_menu_list = [{"name": name, "garden id": i + 1} for i, name in enumerate(garden_names_api)]
 
-        # add new gardens to the option menu
-        for name, status in self.gardens.items():
-            if name not in garden_names:
-                garden = {"name": name, "garden id": len(self.option_menu_list) + 1}
-                self.option_menu_list.append(garden)
-                garden_names.append(name)
-                self.optionmenu['menu'].add_command(label=name,
-                                                    command=lambda value=name: self.selected_garden.set(value))
-
-        # Remove gardens from the option menu that are no longer in self.gardens
-        menu = self.optionmenu['menu']
-        for i in range(menu.index('end')):
-            label = menu.entrycget(i, 'label')
-            if label not in self.gardens:
-                menu.delete(i)
-
-        # clear the current option menu and repopulate it with the updated garden list
-        self.optionmenu['menu'].delete(0, tk.END)
         for garden in self.option_menu_list:
-            if isinstance(garden, dict):
-                self.optionmenu['menu'].add_command(label=garden['name'],
-                                                    command=lambda value=garden['name']: self.selected_garden.set(
-                                                        value))
-
+            self.optionmenu['menu'].add_command(label=garden['name'],
+                                                command=lambda value=garden['name']: self.selected_garden.set(value))
 
     def new_user_garden(self, garden_name):
-        response = "new_user_garden empty response"
-        garden_created = False
-        try:
-            response = self.s3_client.create_bucket(
-                Bucket=garden_name,
-                CreateBucketConfiguration={
-                    'LocationConstraint': 'us-west-2',
-                },
-            )
-        except self.s3_client.exceptions.ClientError:
-            print("Invalid bucket name\n")
-        except self.s3_client.exceptions.BucketAlreadyExists:
-            print("Garden name already exists\n")
-        else:
-            garden_created = True
+        # Make API POST request to create new garden for the current user
+        response = requests.post(f'http://localhost:9000/createGarden/{self.username}/{garden_name}')
+        # check the response from the API
+        if response.status_code != 200:
+            print(f"Error creating new garden named {garden_name}: {response}")
+            return
         # add new garden to the option list
         self.update_option_list()
         print(response)
 
-
     def remove_user_garden(self, garden_name):
-        response = "remove_user_garden empty response"
-        try:
-            response = self.s3_client.delete_bucket(
-                Bucket=garden_name,
-            )
-            # Remove the garden from the gardens dictionary
-            if garden_name in self.gardens:
-                self.gardens.pop(garden_name)
-
-                # Remove the garden from the option menu list
-            for i, garden in enumerate(self.option_menu_list):
-                if isinstance(garden, dict) and garden['name'] == garden_name:
-                    self.option_menu_list.pop(i)
-                    break
-
-        except self.s3_client.exceptions.ClientError:
-            print("Invalid bucket name\n")
-        except botocore.exceptions.ParamValidationError as e:
-            # handle the exception here
-            print("ParamValidationError: {}".format(str(e)))
+        # Make API DELETE request to delete a garden for the current user
+        response = requests.delete(f'http://localhost:9000/deleteGarden/{self.username}/{garden_name}')
+        # check the response from the API
+        if response.status_code != 200:
+            print(f"Error deleting garden named {garden_name}: {response}")
+            return
 
         # Update the option menu list
-        self.gardens.pop(garden_name, None)
         self.update_option_list()
         print(response)
 

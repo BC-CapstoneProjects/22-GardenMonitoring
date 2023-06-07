@@ -46,7 +46,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   
 
   // Add useState hooks for scans and selectedGarden
-  const [scans, setLocalScans] = useState([]);
+  const [localScans, setLocalScans] = useState([]);
   const [selectedGarden, setLocalSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
 
   // bucket ("garden") creation and deletion
@@ -90,6 +90,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   // counts the number of occurrences of each disease in the scan results
   // prepares the data for the bar chart.
   const updateBarData = (scanResults) => {
+    console.log("updateBarData");
     const diseaseCounts = scanResults.reduce((acc, curr) => {
       if (!curr.disease) {
         return acc;
@@ -117,7 +118,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         disease: plant.disease || 'Unknown'
       };
     });
-
+    console.log("transformed scans ", transformedData);
     return transformedData;
   };
 
@@ -235,7 +236,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       const result = await response.json();
       console.log("API Result:", result);
     
-      const barData2 = { data: scans, selectedGarden: selectedGarden }; // create barData object here
+      const barData2 = { data: localScans, selectedGarden: selectedGarden }; // create barData object here
       setBarData(barData2);
     
       // Check that result.presignedUrls is defined and is an array before updating state
@@ -441,7 +442,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
               {/* {selectedGarden} Weekly Report */}
             </Typography>
             <Box height="250px" mt="-20px">
-              <BarChart isDashboard={true} data={scans} selectedGarden={selectedGarden} />
+              <BarChart isDashboard={true} data={localScans} selectedGarden={selectedGarden} />
             </Box>
           </Box>
         }

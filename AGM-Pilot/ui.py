@@ -186,11 +186,13 @@ def monitor():
                         hold_counter += 1
                         attempts = 0
                         if hold_counter > 5 and images_captured < 2:
-                            images_captured += 1
+
+                            # plant names become "Plant_n" where n is some number 0-7
                             img_name = str(
-                                "images/test_plant" + rnd_num + "_" + str(
+                                "images/Plant" + "_" + str(
                                     images_captured) + ".png")
                             cv2.imwrite(img_name, me.get_frame_read().frame)
+                            images_captured += 1
                             image_captured = True
                             hold_counter = 0
 
