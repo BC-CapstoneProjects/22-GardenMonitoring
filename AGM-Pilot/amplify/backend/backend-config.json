@@ -1,0 +1,101 @@
+{
+  "auth": {
+    "agmamplify6657deb7": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_agmamplify6657deb7_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    },
+    "AMPLIFY_auth_agmamplify6657deb7_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "agmamplify6657deb7"
+        }
+      ]
+    }
+  }
+}
