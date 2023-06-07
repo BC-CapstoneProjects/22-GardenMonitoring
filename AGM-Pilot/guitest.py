@@ -52,7 +52,6 @@ class App(ttk.Frame):
         # Call the get_user method to retrieve the IAM user information
         self.user_info = self.iam_client.get_user()
 
-
         # self.session = boto3.Session()
         # self.s3_client = self.session.client('s3')
         # self.s3 = self.session.resource('s3')
@@ -200,8 +199,12 @@ class App(ttk.Frame):
         self.accentbutton.grid(row=7, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
 
         # Togglebutton
+        # sync local garden data with AWS garden data
+        # initiates ML if timestamp is newer
+        self.toggle_state = tk.IntVar() # this stores togglebutton's state (checked/unchecked)
         self.togglebutton = ttk.Checkbutton(
-            self.widgets_frame, text="Ready", style="Toggle.TButton"
+            self.widgets_frame, text="Sync local data", style="Toggle.TButton", command=self.upload_images,
+            variable=self.toggle_state
         )
         self.togglebutton.grid(row=8, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
 
@@ -387,6 +390,46 @@ class App(ttk.Frame):
         # Update the option menu list
         self.update_option_list()
         print(response)
+
+    def upload_images(self):
+        # update text of toggle button
+        self.togglebutton.config(text='Uploading to AWS, do not close AGM-Pilot')
+        self.update_idletasks() # force tkinter to update GUI with text changes
+        print(self.selected_garden.get())
+
+        # get all images in the image directory
+        image_folder = './images'
+        image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
+
+        for image_file in image_files:
+            file_path = os.path.join(image_folder, image_file)
+
+            # generate a presigned URL using the putImage API route
+            url = f'http://localhost:9000/putImage/{self.username}/{self.selected_garden.get()}/{image_file}'
+            response = requests.put(url)
+
+            if response.status_code == 200:
+                print(f'Successfully generated presigned URL for {image_file}')
+                presigned_url = response.json()['presignedUrls']
+
+                # upload the image to the presigned URL
+                with open(file_path, 'rb') as image:
+                    files = {
+                        'file': (None, image)
+                    }
+                    upload_response = requests.put(presigned_url, files=files)
+
+                    if upload_response.status_code == 200:
+                        print(f'Successfully uploaded {image_file}')
+                    else:
+                        print(f'Failed to upload {image_file}')
+            else:
+                print(f'Failed to generate presigned URL for {image_file}')
+        self.togglebutton.grid_forget()
+        self.togglebutton.config(text='Sync local data')
+        self.togglebutton.grid(row=8, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")  # re-grid the button
+        self.toggle_state.set(0)
+        self.update_idletasks()  # update GUI
 
 
 if __name__ == "__main__":
