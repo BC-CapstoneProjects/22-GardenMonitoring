@@ -3,6 +3,21 @@ import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
 import { mockPieData as data } from "../data/mockData";
 
+// export const mockPieData = [
+//   {
+//     id: "Mosaic Disease",
+//     label: "Mosaic Disease",
+//     value: 239,
+//     color: "hsl(104, 70%, 50%)",
+//   },
+//   {
+//     id: "Bacterial Blight",
+//     label: "Bacterial Blight",
+//     value: 170,
+//     color: "hsl(162, 70%, 50%)",
+//   },
+// ];
+
 const PieChart = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);

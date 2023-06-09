@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import logo from './logo.css';
 import { I18n } from 'aws-amplify';
 import { translations } from '@aws-amplify/ui-react';
+import { updateScans } from "./components/Plants/PlantDescriptions";
 
 
 // AWS Cognito
@@ -204,6 +205,11 @@ const formFields = {
   },
 
 };
+
+export const setScans = (newScans) => {
+  // Update the setScans state here
+};
+
 
 
 function App() {

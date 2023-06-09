@@ -1,5 +1,5 @@
 import "./Subject.css";
-import LineChart from "../../components/Charts/LineChart";
+import LineChart from "../../scenes/line";
 import Typography from '@mui/material/Typography';
 import AWS from "aws-sdk";
 

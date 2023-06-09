@@ -8,7 +8,7 @@ router.get('/plant/:plantId', async (req, res, next) => {
   const plantId = req.params.plantId;
 
   try {
-    const filePath = path.join(process.cwd(), 'public', 'scans', `Plant_${plantId}.json`);
+    const filePath = path.join(process.cwd(), 'public', 'scans', `Plant_${p}.json`);
     const data = await readFile(filePath, 'utf8');
     res.json(JSON.parse(data));
   } catch (error) {

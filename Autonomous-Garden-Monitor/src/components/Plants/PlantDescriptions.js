@@ -32,7 +32,7 @@ const plants = [
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
     state: "success",
     sun: 'Full Sun to Partial Shade',
-    leaves: 'Unusual foliage color, Fragrant', 
+    leaves: 'Unusual foliage color, Fragrant',
     flowers: 'Showy, Fragrant',
     suitableLocations: 'Bog gardening',
     propMethods: 'Cuttings: Stem',
@@ -137,10 +137,10 @@ const plants = [
     state: "error",
     water: 'Mesic',
     containers: 'Needs excellent drainage in pots',
-    link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',  
+    link: 'https://garden.org/plants/view/119743/Peace-Lily-Spathiphyllum-cannifolium/',
     disease: 'N/A',
     probability: 'N/A',
-    timestamp: 'N/A',  
+    timestamp: 'N/A',
   },
   {
     id: 7,
@@ -163,6 +163,7 @@ const plants = [
   },
 ];
 
+
 // this function updates the disease, probability, and timestamp for each plant 
 async function updatePlantHealth(plants, bucketName) {
   console.log('updatePlantHealth input:', plants);
@@ -171,6 +172,8 @@ async function updatePlantHealth(plants, bucketName) {
 
   for (const plant of plants) {
     const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
+
+    if (response.ok) {
     const data = await response.json();
 
     // If there are any scans, update the plant with the most recent scan
@@ -179,13 +182,24 @@ async function updatePlantHealth(plants, bucketName) {
       plant.disease = mostRecentScan.disease;
       plant.probability = mostRecentScan.probability;
       plant.timestamp = mostRecentScan.time_stamp;
+    } 
+
+    } 
+    // if the 
+    if (!response.ok) {
+
+      await response.json();
+    
+      plant.disease = "N/A";
+      plant.probability = "N/A";
+      plant.timestamp = "N/A";
     }
   }
 
   // Return the updated plants array
   console.log('updatePlantHealth output:', plants);
 
-  const updatedPlants = plants.map(updatePlantState);
+  const updatedPlants = await plants.map(updatePlantState);
 
   return updatedPlants;
 }
@@ -196,16 +210,28 @@ function updatePlantState(plant) {
   console.log('updatePlantState input:', plant);
 
   switch (plant.disease) {
-    case 'Healthy' && 'N/A':
+    case 'Healthy':
       plant.state = "success";
       break;
     case 'Unknown':
-     plant.state = "warning";
+      plant.state = "error";
+      break;
+    case 'Mosaic Disease':
+      plant.state = "warning";
+      break;
+    case "Green Mite":
+      plant.state = "warning";
+      break;
+    case 'Bacterial Blight':
+      plant.state = "warning";
+      break;
+    case "Brown Streak Disease":
+      plant.state = "warning";
       break;
     default:
-      plant.state = "error";
+      plant.state = "success";
   }
-  
+
 
   // Return the updated plants array
   console.log('updatePlantState output:', plant);

@@ -46,7 +46,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   
 
   // Add useState hooks for scans and selectedGarden
-  const [scans, setLocalScans] = useState([]);
+  const [localScans, setLocalScans] = useState([]);
   const [selectedGarden, setLocalSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
 
   // bucket ("garden") creation and deletion
@@ -69,58 +69,59 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [barData, setBarData] = useState(null);
 
   // listens for changes of the 'plants' state and logs it to the console
-  useEffect(() => {
-    console.log("Updated plants:", plants);
-  }, [plants]);
+  // useEffect(() => {
+  //   console.log("Updated plants:", plants);
+    
+  // }, [plants]);
   
-  useEffect(() => {
-    console.log("Updated imageUrls:", imageUrls);
-  }, [imageUrls]);
+  // useEffect(() => {
+  //   console.log("Updated imageUrls:", imageUrls);
+  // }, [imageUrls]);
   
-  useEffect(() => {
-    fetchScans().then((scanResults) => {
-      
-      setLocalScans(scanResults);
-      //setScans(scanResults);
-      const transformedData = transformDataForChart(scanResults);
-      updateBarData(transformedData);
-    });
-  }, [selectedGarden]);
+  // useEffect(() => {
+  //   fetchScans().then((scanResults) => {
+  //     console.log("scanResults:", scanResults);
+  //     setLocalScans(scanResults);
+  //     setScans(scanResults);
+  //     const transformedData = transformDataForChart(scanResults);
+  //     updateBarData(transformedData);
+  //   });
+  // }, [selectedGarden]);
   
 
   // counts the number of occurrences of each disease in the scan results
   // prepares the data for the bar chart.
-  const updateBarData = (scanResults) => {
-    const diseaseCounts = scanResults.reduce((acc, curr) => {
-      if (!curr.disease) {
-        return acc;
-      }
-      if (!acc[curr.disease]) {
-        acc[curr.disease] = 1;
-      }
-      else {
-        acc[curr.disease]++;
-      }
-      return acc;
-    }, {});
+  // const updateBarData = (scanResults) => {
+  //   const diseaseCounts = scanResults.reduce((acc, curr) => {
+  //     if (!curr.disease) {
+  //       return acc;
+  //     }
+  //     if (!acc[curr.disease]) {
+  //       acc[curr.disease] = 1;
+  //     }
+  //     else {
+  //       acc[curr.disease]++;
+  //     }
+  //     return acc;
+  //   }, {});
 
-    const newBarData = Object.keys(diseaseCounts).map(disease => {
-      return { name: disease, count: diseaseCounts[disease] };
-    });
-    setBarData(newBarData);
-  };
+  //   const newBarData = Object.keys(diseaseCounts).map(disease => {
+  //     return { name: disease, count: diseaseCounts[disease] };
+  //   });
+  //   setBarData(newBarData);
+  // };
 
   // returns an array of objects
-  const transformDataForChart = (scanResults) => {
-    const transformedData = scanResults.map(plant => {
-      return {
-        time_stamp: plant.timestamp,
-        disease: plant.disease || 'Unknown'
-      };
-    });
+  // const transformDataForChart = (scanResults) => {
+  //   const transformedData = scanResults.map(plant => {
+  //     return {
+  //       time_stamp: plant.timestamp,
+  //       disease: plant.disease || 'Unknown'
+  //     };
+  //   });
 
-    return transformedData;
-  };
+  //   return transformedData;
+  // };
 
   useEffect(() => {
     // we could add more code here to be executed when the refreshKey state changes...
@@ -217,28 +218,24 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
   // function that updates data after a user selects a garden from the dropdown
   const handleGardenSelection = async (gardenName) => {
-    setSelectedGarden(gardenName); // set selected garden name
+    setSelectedGarden(gardenName); // Update the selectedGarden state in App.js
+    setLocalSelectedGarden(gardenName); // Update the selectedGarden state in Garden.js and the parent state in App.js
     localStorage.setItem('selectedGarden', gardenName); // Save selected garden localStorage 
     setIsGardenSelected(true); // sets isGardenSelected state variable to true, can view barchart
     setDropdownVisible(false); // hide dropdown menu
     setShowGardenButton(false);
     setIsLoading(true);
     setAnimateEye(true);
-  
-    // Update the selectedGarden state in Garden.js and the parent state in App.js
-    setLocalSelectedGarden(gardenName);
-    setSelectedGarden(gardenName);
-  
     try {
       // Call getImage route from the API using the selected 'gardenName'
       const user = await Auth.currentAuthenticatedUser();
       const response = await fetch(`http://localhost:9000/getImage/${user.username}/${gardenName}`); 
       const result = await response.json();
       console.log("API Result:", result);
-    
-      const barData2 = { data: scans, selectedGarden: selectedGarden }; // create barData object here
-      setBarData(barData2);
-    
+
+      // const barData2 = { data: localScans, selectedGarden: selectedGarden }; // create barData object here
+      // setBarData(barData2);
+
       // Check that result.presignedUrls is defined and is an array before updating state
       if (Array.isArray(result.presignedUrls)) {
         setImageUrls(result.presignedUrls);
@@ -255,6 +252,8 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         
         // update the plants state in the PlantDescriptions component
         setPlants(plantsWithUpdatedState);
+        setLocalScans(plantsWithUpdatedState);
+        setScans(plantsWithUpdatedState);
       });
     } 
     catch (error) {
@@ -442,7 +441,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
               {/* {selectedGarden} Weekly Report */}
             </Typography>
             <Box height="250px" mt="-20px">
-              <BarChart isDashboard={true} data={scans} selectedGarden={selectedGarden} />
+              <BarChart isDashboard={true} data={localScans} selectedGarden={selectedGarden} />
             </Box>
           </Box>
         }
