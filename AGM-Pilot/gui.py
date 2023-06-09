@@ -1,9 +1,10 @@
 import os
 import tkinter as tk
+from time import strftime, gmtime
 from tkinter import messagebox
 import tkinter.ttk as ttk
 import threading
-from ui import monitor
+from pilot import monitor
 import botocore
 from ttkthemes import ThemedTk
 import webbrowser
@@ -22,7 +23,7 @@ button_names = {
 }
 
 """
-guitest.py was built with the help from the following
+gui.py was built with the help from the following
 Example script and assets, for testing the Azure ttk theme.
 Any additional implementation is original work created by
 Capstone, Group 7 (AGM), at Bellevue College.
@@ -190,7 +191,7 @@ class App(ttk.Frame):
         )
         self.optionmenu.grid(row=5, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
 
-        # Accentbutton, uses 'monitoring' function imported from ui.py
+        # Accentbutton, uses 'monitoring' function imported from pilot.py
         self.accentbutton = ttk.Button(
             self.widgets_frame, text="Start Garden Monitoring", style="Accent.TButton",
             command=self.start_monitoring
@@ -244,7 +245,7 @@ class App(ttk.Frame):
 
         # Treeview headings
         self.treeview.heading("#0", text="Plant ID", anchor="center")
-        self.treeview.heading(1, text="Date and time captured", anchor="center")
+        self.treeview.heading(1, text="Date and time of sync", anchor="center")
         # self.treeview.heading(2, text="Column 3", anchor="center")
 
         # Defines a callback function when the selected garden changes and updates the treeview
@@ -269,12 +270,12 @@ class App(ttk.Frame):
         self.progress = ttk.Progressbar(
             self.tab_1, value=0, variable=self.var_5, mode="determinate"
         )
-        self.progress.grid(row=0, column=0, columnspan=2, padx=(10, 20), pady=(20, 0), sticky="ew")
+        self.progress.grid(row=5, column=0, columnspan=2, padx=(10, 20), pady=(20, 0), sticky="ew")
 
         # Label
         self.label = ttk.Label(
             self.tab_1,
-            text=f"Current progress =  {self.var_5}%",
+            text=f"Current progress =  {self.progress_percentage}%",
             justify="center",
             font=("-size", 15, "-weight", "bold"),
         )
@@ -391,6 +392,7 @@ class App(ttk.Frame):
         self.update_option_list()
         print(response)
 
+    # uploads all images from 'images' folder to s3 bucket with name in selected_garden.get()
     def upload_images(self):
         # update text of toggle button
         self.togglebutton.config(text='Uploading to AWS, do not close AGM-Pilot')
@@ -400,6 +402,8 @@ class App(ttk.Frame):
         # get all images in the image directory
         image_folder = './images'
         image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
+
+        time_stamp_written = False
 
         for image_file in image_files:
             file_path = os.path.join(image_folder, image_file)
@@ -414,22 +418,64 @@ class App(ttk.Frame):
 
                 # upload the image to the presigned URL
                 with open(file_path, 'rb') as image:
-                    files = {
-                        'file': (None, image)
-                    }
-                    upload_response = requests.put(presigned_url, files=files)
+                    headers = {"Content-Type": "image/jpeg"}  # AWS needs this header or image data will become corrupt
+                    image_data = image.read()
+                    upload_response = requests.put(presigned_url, data=image_data, headers=headers)
 
                     if upload_response.status_code == 200:
                         print(f'Successfully uploaded {image_file}')
+                        if not time_stamp_written:
+                            # upload new time_stamp.txt
+                            time_stamp_written = self.upload_timestamp()
                     else:
                         print(f'Failed to upload {image_file}')
             else:
                 print(f'Failed to generate presigned URL for {image_file}')
+
         self.togglebutton.grid_forget()
         self.togglebutton.config(text='Sync local data')
         self.togglebutton.grid(row=8, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")  # re-grid the button
         self.toggle_state.set(0)
+        self.update_tree() # update the Plant ID's and date/time information in the treeview
         self.update_idletasks()  # update GUI
+
+    # creates and uploads a new time_stamp to the current garden
+    # returns bool
+    def upload_timestamp(self):
+        time_stamp_written = False
+        time_stamp_file = 'time_stamp.txt'
+
+        # generate a presigned URL using the putImage API route
+        url = f'http://localhost:9000/putImage/{self.username}/{self.selected_garden.get()}/{time_stamp_file}'
+        response = requests.put(url)
+
+        if response.status_code == 200:
+            print(f'Successfully generated presigned URL for {time_stamp_file}')
+            presigned_url = response.json()['presignedUrls']
+
+            # upload the new time_stamp.txt to the presigned URL
+            try:
+                fp = open("time_stamp.txt", "w")
+                fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
+                fp.close()
+            except FileNotFoundError:
+                fp = open("time_stamp.txt", "w")
+                fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
+                fp.close()
+            with open(str('time_stamp.txt'), "rb") as f:
+                f = {
+                    'file': (None, f)
+                }
+                time_stamp_upload_response = requests.put(presigned_url, files=f)
+                if time_stamp_upload_response.status_code == 200:
+                    print(f'Successfully uploaded {f}')
+                    return True
+
+                else:
+                    print(f'Failed to upload {f}')
+                    return False
+        else:
+            print(f'Failed to generate presigned URL for {time_stamp_file}')
 
 
 if __name__ == "__main__":
