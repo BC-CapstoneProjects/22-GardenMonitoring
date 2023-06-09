@@ -29,6 +29,7 @@ import { getGardenNames } from './routes/getGardenNames.js';
 import { updateLabel } from './routes/updateLabel.js';
 import { createGarden } from './routes/createGarden.js';
 import { deleteGarden } from './routes/deleteGarden.js';
+import { putImage } from './routes/putImage.js';
 
 //define cronjobs
 //import { initScheduledJobs } from './scheduledFunctions/initScheduledJobs.js';
@@ -63,6 +64,7 @@ app.use('/updateLabel', updateLabel);
 app.use('/users', users);
 app.use('/createGarden', createGarden);
 app.use('/deleteGarden', deleteGarden);
+app.use('/putImage', putImage);
 
 // app.use(express.static('./public'));
 
