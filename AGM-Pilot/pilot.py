@@ -1,19 +1,21 @@
-import sys
+import logging
+import os
+import time
+from time import gmtime, strftime
 
 import boto3
-from botocore.exceptions import ClientError, ProfileNotFound
-import os, time, logging
-from time import gmtime, strftime
-from config.definitions import ROOT_DIR
 import cv2
-from djitellopy import tello
 import cvzone
 import numpy as np
+from botocore.exceptions import ClientError
+from djitellopy import tello
+
+from config.definitions import ROOT_DIR
 
 thres = 0.50
 nmsThres = 0.2
 classNames = []
-classFile = 'ss.names'  # Contains a totoal of 91 different objects which can be recognized by the code
+classFile = 'ss.names'  # Contains a total of 91 different objects which can be recognized by the code
 with open(classFile, 'rt') as f:
     classNames = f.read().split('\n')
 
@@ -31,7 +33,6 @@ net.setInputSwapRB(True)
 
 
 flight_path = {}
-
 
 plant_x = 0
 plant_y = 0
@@ -132,11 +133,22 @@ def select_garden(user_client):
 
 
 def monitor():
+    me = tello.Tello()
+    me.LOGGER.setLevel(logging.WARNING)
+    me.connect()
+    print("Battery = " + str(me.get_battery()) + "%")
+    if me.get_battery() <= 15:
+        me.streamoff()
+        print("Battery too low to fly.")
+
+    me.streamon()
+    monitor()
+
     rnd = np.random.default_rng(12345)
     rnd_num = str(rnd.random())
     print(bcolors.WARNING + "DRONE TAKING OFF" + bcolors.ENDC)
     time.sleep(2)
-    me.takeoff()
+    # me.takeoff()
     attempts = 0
     rotate_right_counter = 0
     rotate_left_counter = 0
@@ -175,18 +187,19 @@ def monitor():
                     if image_captured:
                         print(bcolors.OKCYAN + "I've taken", images_captured, "pictures" + bcolors.ENDC)
                         hold_counter = 0
-                        me.rotate_clockwise(50)
-                        me.move_back(30)
+                        # me.rotate_clockwise(50)
+                        # me.move_back(30)
                         image_captured = False
                         if images_captured >= 2:
-                            me.land()
+                            # me.land()
                             monitoring = False
+                            me.streamoff()
+                            continue
 
                     if distance_ok and x_centered and y_centered:
                         hold_counter += 1
                         attempts = 0
                         if hold_counter > 5 and images_captured < 2:
-
                             # plant names become "Plant_n" where n is some number 0-7
                             img_name = str(
                                 "images/Plant" + "_" + str(
@@ -203,7 +216,7 @@ def monitor():
                         distance_ok = False
                         if move_forward_counter > 3:
                             move_forward_counter = 0
-                            me.move_forward(20)
+                            # me.move_forward(20)
                             print(bcolors.WARNING + "MOVE DRONE FORWARD" + bcolors.ENDC)
 
                     else:
@@ -212,32 +225,29 @@ def monitor():
                             move_backward_counter += 1
                             distance_ok = False
                             if move_backward_counter > 1:
-                                me.move_back(20)
+                                # me.move_back(20)
                                 print(bcolors.FAIL + "MOVE DRONE BACK" + bcolors.ENDC)
                         else:
                             distance_ok = True
                             hold_counter += 1
                             attempts = 0
 
-
                     # check plant in x-axis
                     if x > 440:
-                        #print(bcolors.WARNING + "X axis off center, move drone right" + bcolors.ENDC)
+                        # print(bcolors.WARNING + "X axis off center, move drone right" + bcolors.ENDC)
                         x_centered = False
                         rotate_right_counter += 1
                         if rotate_right_counter > 2:
-                            #print("HELP HELP HELP HELP")
                             print(bcolors.WARNING + "ROTATE DRONE CLOCKWISE" + bcolors.ENDC)
-                            me.rotate_clockwise(10)
+                            # me.rotate_clockwise(10)
                             rotate_right_counter = 0
                     elif x < 220:
-                        #print(bcolors.WARNING + "X axis off center, move drone left" + bcolors.ENDC)
+                        # print(bcolors.WARNING + "X axis off center, move drone left" + bcolors.ENDC)
                         rotate_left_counter += 1
                         x_centered = False
                         if rotate_left_counter > 2:
-                            #print("HELP HELP HELP HELP")
                             print(bcolors.WARNING + "ROTATE DRONE COUNTERCLOCKWISE" + bcolors.ENDC)
-                            me.rotate_counter_clockwise(10)
+                            # me.rotate_counter_clockwise(10)
                             rotate_left_counter = 0
                     else:
                         print(bcolors.OKGREEN + "X AXIS ON CENTER" + bcolors.ENDC)
@@ -249,20 +259,20 @@ def monitor():
 
                     # check plant in y-axis
                     if y > 400:
-                        #print(bcolors.WARNING + "Y axis off center, move drone down" + bcolors.ENDC)
+                        # print(bcolors.WARNING + "Y axis off center, move drone down" + bcolors.ENDC)
                         y_centered = False
                         move_down_counter += 1
                         if move_down_counter > 5:
                             print(bcolors.WARNING + "MOVE DRONE DOWN" + bcolors.ENDC)
-                            me.move_down(20)
+                            # me.move_down(20)
                             move_down_counter = 0
                     elif y < 80:
-                        #print(bcolors.WARNING + "Y axis off center, move drone up" + bcolors.ENDC)
+                        # print(bcolors.WARNING + "Y axis off center, move drone up" + bcolors.ENDC)
                         y_centered = False
                         move_up_counter += 1
                         if move_up_counter > 5:
                             print(bcolors.WARNING + "MOVE DRONE UP" + bcolors.ENDC)
-                            me.move_up(20)
+                            # me.move_up(20)
                             move_up_counter = 0
                     else:
                         print(bcolors.OKGREEN + "Y AXIS ON CENTER" + bcolors.ENDC)
@@ -278,11 +288,14 @@ def monitor():
                     if object_not_found_counter > 5:
                         attempts += 1
                         object_not_found_counter = 0
-                        me.rotate_clockwise(40)
+                        # me.rotate_clockwise(40)
                     elif attempts > 5:
-                        me.land()
+                        # me.land()
                         print(bcolors.FAIL + "5 failed attempts landing" + bcolors.ENDC)
                         monitoring = False
+                        me.streamoff()
+                        continue
+
         except:
             pass
         # me.send_rc_control(0, 0, 0, 0)

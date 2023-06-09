@@ -3,6 +3,8 @@ import { s3Client } from "../public/libs/s3Client.js";
 import { dynamoDbClient } from '../public/libs/dynamoDbClient.js';
 import { PutItemCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { CreateBucketCommand } from '@aws-sdk/client-s3';
+import { PutBucketNotificationConfigurationCommand } from '@aws-sdk/client-s3';
+import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda'
 
 const router = express.Router();
 
@@ -61,6 +63,49 @@ router.post("/:userId/:bucketName", async (req, res) => {
 
     // If bucket creation is successful, update DynamoDB
     await updateDynamoDb();
+
+    // Add permission for the new bucket to invoke Lambda
+    const lambdaClient = new LambdaClient({ region: "us-west-2" });
+    const lambdaFunctionArn = "arn:aws:lambda:us-west-2:286336465435:function:s3trigger_startstopec2";
+    const addPermissionParams = {
+      FunctionName: lambdaFunctionArn,
+      StatementId: `${bucketName}-s3invoke`,
+      Action: 'lambda:InvokeFunction',
+      Principal: 's3.amazonaws.com',
+      SourceArn: `arn:aws:s3:::${bucketName}`
+    };
+    await lambdaClient.send(new AddPermissionCommand(addPermissionParams));
+
+    // Configure bucket to use the s3trigger_startstopec2 lambda function on s3:ObjectCreated events
+    const notificationParams = {
+      Bucket: bucketName,
+      NotificationConfiguration: {
+          LambdaFunctionConfigurations: [
+              {
+                  LambdaFunctionArn: lambdaFunctionArn,
+                  Events: ["s3:ObjectCreated:*"],
+                  Filter: { 
+                      Key: {
+                          FilterRules: [{ 
+                              Name: "suffix", 
+                              Value: ".txt" 
+                          }]
+                      }
+                  }
+              },
+          ],
+      },
+  };
+    
+    try {
+        // Add the notification params to the new s3 bucket
+        await s3Client.send(new PutBucketNotificationConfigurationCommand(notificationParams));
+        console.log(`Notification configuration set for new bucket: ${bucketName}`);
+    }
+    catch (error) {
+        console.log(`Error setting notification configuration for new bucket: ${bucketName}: Error: ${error}`);
+        throw error;
+    }
 
     res.status(200).send(`Bucket "${bucketName}" created successfully.`);
   } catch (error) {
