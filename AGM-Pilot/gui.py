@@ -443,39 +443,28 @@ class App(ttk.Frame):
     # returns bool
     def upload_timestamp(self):
         time_stamp_written = False
-        time_stamp_file = 'time_stamp.txt'
 
         # generate a presigned URL using the putImage API route
-        url = f'http://localhost:9000/putImage/{self.username}/{self.selected_garden.get()}/{time_stamp_file}'
+        url = f'http://localhost:9000/putImage/{self.username}/{self.selected_garden.get()}/time_stamp.txt'
         response = requests.put(url)
 
         if response.status_code == 200:
-            print(f'Successfully generated presigned URL for {time_stamp_file}')
+            print(f'Successfully generated presigned URL for timestamp.')
             presigned_url = response.json()['presignedUrls']
 
-            # upload the new time_stamp.txt to the presigned URL
-            try:
-                fp = open("time_stamp.txt", "w")
-                fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
-                fp.close()
-            except FileNotFoundError:
-                fp = open("time_stamp.txt", "w")
-                fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
-                fp.close()
-            with open(str('time_stamp.txt'), "rb") as f:
-                f = {
-                    'file': (None, f)
-                }
-                time_stamp_upload_response = requests.put(presigned_url, files=f)
-                if time_stamp_upload_response.status_code == 200:
-                    print(f'Successfully uploaded {f}')
-                    return True
+            # create and upload a new time_stamp.txt to the presigned URL
+            timestamp = strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime())
+            headers = {'Content-Type': 'text/plain'}
+            timestamp_upload_response = requests.put(presigned_url, data=timestamp, headers=headers)
+            if timestamp_upload_response.status_code == 200:
+                print(f'Successfully uploaded timestamp.')
+                return True
 
-                else:
-                    print(f'Failed to upload {f}')
-                    return False
+            else:
+                print(f'Failed to upload timestamp.')
+                return False
         else:
-            print(f'Failed to generate presigned URL for {time_stamp_file}')
+            print(f'Failed to generate presigned URL for timestamp.')
 
 
 if __name__ == "__main__":
