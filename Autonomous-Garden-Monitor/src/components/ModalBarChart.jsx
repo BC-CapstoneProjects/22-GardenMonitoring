@@ -2,7 +2,7 @@ import { useTheme } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { Bar } from "react-chartjs-2";
-import plants from '../components/Plants/PlantDescriptions';
+import plants from './Plants/PlantDescriptions';
 import React, { useState, useEffect } from "react"; 
 
 const BarChart = ({ isDashboard = false, data, selectedGarden }) => {
