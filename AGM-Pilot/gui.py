@@ -36,35 +36,29 @@ Source: https://github.com/rdbende/ttk-widget-factory
 # import tkinter as tk
 # from tkinter import ttk
 
+def start_monitoring():
+    monitor_thread = threading.Thread(target=monitor)
+    monitor_thread.start()
+    print("drone landed")
+
+
 class App(ttk.Frame):
 
     def __init__(self, parent):
         ttk.Frame.__init__(self)
 
+        # Call the get_user method to retrieve the IAM user information
+        self.user_info = ""
+
         # AccountInfo
         # Create a client for the IAM service
-        self.iam_client = boto3.client('iam')
+        self.iam_client = ""
 
         # cognito client to authenticate user log in
-        self.cognito_idp_client = boto3.client('cognito-idp')
+        self.cognito_idp_client = ""
+
         self.user_authenticated = False
         self.username = ""
-
-        # Call the get_user method to retrieve the IAM user information
-        self.user_info = self.iam_client.get_user()
-
-        # self.session = boto3.Session()
-        # self.s3_client = self.session.client('s3')
-        # self.s3 = self.session.resource('s3')
-        # # Get the user's email (if available)
-        # try:
-        #     self.email = self.user_info['User']['Email']
-        # except KeyError:
-        #     self.email = 'Email not available'
-        # for bucket in self.s3.buckets.all():
-        #     # existing s3 buckets will default to a non-active status
-        #     if bucket.name not in self.gardens:
-        #         self.gardens[bucket.name] = "non-active"
 
         # define selected_garden var as a string
         self.selected_garden = tk.StringVar(value="Select Garden")
@@ -76,10 +70,6 @@ class App(ttk.Frame):
 
         # Create value lists
         self.option_menu_list = ["", "Select Garden"]
-
-        # for i, (name, status) in enumerate(self.gardens.items()):
-        #     garden = {"name": name, "garden id": i + 1}
-        #     self.option_menu_list.append(garden)
 
         self.combo_list = ["Combobox", "Editable item 1", "Editable item 2"]
         self.readonly_combo_list = ["Readonly combobox", "Item 1", "Item 2"]
@@ -107,10 +97,6 @@ class App(ttk.Frame):
         for obj in bucket.objects.all():
             # Insert the object into the tree
             self.treeview.insert('', 'end', text=obj.key, values=obj.last_modified)
-
-    def start_monitoring(self):
-        monitor_thread = threading.Thread(target=monitor)
-        monitor_thread.start()
 
     def setup_widgets(self):
 
@@ -154,7 +140,7 @@ class App(ttk.Frame):
         self.check_2.grid(row=9, column=0, padx=5, pady=50, sticky="nsew")
 
         self.dashboard = ttk.Button(self.account_frame, style="Accent.TButton", text="Go to my AGM Dashboard",
-                                    command=lambda: webbrowser.open("http://localhost:3000/garden"))
+                                    command=lambda: webbrowser.open("http://localhost:3000/"))
         self.dashboard.grid(row=8, column=0, padx=5, pady=20, sticky="nsew")
         self.dashboard.grid_remove()  # initially hide the button
 
@@ -194,14 +180,13 @@ class App(ttk.Frame):
         # Accentbutton, uses 'monitoring' function imported from pilot.py
         self.accentbutton = ttk.Button(
             self.widgets_frame, text="Start Garden Monitoring", style="Accent.TButton",
-            command=self.start_monitoring
+            command=start_monitoring
         )
 
         self.accentbutton.grid(row=7, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
 
         # Togglebutton
         # sync local garden data with AWS garden data
-        # initiates ML if timestamp is newer
         self.toggle_state = tk.IntVar() # this stores togglebutton's state (checked/unchecked)
         self.togglebutton = ttk.Checkbutton(
             self.widgets_frame, text="Sync local data", style="Toggle.TButton", command=self.upload_images,
@@ -270,7 +255,7 @@ class App(ttk.Frame):
         self.progress = ttk.Progressbar(
             self.tab_1, value=0, variable=self.var_5, mode="determinate"
         )
-        self.progress.grid(row=5, column=0, columnspan=2, padx=(10, 20), pady=(20, 0), sticky="ew")
+        self.progress.grid(row=0, column=0, columnspan=2, padx=(10, 20), pady=(20, 0), sticky="ew")
 
         # Label
         self.label = ttk.Label(
@@ -283,7 +268,7 @@ class App(ttk.Frame):
 
         # Tab #2
         self.tab_2 = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_2, text="Image preview")
+        self.notebook.add(self.tab_2, text="Local image preview")
 
         # Tab #3
         self.logs = ttk.Frame(self.notebook)
@@ -294,6 +279,16 @@ class App(ttk.Frame):
         self.sizegrip.grid(row=100, column=100, padx=(0, 5), pady=(0, 5))
 
     def authenticate_user(self):
+        # AccountInfo
+        # Create a client for the IAM service
+        self.iam_client = boto3.client('iam')
+
+        # cognito client to authenticate user log in
+        self.cognito_idp_client = boto3.client('cognito-idp')
+
+        # Call the get_user method to retrieve the IAM user information
+        self.user_info = self.iam_client.get_user()
+
         username = self.account_entry.get()
         password = self.password_entry.get()
 
