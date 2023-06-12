@@ -3,42 +3,134 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockLineData as data } from "../data/mockData";
 
-const LineChart = ({ isCustomLineColors = false, data, isDashboard = false }) => {
+
+
+const mockLineData = [
+  {
+    id: "",
+    color: tokens("dark").redAccent[200],
+    data: [
+      {
+        x: "plane",
+        y: 191,
+      },
+      {
+        x: "helicopter",
+        y: 136,
+      },
+      {
+        x: "boat",
+        y: 91,
+      },
+      {
+        x: "train",
+        y: 190,
+      },
+      {
+        x: "subway",
+        y: 211,
+      },
+      {
+        x: "bus",
+        y: 152,
+      },
+      {
+        x: "car",
+        y: 189,
+      },
+      {
+        x: "moto",
+        y: 152,
+      },
+      {
+        x: "bicycle",
+        y: 8,
+      },
+      {
+        x: "horse",
+        y: 197,
+      },
+      {
+        x: "skateboard",
+        y: 107,
+      },
+      {
+        x: "others",
+        y: 170,
+      },
+    ],
+  },
+];
+
+
+
+const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const labels = ["Mosaic Disease", "Bacterial Blight", "Green Mite", "Brown Streak Disease", "Healthy", "Unknown"];
-  const dateDiseaseCounts = {};
+  //get the disease info of selected plant
+  const plantLineData = lineData[id];
 
-  function formatDate(time_stamp) {
-    const [dayOfWeek, day, month, year, time, timeZone ] = time_stamp.split(/[-\s:]/);
-    const months = {
-      Jan: '01',
-      Feb: '02',
-      Mar: '03',
-      Apr: '04',
-      May: '05',
-      Jun: '06',
-      Jul: '07',
-      Aug: '08',
-      Sep: '09',
-      Oct: '10',
-      Nov: '11',
-      Dec: '12'
-    };
-    return `${year}-${months[month]}-${day}`;
+  //date sort function
+  function sortObjectByKeys(obj) {
+    if (obj) {
+      let entries = Object.entries(obj);
+      entries.sort((a, b) => {
+        let timeA = Date.parse(a[0]);
+        let timeB = Date.parse(b[0]);
+        return timeA - timeB;
+      });
+      return Object.fromEntries(entries);
+    } else {
+      console.error('The input object is null or undefined!');
+      return obj;
+    }
   }
 
-  data.forEach(plantData => {
-    const date = formatDate(plantData.timestamp);
-    const disease = formatDate(plantData.timestamp);
-    // if (!dateDiseaseCounts)
+  //sort the disease's date using date-sort function:'sortObjectByKeys'
+  for (let disease in plantLineData) {
+    console.log('log the object', plantLineData[disease]); // log the object
+    plantLineData[disease] = sortObjectByKeys(plantLineData[disease]);
+  }
 
-  })
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const year = date.getFullYear();
+  
+    return `${month}/${day}/${year}`;
+  }
+
+  const formattedData1 = Object.entries(plantLineData).map(([id, dataObj]) => {
+    const data = Object.entries(dataObj).map(([x, y]) => ({x: formatDate(x), y}));
+  
+    return {
+      id,
+      data
+    };
+  });
+  console.log('formattedData1', formattedData1);
+
+
+  const formattedData2 = Object.entries(formattedData1).map(([id, dataObj]) => {
+    const data = Object.entries(dataObj).map(([x, y]) => ({x, y}));
+    return {
+      id,
+      color: tokens("dark").redAccent[200],
+      data
+    };
+  });
+  
+  console.log('formattedData2',formattedData2);
+
+
+
+
 
   return (
     <ResponsiveLine
-      data={data}
+      data={formattedData2}
       theme={{
         axis: {
           domain: {
@@ -91,7 +183,7 @@ const LineChart = ({ isCustomLineColors = false, data, isDashboard = false }) =>
         tickSize: 0,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "transportation", // added
+        legend: isDashboard ? undefined : "Date", // added
         legendOffset: 36,
         legendPosition: "middle",
       }}
@@ -101,7 +193,7 @@ const LineChart = ({ isCustomLineColors = false, data, isDashboard = false }) =>
         tickSize: 3,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "count", // added
+        legend: isDashboard ? undefined : "Disease Count", // added
         legendOffset: -40,
         legendPosition: "middle",
       }}

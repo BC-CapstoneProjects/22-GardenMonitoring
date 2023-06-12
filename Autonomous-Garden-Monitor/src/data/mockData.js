@@ -514,6 +514,48 @@ export const mockPieData = [
   },
 ];
 
+
+export const mockModalLineData = [
+  {
+    id: "us",
+    color: tokens("dark").redAccent[200],
+    data: [
+      {
+        x: "06/09/2023",
+        y: 191,
+      },
+      {
+        x: "06/10/2023",
+        y: 136,
+      },
+      {
+        x: "06/11/2023",
+        y: 91,
+      },
+      {
+        x: "06/12/2023",
+        y: 190,
+      },
+      {
+        x: "06/13/2023",
+        y: 211,
+      },
+      {
+        x: "06/14/2023",
+        y: 152,
+      },
+      {
+        x: "06/15/2023",
+        y: 189,
+      },
+      {
+        x: "06/16/2023",
+        y: 152,
+      },
+    ],
+  },
+];
+
 export const mockLineData = [
   {
     id: "japan",

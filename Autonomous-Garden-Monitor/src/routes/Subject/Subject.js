@@ -1,16 +1,19 @@
 import "./Subject.css";
-import LineChart from "../../scenes/line";
+import LineChart from "../../scenes/line/ModalLineChart";
 import Typography from '@mui/material/Typography';
-import AWS from "aws-sdk";
+import { plants as PlantDescriptions, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
 
 import { useEffect, useState } from "react";
 
 function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
-  propMethods, otherMethods, containers, link, imageUrls,index}) {
+  propMethods, otherMethods, containers, link, imageUrls, index, lineData} ) {
 
   console.log('imageUrls',imageUrls, index)
   console.log('indexcheck', index)
+
+  console.log('lineData in Subject', lineData)
+  
     
   const [diseaseData, setDiseaseData] = useState(null);
 
@@ -59,7 +62,7 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
           className="subject-image border-8 border-sky-500 hover:border-double rounded"
       />
         <p className="border-primary rounded">
-          <LineChart />
+          <LineChart id={id} lineData={lineData} />
         </p>
       </div>
       <div >

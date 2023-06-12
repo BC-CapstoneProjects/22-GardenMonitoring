@@ -3,7 +3,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import { plants as PlantDescriptions, updatePlantHealth, updatePlantState } from "../../components/Plants/PlantDescriptions";
+import { plants as PlantDescriptions, updatePlantHealth, updatePlantState, getLineChartData } from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Subject from "../../routes/Subject/Subject";
@@ -66,7 +66,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const [barData, setBarData] = useState(null);
+  const [lineData, setLineData] = useState('');
 
   // listens for changes of the 'plants' state and logs it to the console
   // useEffect(() => {
@@ -255,6 +255,12 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         setLocalScans(plantsWithUpdatedState);
         setScans(plantsWithUpdatedState);
       });
+
+      getLineChartData(plants, gardenName).then((lineChartData) => {
+        setLineData(lineChartData);
+        console.log('setLineData:', lineData);
+      });
+
     } 
     catch (error) {
       console.log("Error fetching images:", error);
@@ -306,12 +312,14 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [selectedPlant, setSelectedPlant] = useState(null);
 
   // Add a function to handle plant clicks
-  const handlePlantClick = (plant, index) => {
+  const handlePlantClick = (plant, index, lineData) => {
     const imageUrl = imageUrls[index] || plant.imageSrc; // remove the hardcoded localhost URL
+    // console.log('lineData from handlePlantClick', lineData)
     setSelectedPlant({
       ...plant,
       imageUrl,
-    });
+      lineData
+    } );
     setModalOpen(true);
     setSubjectID(plant.id);
 };
@@ -511,7 +519,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                           link,
                           disease,
                         },
-                        index
+                        index, lineData
                       )
                     }
                   >
@@ -554,7 +562,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                         handlePlantClick({
                           id, name, type, imageUrls, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
                           propMethods, otherMethods, containers, link, disease
-                        }, index)
+                        }, index, lineData)
                       }
                     />
                   </Box>
