@@ -1,5 +1,6 @@
 import { Auth } from 'aws-amplify';
 
+
 const plants = [
   {
     id: 0,
@@ -174,22 +175,23 @@ async function updatePlantHealth(plants, bucketName) {
     const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
 
     if (response.ok) {
-    const data = await response.json();
+      const data = await response.json();
 
-    // If there are any scans, update the plant with the most recent scan
-    if (data && data[0] && data[0].length > 0) {
-      const mostRecentScan = data[0][0];
-      plant.disease = mostRecentScan.disease;
-      plant.probability = mostRecentScan.probability;
-      plant.timestamp = mostRecentScan.time_stamp;
-    } 
+      // console.log("response11", data);
 
-    } 
-    // if the 
+      // If there are any scans, update the plant with the most recent scan
+      if (data && data[0] && data[0].length > 0) {
+        const mostRecentScan = data[0][0];
+        plant.disease = mostRecentScan.disease;
+        plant.probability = mostRecentScan.probability;
+        plant.timestamp = mostRecentScan.time_stamp;
+      }
+
+    }
+    // if there's no data saved in DynamoDB for this plant,
     if (!response.ok) {
 
       await response.json();
-    
       plant.disease = "N/A";
       plant.probability = "N/A";
       plant.timestamp = "N/A";
@@ -203,6 +205,117 @@ async function updatePlantHealth(plants, bucketName) {
 
   return updatedPlants;
 }
+
+
+
+// this function saves the number of the diseased plants in slected garden.
+async function getLineChartData(plants, bucketName) {
+
+  const user = await Auth.currentAuthenticatedUser();
+
+  let IdMap = {};
+  
+
+  for (const plant of plants) {
+    const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
+    let id = `${plant.id}`;
+
+    if (response.ok) {
+      const data = await response.json();
+      let countMap = {};
+
+      // If there are any scans, update the plant with the most recent scan
+      if (data && data[0] && data[0].length > 0) {
+        for (let i = 0; i < data[0].length; i++) {
+          const currentScan = data[0][i];
+          const disease = currentScan['disease'];
+          const time_stamp = currentScan['time_stamp'];
+          // const date = currentScan.time_stamp
+
+          if(!countMap[disease]) {
+            countMap[disease] = {};
+          }
+
+          if (!countMap[disease][time_stamp]) {
+            // If the key is not in the map, add it with a value of 1
+            countMap[disease][time_stamp] = 0;
+          }
+          countMap[disease][time_stamp]++;
+        }
+      }
+
+      console.log("getLineChartData", countMap);
+      console.log("getLineChartData2", plant.id);
+      
+      IdMap[id] = countMap;
+
+    }
+    // if there's no data saved in DynamoDB for this plant,
+    if (!response.ok) {
+      return null;
+    }
+  }
+  // Return the updated plants array
+  console.log('IdMap:', IdMap);
+
+  return IdMap;
+}
+
+
+
+// // this function saves the number of the diseased plants in slected garden.
+// async function getLineChartData(plants, bucketName) {
+
+//   const user = await Auth.currentAuthenticatedUser();
+
+//   let IdMap = {};
+  
+
+//   for (const plant of plants) {
+//     const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
+//     let id = `${plant.id}`;
+    
+//     if (response.ok) {
+//       const data = await response.json();
+//       let countMap = {};
+
+//       // If there are any scans, update the plant with the most recent scan
+//       if (data && data[0] && data[0].length > 0) {
+//         for (let i = 0; i < data[0].length; i++) {
+//           const currentScan = data[0][i];
+//           const disease = currentScan['disease'];
+//           const time_stamp = currentScan['time_stamp'];
+//           // const date = currentScan.time_stamp
+
+//           if(!countMap[time_stamp]) {
+//             countMap[time_stamp] = {};
+//           }
+
+//           if (!countMap[time_stamp][disease]) {
+//             // If the key is not in the map, add it with a value of 1
+//             countMap[time_stamp][disease] = 0;
+//           }
+//           countMap[time_stamp][disease]++;
+//         }
+//       }
+
+//       console.log("getLineChartData", countMap);
+//       console.log("getLineChartData2", plant.id);
+      
+//       IdMap[id] = countMap;
+
+//     }
+//     // if there's no data saved in DynamoDB for this plant,
+//     if (!response.ok) {
+//       return null;
+//     }
+//   }
+//   // Return the updated plants array
+//   console.log('IdMap:', IdMap);
+
+//   return IdMap;
+// }
+
 
 
 // this function updates a the 'state' field for the given plant based on it's disease label
@@ -290,4 +403,4 @@ updateAllImageSrcs(plants).then((updatedPlants) => {
   plants = updatedPlants;
 });
 
-export { plants, updatePlantHealth, updatePlantState };
+export { plants, updatePlantHealth, updatePlantState, getLineChartData };
