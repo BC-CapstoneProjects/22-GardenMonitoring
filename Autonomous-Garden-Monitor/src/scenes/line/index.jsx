@@ -2,11 +2,11 @@ import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
 
-const Line = () => {
+const Line = ({ plantName }) => {
   return (
     <Box m="20px">
-      <Header title="Line Chart" subtitle="Simple Line Chart" />
-      <Box height="75vh">
+      <Header subtitle={`${plantName ?? "Plant"} Line Chart`} />
+      <Box height="25vh">
         <LineChart />
       </Box>
     </Box>
