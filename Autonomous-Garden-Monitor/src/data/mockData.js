@@ -516,164 +516,158 @@ export const mockPieData = [
 
 export const mockLineData = [
   {
-    id: "japan",
+    id: "Mosaic Disease",
     color: tokens("dark").greenAccent[500],
     data: [
       {
-        x: "plane",
-        y: 101,
+        x: "2023_23-06-09",
+        y: 0,
       },
       {
-        x: "helicopter",
-        y: 75,
+        x: "2023_23-06-16",
+        y: 0,
       },
       {
-        x: "boat",
-        y: 36,
+        x: "2023_23-06-20",
+        y: 0,
       },
       {
-        x: "train",
-        y: 216,
+        x: "2023_23-06-25",
+        y: 0,
       },
       {
-        x: "subway",
-        y: 35,
-      },
-      {
-        x: "bus",
-        y: 236,
-      },
-      {
-        x: "car",
-        y: 88,
-      },
-      {
-        x: "moto",
-        y: 232,
-      },
-      {
-        x: "bicycle",
-        y: 281,
-      },
-      {
-        x: "horse",
-        y: 1,
-      },
-      {
-        x: "skateboard",
-        y: 35,
-      },
-      {
-        x: "others",
-        y: 14,
+        x: "2023_23-06-30",
+        y: 0,
       },
     ],
   },
   {
-    id: "france",
+    id: "Bacterial Blight",
     color: tokens("dark").blueAccent[300],
     data: [
       {
-        x: "plane",
-        y: 212,
+        x: "2023_23-06-09",
+        y: 0,
       },
       {
-        x: "helicopter",
-        y: 190,
+        x: "2023_23-06-16",
+        y: 0,
       },
       {
-        x: "boat",
-        y: 270,
+        x: "2023_23-06-20",
+        y: 0,
       },
       {
-        x: "train",
-        y: 9,
+        x: "2023_23-06-25",
+        y: 0,
       },
       {
-        x: "subway",
-        y: 75,
-      },
-      {
-        x: "bus",
-        y: 175,
-      },
-      {
-        x: "car",
-        y: 33,
-      },
-      {
-        x: "moto",
-        y: 189,
-      },
-      {
-        x: "bicycle",
-        y: 97,
-      },
-      {
-        x: "horse",
-        y: 87,
-      },
-      {
-        x: "skateboard",
-        y: 299,
-      },
-      {
-        x: "others",
-        y: 251,
+        x: "2023_23-06-30",
+        y: 0,
       },
     ],
   },
   {
-    id: "us",
+    id: "Green Mite",
     color: tokens("dark").redAccent[200],
     data: [
       {
-        x: "plane",
-        y: 191,
+        x: "2023_23-06-09",
+        y: 10,
       },
       {
-        x: "helicopter",
-        y: 136,
+        x: "2023_23-06-16",
+        y: 75,
       },
       {
-        x: "boat",
-        y: 91,
+        x: "2023_23-06-20",
+        y: 36,
       },
       {
-        x: "train",
-        y: 190,
+        x: "2023_23-06-25",
+        y: 21,
       },
       {
-        x: "subway",
-        y: 211,
+        x: "2023_23-06-30",
+        y: 35,
+      },
+    ],
+  },
+  {
+    id: "Brown Streak Disease",
+    color: tokens("dark").redAccent[200],
+    data: [
+      {
+        x: "2023_23-06-09",
+        y: 0,
       },
       {
-        x: "bus",
-        y: 152,
+        x: "2023_23-06-16",
+        y: 0,
       },
       {
-        x: "car",
-        y: 189,
+        x: "2023_23-06-20",
+        y: 0,
       },
       {
-        x: "moto",
-        y: 152,
+        x: "2023_23-06-25",
+        y: 0,
       },
       {
-        x: "bicycle",
-        y: 8,
+        x: "2023_23-06-30",
+        y: 0,
+      },
+    ],
+  },
+  {
+    id: "Healthy",
+    color: tokens("dark").redAccent[200],
+    data: [
+      {
+        x: "2023_23-06-09",
+        y: 0,
       },
       {
-        x: "horse",
-        y: 197,
+        x: "2023_23-06-16",
+        y: 0,
       },
       {
-        x: "skateboard",
-        y: 107,
+        x: "2023_23-06-20",
+        y: 0,
       },
       {
-        x: "others",
-        y: 170,
+        x: "2023_23-06-25",
+        y: 0,
+      },
+      {
+        x: "2023_23-06-30",
+        y: 0,
+      },
+    ],
+  },
+  {
+    id: "Unknown",
+    color: tokens("dark").redAccent[200],
+    data: [
+      {
+        x: "2023_23-06-09",
+        y: 0,
+      },
+      {
+        x: "2023_23-06-16",
+        y: 0,
+      },
+      {
+        x: "2023_23-06-20",
+        y: 0,
+      },
+      {
+        x: "2023_23-06-25",
+        y: 0,
+      },
+      {
+        x: "2023_23-06-30",
+        y: 0,
       },
     ],
   },

@@ -2,7 +2,8 @@ import "./Subject.css";
 import LineChart from "../../scenes/line";
 import Typography from '@mui/material/Typography';
 import AWS from "aws-sdk";
-
+import { SelectField } from '@aws-amplify/ui-react';
+import { plantTypes } from "../../components/Plants/PlantTypes";
 import { useEffect, useState } from "react";
 
 function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun, 
@@ -23,6 +24,8 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
   }, [id, disease]);
 
   console.log("Disease Data: ", id, diseaseData);
+  const [plantType, setPlantType] = useState(type);
+  const plantTypeRecord = plantTypes.find(plantTypeEntry=> plantTypeEntry.id == plantType);
 
   return (
     <div id="subject-page" data-key="subject" className="grid grid-cols-2">
@@ -32,9 +35,13 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
     <Typography variant="h5" component="span" >{name ?? "name not found "}</Typography>
     <br />
     <Typography variant="h5" component="span" className="underline" sx={{ fontWeight: "bold" }} >Genus: </Typography>
-    <Typography variant="h5" component="span" >
-      {type ?? <span style={{ color: "red" }}>{'Information Not Available'}</span>}
-    </Typography>
+    
+    <SelectField value={plantType} onChange={(e) => setPlantType(e.target.value)}>       
+      {
+        plantTypes.map( ({id, type}) => 
+          <option key={id} value={id} >{type}</option> )
+      }
+    </SelectField>
     <br />
     {diseaseData && treatmentPlan(diseaseData.label)}
   </div>
@@ -59,7 +66,10 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
           className="subject-image border-8 border-sky-500 hover:border-double rounded"
       />
         <p className="border-primary rounded">
-          <LineChart />
+        <div className="smallChart">
+          <LineChart plantName={name}/>
+        </div>
+
         </p>
       </div>
       <div >
@@ -67,98 +77,98 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
         Tips and Tricks
       </h2>
       <section className="table table-fixed">
-        <div className="text-black text-center">{"For more information about your "}{name}{" click here: "} <a href={ link } target="_blank" className="hover:underline text-blue-500" rel="noreferrer">garden.org</a></div>      
+        <div className="text-black text-center">{"For more information about your "}{name}{" click here: "} <a href={ plantTypeRecord.link } target="_blank" className="hover:underline text-blue-500" rel="noreferrer">garden.org</a></div>      
         <table className="modal-bodyborder-collapse 
           border-separate border-spacing-2 border-slate-500 bg-slate-900/20 rounded">
         <tbody>
           <tr>  
             <td className="border-2 border-slate-600 hover:border-dashed bg-white">
               <p className="text-black">
-                <b>Sun Requirements:</b> {sun ?? <span style={{color: "red"}}>Information Not Available</span>}
+                <b>Sun Requirements:</b> {plantTypeRecord.sun ?? <span style={{color: "red"}}>Information Not Available</span>}
               </p>
             </td>
           </tr>
           <tr>
             <td className="border-2 border-slate-600 bg-gray-300 rounded hover:border-dashed">
               <p className="text-black">
-                <b>Water Preferences:</b> {water ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                <b>Water Preferences:</b> {plantTypeRecord.water ?? <span style={{color: "red"}}>Information Not Available</span>}  
               </p>
             </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 rounded hover:border-dashed bg-white">
                   <p className="text-black">
-                  <b>Soil pH Preferences:</b> {soil ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Soil pH Preferences:</b> {plantTypeRecord.soil ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
               </tr>
           <tr>
                 <td className="border-2 border-slate-600 bg-gray-300 rounded hover:border-dashed">
                   <p className="text-black">
-                  <b>Minimum cold hardiness:</b> {minColdHard ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Minimum cold hardiness:</b> {plantTypeRecord.minColdHard ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 rounded hover:border-dashed bg-white">
                   <p className="text-black">
-                  <b>Leaves:</b> {leaves ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Leaves:</b> {plantTypeRecord.leaves ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 bg-gray-300 rounded hover:border-dashed">
                   <p className="text-black">
-                  <b>Flowers:</b> {flowers ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Flowers:</b> {plantTypeRecord.flowers ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 rounded hover:border-dashed bg-white">
                   <p className="text-black">
-                  <b>Flower color:</b> {flowerColor ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Flower color:</b> {plantTypeRecord.flowerColor ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 bg-gray-300 rounded hover:border-dashed">
                   <p className="text-black">
-                  <b>Bloom size:</b> {bloomSize ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Bloom size:</b> {plantTypeRecord.bloomSize ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 rounded hover:border-dashed bg-white">
                   <p className="text-black">
-                  <b>Flower time:</b> {flowerTime ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Flower time:</b> {plantTypeRecord.flowerTime ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
                 <td className="border-2 border-slate-600 bg-gray-300 rounded hover:border-dashed">
                   <p className="text-black">
-                  <b>Suitable locations:</b> {suitableLocations ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                  <b>Suitable locations:</b> {plantTypeRecord.suitableLocations ?? <span style={{color: "red"}}>Information Not Available</span>}  
                   </p>
                 </td>
           </tr>
           <tr>
             <td className="border-2 border-slate-600 rounded hover:border-dashed bg-white">
               <p className="text-black">
-                <b>Propagation:</b> {propMethods ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                <b>Propagation:</b> {plantTypeRecord.propMethods ?? <span style={{color: "red"}}>Information Not Available</span>}  
               </p>
             </td>
           </tr>
           <tr>
             <td className="border-2 border-slate-600 bg-gray-300 rounded hover:border-dashed">
               <p className="text-black">
-                <b>Other methods:</b> {otherMethods ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                <b>Other methods:</b> {plantTypeRecord.otherMethods ?? <span style={{color: "red"}}>Information Not Available</span>}  
               </p>
             </td>
           </tr>
           <tr>
             <td className="border-2 border-slate-600 rounded hover:border-dashed bg-white">
               <p className="text-black">
-                <b>Containers:</b> {containers ?? <span style={{color: "red"}}>Information Not Available</span>}  
+                <b>Containers:</b> {plantTypeRecord.containers ?? <span style={{color: "red"}}>Information Not Available</span>}  
               </p>
             </td>
           </tr>
