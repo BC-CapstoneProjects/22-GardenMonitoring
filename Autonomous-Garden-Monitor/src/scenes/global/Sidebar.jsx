@@ -16,6 +16,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -208,6 +209,20 @@ const Sidebar = () => {
               title="Line Chart"
               to="/line"
               icon={<TimelineOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "20px 50px 5px 10px" }}
+            >
+              Downloads
+            </Typography>
+            <Item
+              title="AGM-Pilot"
+              to="/downloads"
+              icon={<TrackChangesIcon /> }
               selected={selected}
               setSelected={setSelected}
             />

@@ -17,6 +17,7 @@ import Form from "./scenes/form";
 import Line from "./scenes/line";
 import Pie from "./scenes/pie";
 import Geography from "./scenes/geography";
+import Downloads from "./scenes/downloads";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
@@ -258,10 +259,11 @@ function App() {
                 {/* <Route path="/" element={<Sign />} /> */}
                 <Route path="/form" element={<Form />} />
                 <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
-                <Route path="/pie" element={<Pie data={scans} selectedGarden={selectedGarden} />} />
-                <Route path="/line" element={<Line data={scans} selectedGarden={selectedGarden} />} />
+                <Route path="/pie" element={<Pie />} />
+                <Route path="/line" element={<Line />} />
                 <Route path="/calendar" element={<Calendar />} />
                 <Route path="/geography" element={<Geography />} />
+                <Route path="/downloads" element={<Downloads />} />
                 {/* <Route path="/garden" element={<Garden />} />
               <Route path="/view/:subjectID" element={<Garden />} /> */}
 
