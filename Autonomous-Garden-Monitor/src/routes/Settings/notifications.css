@@ -1,0 +1,25 @@
+.button {
+    border-radius: 5px;
+    border: none;
+    padding: 5px 10px;
+  }
+  .button.on {
+    background-color: #83c5ff;
+  }
+  .button.off {
+    background-color: #bbbbbb;
+  }
+  
+  .button.edit {
+    background-color: #fae529;
+  }
+  
+  .sidebar-item .button {
+    color: #ffffff;
+    background-color: #4e6bd5;
+  }
+  
+  .sidebar-item .button.home-button {
+    background-color: #e63880;
+  }
+  
