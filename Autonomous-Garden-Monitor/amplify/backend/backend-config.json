@@ -1,101 +1,28 @@
 {
   "auth": {
-    "dev1e3ee0d4": {
+    "dev2479df4a": {
       "customAuth": false,
       "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
       "providerPlugin": "awscloudformation",
-      "service": "Cognito",
-      "serviceType": "imported"
-    }
-  },
-  "parameters": {
-    "AMPLIFY_auth_dev1e3ee0d4_allowUnauthenticatedIdentities": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_authRoleArn": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_authRoleName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_identityPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_identityPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_nativeClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_unauthRoleArn": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_unauthRoleName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_userPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_userPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_webClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
+      "service": "Cognito"
     }
   }
 }

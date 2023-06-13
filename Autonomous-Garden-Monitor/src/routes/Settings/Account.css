@@ -1,0 +1,33 @@
+
+.button.red {
+    background-color: #da3344;
+  }
+  .sidebar-item .button {
+    color: #ffffff;
+    background-color: #4e6bd5;
+  }
+  
+  .sidebar-item .button.home-button {
+    background-color: #e63880;
+  }
+  .button:hover.red {
+    background-color: #da3344;
+    color: white;
+  }
+  .navbar .nav-item {
+    display: inline-block;
+    padding: 0 10px;
+  }
+  
+  input {
+    border: 1px solid black;
+  }
+  .navbar {
+    text-align: center;
+  }
+  
+  .navbar .nav-item {
+    display: inline-block;
+    padding: 0 10px;
+  }
+  
