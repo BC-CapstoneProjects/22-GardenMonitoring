@@ -132,7 +132,8 @@ def select_garden(user_client):
             continue
 
 
-def monitor():
+def monitor(flag):
+    flag = True
     me = tello.Tello()
     me.LOGGER.setLevel(logging.WARNING)
     me.connect()
@@ -142,7 +143,6 @@ def monitor():
         print("Battery too low to fly.")
 
     me.streamon()
-    monitor()
 
     rnd = np.random.default_rng(12345)
     rnd_num = str(rnd.random())
@@ -294,7 +294,8 @@ def monitor():
                         print(bcolors.FAIL + "5 failed attempts landing" + bcolors.ENDC)
                         monitoring = False
                         me.streamoff()
-                        continue
+                        flag = False
+                        return flag
 
         except:
             pass
@@ -315,60 +316,6 @@ def menu():
     credentials_source = credentials.method
 
     print("Credentials are coming from:", credentials_source)
-
-
-# upload file to active S3 in 'garden'
-# def sync_garden():
-#     s3_client = boto3.client(
-#         's3'
-#     )
-#     gardens_to_sync = 0
-#     active_gardens = []  # used to store names of all gardens that will be uploaded to
-#     for key, value in gardens.items():
-#         if value == "active":
-#             gardens_to_sync += 1
-#             active_gardens.append(key)
-#     if gardens_to_sync == 0:
-#         return False
-#
-#     os.system('cls')
-#     print("Sync to", gardens_to_sync, "gardens?")
-#     ready_to_sync = input("\n\ny/n: ")
-#
-#     if ready_to_sync == 'y':
-#         for target_garden in active_gardens:
-#             # first upload all image files from images folder
-#             for image in images:
-#                 path = p
-#                 path += "\\"
-#                 path += image
-#                 print(path)
-#                 try:
-#                     with open(str(path), "rb") as f:
-#                         response = s3_client.upload_file(path, target_garden, str(image),
-#                                                          ExtraArgs={"ContentType": "image/jpeg"})
-#                 except ClientError as e:
-#                     logging.error(e)
-#                     return False
-#             # finally upload the timestamp for this sync
-#             try:
-#                 try:
-#                     fp = open("time_stamp.txt", "w")
-#                     fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
-#                     fp.close()
-#                 except FileNotFoundError:
-#                     fp = open("time_stamp.txt", "w")
-#                     fp.write(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
-#                     fp.close()
-#                 with open(str('time_stamp.txt'), "rb") as f:
-#                     response = s3_client.upload_file('time_stamp.txt', target_garden, str("time_stamp.txt"),
-#                                                      ExtraArgs={"ContentType": "text/html"})
-#             except ClientError as e:
-#                 logging.error(e)
-#                 return False
-#         return True
-#     else:
-#         return False
 
 
 if __name__ == '__main__':

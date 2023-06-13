@@ -5,7 +5,7 @@ const plants = [
   {
     id: 0,
     name: 'Plant_0',
-    type: 'Echeveria',
+    type: 0,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
     state: "success",
@@ -28,7 +28,7 @@ const plants = [
   {
     id: 1,
     name: 'Plant_1',
-    type: 'Mentha x piperita',
+    type: 1,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
     state: "success",
@@ -47,7 +47,7 @@ const plants = [
   {
     id: 2,
     name: 'Plant_2',
-    type: 'Rosa',
+    type: 2,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
     state: "success",
@@ -65,7 +65,7 @@ const plants = [
   {
     id: 3,
     name: 'Plant_3',
-    type: 'Goeppertia orbifolia',
+    type: 3,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
     state: "warning",
@@ -84,7 +84,7 @@ const plants = [
   {
     id: 4,
     name: 'Plant_4',
-    type: 'Gerbera',
+    type: 4,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
     state: "success",
@@ -105,7 +105,7 @@ const plants = [
   {
     id: 5,
     name: 'Plant_5',
-    type: 'Leucanthemum × superbum',
+    type: 5,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
     state: "warning",
@@ -124,7 +124,7 @@ const plants = [
   {
     id: 6,
     name: 'Plant_6',
-    type: 'Herb',
+    type: 6,
     sun: 'Partial or Dappled Shade',
     soil: 'Slightly acid (6.1 – 6.5) Neutral (6.6 – 7.3)',
     minColdHard: 'Zone 13 +15.6 °C (60 °F) to +21.1 °C (70 °F)',
@@ -146,7 +146,7 @@ const plants = [
   {
     id: 7,
     name: 'Plant_7',
-    type: 'Adiantum capillus-veneris',
+    type: 7,
     imageSrc: 'http://localhost:9000/images/agm-notfound.png', //'/assets/Succulent.jpg', 
     imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
     state: "success",
@@ -230,6 +230,7 @@ async function getLineChartData(plants, bucketName) {
           const currentScan = data[0][i];
           const disease = currentScan['disease'];
           const time_stamp = currentScan['time_stamp'];
+          const probability = currentScan['probability'];
           // const date = currentScan.time_stamp
 
           if(!countMap[disease]) {
@@ -238,9 +239,11 @@ async function getLineChartData(plants, bucketName) {
 
           if (!countMap[disease][time_stamp]) {
             // If the key is not in the map, add it with a value of 1
-            countMap[disease][time_stamp] = 0;
+            // countMap[disease][time_stamp] = 0;
+            countMap[disease][time_stamp] = probability;
           }
-          countMap[disease][time_stamp]++;
+          // countMap[disease][time_stamp]++;
+          countMap[disease][time_stamp] = probability;
         }
       }
 

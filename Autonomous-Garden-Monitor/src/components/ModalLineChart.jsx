@@ -5,58 +5,36 @@ import { mockLineData as data } from "../data/mockData";
 
 
 
-const mockLineData = [
+const mockLineData1 = [
   {
-    id: "",
+    id: "Green Mite",
     color: tokens("dark").redAccent[200],
     data: [
       {
-        x: "plane",
-        y: 191,
+        x: "06/06/2023",
+        y: 1,
       },
       {
-        x: "helicopter",
-        y: 136,
+        x: "06/09/2023",
+        y: 1,
+      },
+    ],
+  },
+  {
+    id: "Healthy",
+    color: tokens("dark").greenAccent[500],
+    data: [
+      {
+        x: "06/07/2023",
+        y: 0.5,
       },
       {
-        x: "boat",
-        y: 91,
+        x: "06/08/2023",
+        y: 1.3,
       },
       {
-        x: "train",
-        y: 190,
-      },
-      {
-        x: "subway",
-        y: 211,
-      },
-      {
-        x: "bus",
-        y: 152,
-      },
-      {
-        x: "car",
-        y: 189,
-      },
-      {
-        x: "moto",
-        y: 152,
-      },
-      {
-        x: "bicycle",
-        y: 8,
-      },
-      {
-        x: "horse",
-        y: 197,
-      },
-      {
-        x: "skateboard",
-        y: 107,
-      },
-      {
-        x: "others",
-        y: 170,
+        x: "06/10/2023",
+        y: 1,
       },
     ],
   },
@@ -67,6 +45,7 @@ const mockLineData = [
 const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
 
   //get the disease info of selected plant
   const plantLineData = lineData[id];
@@ -98,13 +77,13 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
     const year = date.getFullYear();
-  
+
     return `${month}/${day}/${year}`;
   }
 
   const formattedData1 = Object.entries(plantLineData).map(([id, dataObj]) => {
-    const data = Object.entries(dataObj).map(([x, y]) => ({x: formatDate(x), y}));
-  
+    const data = Object.entries(dataObj).map(([x, y]) => ({ x: formatDate(x), y }));
+
     return {
       id,
       data
@@ -113,16 +92,69 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
   console.log('formattedData1', formattedData1);
 
 
-  const formattedData2 = Object.entries(formattedData1).map(([id, dataObj]) => {
-    const data = Object.entries(dataObj).map(([x, y]) => ({x, y}));
+  // here you define your color values. Replace these with the actual colors you want.
+  let diseaseColors = {
+    'Green Mite': 'red',
+    'Healthy': 'green',
+    'Mosaic Disease': 'orange',
+    'Bacterial Blight': 'purple',
+    'Brown Streak Disease': 'pink',
+    'Unknown': 'black',
+  };
+
+  let newData = formattedData1.map(item => {
     return {
-      id,
-      color: tokens("dark").redAccent[200],
-      data
+      id: item.id,
+      color: diseaseColors[item.id],
+      data: item.data
     };
   });
-  
-  console.log('formattedData2',formattedData2);
+
+  console.log('newData', newData);
+
+
+  // First, get a set of all unique 'x' values
+  let allXValues = new Set();
+  for (let item of newData) {
+    for (let data of item.data) {
+      allXValues.add(data.x);
+    }
+  }
+
+  // Then, for each item in newData, check if it has all 'x' values
+  for (let item of newData) {
+    let currentXValues = new Set(item.data.map(data => data.x));
+    // let firstMissing = true;   // flag to check if it's the first missing entry
+
+    for (let xValue of allXValues) {
+      // If the current item doesn't have this 'x' value, add it with 'y' set to 0
+      if (!currentXValues.has(xValue)) {
+        item.data.push({ x: xValue, y: 0 });
+      }
+    }
+
+    // Optional: Sort the data array by 'x' value
+    item.data.sort((a, b) => a.x.localeCompare(b.x));
+  }
+
+  console.log('newData2', newData);
+
+
+
+
+
+
+
+  // const formattedData2 = Object.entries(formattedData1).map(([id, dataObj]) => {
+  //   const data = Object.entries(dataObj).map(([x, y]) => ({x, y}));
+  //   return {
+  //     id,
+  //     color: tokens("dark").redAccent[200],
+  //     data
+  //   };
+  // });
+
+  // console.log('formattedData2',formattedData2);
 
 
 
@@ -130,7 +162,7 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
 
   return (
     <ResponsiveLine
-      data={formattedData2}
+      data={newData}
       theme={{
         axis: {
           domain: {
@@ -146,7 +178,7 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
           ticks: {
             line: {
               stroke: colors.grey[100],
-              strokeWidth: 1,
+              strokeWidth: 3,
             },
             text: {
               fill: colors.grey[100],
@@ -193,31 +225,31 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
         tickSize: 3,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "Disease Count", // added
+        legend: isDashboard ? undefined : "Probability of disease in %", // added
         legendOffset: -40,
         legendPosition: "middle",
       }}
       enableGridX={false}
       enableGridY={false}
       pointSize={8}
-      pointColor={{ theme: "background" }}
+      pointColor={{ from: "serieColor" }}
       pointBorderWidth={2}
       pointBorderColor={{ from: "serieColor" }}
       pointLabelYOffset={-12}
       useMesh={true}
       legends={[
         {
-          anchor: "bottom-right",
+          anchor: "top-right",
           direction: "column",
-          justify: false,
+          justify: true,
           translateX: 100,
           translateY: 0,
           itemsSpacing: 0,
           itemDirection: "left-to-right",
-          itemWidth: 80,
+          itemWidth: 90,
           itemHeight: 20,
           itemOpacity: 0.75,
-          symbolSize: 12,
+          symbolSize: 10,
           symbolShape: "circle",
           symbolBorderColor: "rgba(0, 0, 0, .5)",
           effects: [
