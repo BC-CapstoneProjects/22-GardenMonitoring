@@ -4,7 +4,7 @@ import { dynamoDbClient } from '../public/libs/dynamoDbClient.js';
 import { PutItemCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { CreateBucketCommand } from '@aws-sdk/client-s3';
 import { PutBucketNotificationConfigurationCommand } from '@aws-sdk/client-s3';
-// import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda'
+import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda'
 
 const router = express.Router();
 
