@@ -4,8 +4,9 @@ import LineChart from "../../components/ModalLineChart";
 
 const Line = ({id, lineData}) => {
   return (
+    
     <Box m="20px">
-      <Header title="Line Chart" subtitle="Simple Line Chart" />
+      <Header title="Line Chart"  subtitle={`Plant ${id} Diesease Chart `} />
       <Box height="40vh">
         <LineChart id={id} lineData={lineData} />
       </Box>

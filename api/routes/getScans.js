@@ -3,7 +3,6 @@ import { dynamoDbClient } from "../public/libs/dynamoDbClient.js";
 import { ScanCommand, DescribeTableCommand, GetItemCommand, QueryCommand } from "@aws-sdk/client-dynamodb";
 
 const router = express.Router();
-import { setScans } from '../../Autonomous-Garden-Monitor/src/App.js';
 
 // helper function that first verifies userId parameter is tied to the bucketName param
 const verifyBucketOwnership = async (userId, bucketName) => {
