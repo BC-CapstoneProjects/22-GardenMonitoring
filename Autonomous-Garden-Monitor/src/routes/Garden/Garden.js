@@ -518,6 +518,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                           containers,
                           link,
                           disease,
+                          selectedGarden,
                         },
                         index, lineData
                       )

@@ -61,6 +61,9 @@ router.post("/:userId/:bucketName", async (req, res) => {
       })
     );
 
+    // if dynamodb of the same name doesnt exist, create the table
+    // attach tedo's lambda
+
     // If bucket creation is successful, update DynamoDB
     await updateDynamoDb();
 
