@@ -49,7 +49,7 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
 
   //get the disease info of selected plant
   const plantLineData = lineData[id];
-  console.log('linedata import',lineData);
+  console.log('linedata import',lineData[id]);
 
   //date sort function
   function sortObjectByKeys(obj) {
@@ -75,24 +75,24 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
 
   console.log('plantLineData ',plantLineData);
 
-  function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
-    const year = date.getFullYear();
+  // function formatDate(dateStr) {
+  //   const date = new Date(dateStr);
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+  //   const year = date.getFullYear();
 
-    return `${month}/${day}/${year}`;
-  }
+  //   return `${month}/${day}/${year}`;
+  // }
 
-  const formattedData1 = Object.entries(plantLineData).map(([id, dataObj]) => {
-    const data = Object.entries(dataObj).map(([x, y]) => ({ x: formatDate(x), y }));
+  // const formattedData1 = Object.entries(plantLineData).map(([id, dataObj]) => {
+  //   const data = Object.entries(dataObj).map(([x, y]) => ({ x: formatDate(x), y }));
 
-    return {
-      id,
-      data
-    };
-  });
-  console.log('formattedData1', formattedData1);
+  //   return {
+  //     id,
+  //     data
+  //   };
+  // });
+  // console.log('formattedData1', formattedData1);
 
 
   // here you define your color values. Replace these with the actual colors you want.
@@ -105,42 +105,42 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
     'Unknown': 'black',
   };
 
-  let newData = formattedData1.map(item => {
-    return {
-      id: item.id,
-      color: diseaseColors[item.id],
-      data: item.data
-    };
-  });
+  // let newData = formattedData1.map(item => {
+  //   return {
+  //     id: item.id,
+  //     color: diseaseColors[item.id],
+  //     data: item.data
+  //   };
+  // });
 
-  console.log('newData', newData);
+  // console.log('newData', newData);
 
 
   // First, get a set of all unique 'x' values
-  let allXValues = new Set();
-  for (let item of newData) {
-    for (let data of item.data) {
-      allXValues.add(data.x);
-    }
-  }
+  // let allXValues = new Set();
+  // for (let item of newData) {
+  //   for (let data of item.data) {
+  //     allXValues.add(data.x);
+  //   }
+  // }
 
-  // Then, for each item in newData, check if it has all 'x' values
-  for (let item of newData) {
-    let currentXValues = new Set(item.data.map(data => data.x));
-    // let firstMissing = true;   // flag to check if it's the first missing entry
+  // // Then, for each item in newData, check if it has all 'x' values
+  // for (let item of newData) {
+  //   let currentXValues = new Set(item.data.map(data => data.x));
+  //   // let firstMissing = true;   // flag to check if it's the first missing entry
 
-    for (let xValue of allXValues) {
-      // If the current item doesn't have this 'x' value, add it with 'y' set to 0
-      if (!currentXValues.has(xValue)) {
-        item.data.push({ x: xValue, y: 0 });
-      }
-    }
+  //   for (let xValue of allXValues) {
+  //     // If the current item doesn't have this 'x' value, add it with 'y' set to 0
+  //     if (!currentXValues.has(xValue)) {
+  //       item.data.push({ x: xValue, y: 0 });
+  //     }
+  //   }
 
-    // Optional: Sort the data array by 'x' value
-    item.data.sort((a, b) => a.x.localeCompare(b.x));
-  }
+  //   // Optional: Sort the data array by 'x' value
+  //   item.data.sort((a, b) => a.x.localeCompare(b.x));
+  // }
 
-  console.log('newData2', newData);
+  // console.log('newData2', newData);
 
 
 
@@ -165,7 +165,7 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
 
   return (
     <ResponsiveLine
-      data={newData}
+      data={data}
       theme={{
         axis: {
           domain: {

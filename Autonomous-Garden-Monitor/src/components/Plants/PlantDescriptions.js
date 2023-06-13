@@ -215,8 +215,6 @@ async function getChartData(plants, bucketName) {
 
   let IdMap = {};
   
-  
-
   for (const plant of plants) {
     const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
     let id = `${plant.id}`;
@@ -232,56 +230,51 @@ async function getChartData(plants, bucketName) {
         for (let i = 0; i < data[0].length; i++) {
           const currentScan = data[0][i];
           importData.push(currentScan);
-          // const disease = currentScan['disease'];
-          // const time_stamp = currentScan['time_stamp'];
-          // const probability = currentScan['probability'];
-          // // const date = currentScan.time_stamp
-
-          // if(!countMap[time_stamp]) {
-          //   countMap[time_stamp] = {};
-          // }
-
-          // if (!countMap[time_stamp][disease]) {
-          //   // If the key is not in the map, add it with a value of 1
-          //   // countMap[disease][time_stamp] = 0;
-          //   countMap[disease][time_stamp] = probability;
-          // }
-          // // countMap[disease][time_stamp]++;
-          // countMap[disease][time_stamp] = probability;
-
-
-          
         }
       }
 
       console.log("importData", importData);
       // console.log("getLineChartData2", plant.id);
 
-      
+      //transfrom data structure
       const transformedData = importData.map(entry => {
         return {
           date: entry.time_stamp,
           data: { [entry.disease]: entry.probability }
         };
       });
-      
+
+
       IdMap[id] = transformedData;
 
       console.log('transformedData:', transformedData);
-
-      
     }
     // if there's no data saved in DynamoDB for this plant,
     if (!response.ok) {
       return null;
     }
   }
+  //transform data format
+  for (let key in IdMap) {
+    for (let i = 0; i < IdMap[key].length; i++) {
+        // Parse date
+        let dateParts = IdMap[key][i].date.split('-');
+        let day = dateParts[1];
+        let month = new Date(Date.parse(dateParts[2] +" 1, 2012")).getMonth()+1;
+        let yearParts = dateParts[3].split('_');
+        let year = yearParts[0];
+
+        // Format date
+        let formattedDate = month.toString().padStart(2, '0') + '/' + day + '/' + year;
+
+        // Replace the date in the object
+        IdMap[key][i].date = formattedDate;
+    }
+  }
 
 
   // Return the updated plants array
   console.log('IdMap:', IdMap);
-
-  
 
   return IdMap;
 }
