@@ -13,6 +13,8 @@ const BarChart = ({ isDashboard = false, data, selectedGarden }) => {
   const colors = tokens(theme.palette.mode);
 
 
+  console.log('bardata import',data);
+
   const labels = ["Mosaic Disease", "Bacterial Blight", "Green Mite", "Brown Streak Disease", "Healthy", "Unknown"];
 
 
