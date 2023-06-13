@@ -3,7 +3,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import { plants as PlantDescriptions, updatePlantHealth, updatePlantState, getLineChartData } from "../../components/Plants/PlantDescriptions";
+import { plants as PlantDescriptions, updatePlantHealth, updatePlantState, getChartData } from "../../components/Plants/PlantDescriptions";
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Subject from "../../routes/Subject/Subject";
@@ -256,8 +256,8 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         setScans(plantsWithUpdatedState);
       });
 
-      getLineChartData(plants, gardenName).then((lineChartData) => {
-        setLineData(lineChartData);
+      getChartData(plants, gardenName).then((chartData) => {
+        setLineData(chartData);
         console.log('setLineData:', lineData);
       });
 
@@ -319,7 +319,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       ...plant,
       imageUrl,
       lineData
-    } );
+    });
     setModalOpen(true);
     setSubjectID(plant.id);
 };

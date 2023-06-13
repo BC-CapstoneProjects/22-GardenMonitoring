@@ -49,6 +49,7 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
 
   //get the disease info of selected plant
   const plantLineData = lineData[id];
+  console.log('linedata import',lineData);
 
   //date sort function
   function sortObjectByKeys(obj) {
@@ -71,6 +72,8 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
     console.log('log the object', plantLineData[disease]); // log the object
     plantLineData[disease] = sortObjectByKeys(plantLineData[disease]);
   }
+
+  console.log('plantLineData ',plantLineData);
 
   function formatDate(dateStr) {
     const date = new Date(dateStr);
