@@ -21,11 +21,13 @@ import Downloads from "./scenes/downloads";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
+import { plants, getChartData } from "./components/Plants/PlantDescriptions";
 import { useNavigate } from "react-router-dom";
 import logo from './logo.css';
 import { I18n } from 'aws-amplify';
 import { translations } from '@aws-amplify/ui-react';
 import { updateScans } from "./components/Plants/PlantDescriptions";
+
 
 
 // AWS Cognito
@@ -207,10 +209,6 @@ const formFields = {
 
 };
 
-export const setScans = (newScans) => {
-  // Update the setScans state here
-};
-
 
 
 function App() {
@@ -220,22 +218,27 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
   const isSignPage = location.pathname === "/";
-
-  
-
-
+  const [chartData, setChartData] = useState('');
+  // get most recent drone scan data from api for every id in PlantDescriptions
+  const [scans, setScans] = useState([]);
 
   // Add useState hook for selectedGarden
   const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
   // Add useEffect hook to update localStorage when selectedGarden changes
   useEffect(() => {
     localStorage.setItem('selectedGarden', selectedGarden);
+
+    getChartData(plants, selectedGarden).then((importedChartData) => {
+      setChartData(importedChartData);
+      console.log('chartData:', chartData);
+    });
+
   }, [selectedGarden]);
 
-  // get most recent drone scan data from api for every id in PlantDescriptions
-  const [scans, setScans] = useState([]);
+  
 
 
+  
 
 
   return (
@@ -250,7 +253,7 @@ function App() {
               <Routes>
                 <Route
                   path="/"
-                  element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+                  element={<Garden setScans={setScans}  chartData={chartData} setSelectedGarden={setSelectedGarden} />}
                 />
                 <Route
                   path="/view/:subjectID"
@@ -258,9 +261,9 @@ function App() {
                 />
                 {/* <Route path="/" element={<Sign />} /> */}
                 <Route path="/form" element={<Form />} />
-                <Route path="/bar" element={<Bar data={scans} selectedGarden={selectedGarden} />} />
-                <Route path="/pie" element={<Pie />} />
-                <Route path="/line" element={<Line />} />
+                <Route path="/bar" element={<Bar data={chartData} selectedGarden={selectedGarden} />} />
+                <Route path="/pie" element={<Pie data={chartData} selectedGarden={selectedGarden} />} />
+                <Route path="/line" element={<Line data={chartData} selectedGarden={selectedGarden} />} />
                 <Route path="/calendar" element={<Calendar />} />
                 <Route path="/geography" element={<Geography />} />
                 <Route path="/downloads" element={<Downloads />} />

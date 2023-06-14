@@ -3,9 +3,9 @@ import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { Bar } from "react-chartjs-2";
 import plants from '../components/Plants/PlantDescriptions';
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 
-const BarChart = ({ isDashboard = false, data, selectedGarden }) => {
+const BarChart = ({ isDashboard = false, data}) => {
 
   const [barData, setBarData] = useState([]);
   //const [chartData, setChartData] = useState(null);  //
@@ -13,95 +13,155 @@ const BarChart = ({ isDashboard = false, data, selectedGarden }) => {
   const colors = tokens(theme.palette.mode);
 
 
-  console.log('bardata import',data);
+  console.log('bardata import', data);
+
+  for (let i = 0; i < Object.keys(data).length; i++) {
+    //sort date
+    data[i].sort((a, b) => {
+        var dateA = new Date(a.date), dateB = new Date(b.date);
+        return dateA - dateB;
+    });
+}
+
+  console.log('bardaasdasta import', data);
+
 
   const labels = ["Mosaic Disease", "Bacterial Blight", "Green Mite", "Brown Streak Disease", "Healthy", "Unknown"];
 
 
-  useEffect(() => {
-    // prepare the chart data whenever `data` changes
-    if(data && data.length > 0) { 
-  const dateDiseaseCounts = {};
+  function restructureData(data) {
+    // First we'll create a dictionary to store the data by date
+    let dateDict = {};
+    let diseases = ['Healthy', 'Bacterial Blight', 'Green Mite', 'Mosaic Disease', 'Brown Streak Disease', 'Unknown'];
 
-
-  function formatDate(time_stamp) {
-    const [dayOfWeek, day, month, year, time, timeZone] = time_stamp.split(/[-\s:]/);
-    const months = {
-      Jan: '01',
-      Feb: '02',
-      Mar: '03',
-      Apr: '04',
-      May: '05',
-      Jun: '06',
-      Jul: '07',
-      Aug: '08',
-      Sep: '09',
-      Oct: '10',
-      Nov: '11',
-      Dec: '12',
-    };
-
-    return `${year}-${months[month]}-${day}`;
-  }
-
-  data.forEach(diseaseInfo => {
-    const date = formatDate(diseaseInfo.timestamp);
-    const disease = diseaseInfo.disease;
-  
-    if (!dateDiseaseCounts[date]) {
-      dateDiseaseCounts[date] = {
-        "Mosaic Disease": 0,
-        "Bacterial Blight": 0,
-        "Green Mite": 0,
-        "Brown Streak Disease": 0,
-        "Healthy": 0,
-        "Unknown": 0
-      };
-    }
-  
-    dateDiseaseCounts[date][disease]++;
-  });  
-
-  console.log('dateDiseaseCounts', dateDiseaseCounts);
-
-  function prepareBarChartData(dateDiseaseCounts) {
-    const diseaseColors = {
-      "Mosaic Disease": "hsl(229, 70%, 50%)",
-      "Bacterial Blight": "hsl(296, 70%, 50%)",
-      "Green Mite": "hsl(97, 70%, 50%)",
-      "Brown Streak Disease": "hsl(340, 70%, 50%)",
-      "Healthy": "hsl(120, 70%, 50%)",
-      "Unknown": "hsl(0, 0%, 70%)",
-    };
-
-    const barChartData = [];
-
-    for (const date in dateDiseaseCounts) {
-      const dateData = { date };
-      const diseaseCounts = dateDiseaseCounts[date];
-
-      for (const disease in diseaseCounts) {
-        const count = diseaseCounts[disease];
-        const colorKey = `${disease}Color`;
-
-        dateData[disease] = count;
-        dateData[colorKey] = diseaseColors[disease];
+    // Generate color function, change to suit your need
+    const generateColor = (disease) => {
+      switch (disease) {
+        case 'Healthy':
+          return 'hsl(120, 70%, 50%)';
+        case 'Bacterial Blight':
+          return 'hsl(296, 70%, 50%)';
+        case 'Green Mite':
+          return 'hsl(97, 70%, 50%)';
+        case 'Mosaic Disease':
+          return 'hsl(229, 70%, 50%)';
+        case 'Brown Streak Disease':
+          return 'hsl(340, 70%, 50%)';
+        case 'Unknown':
+          return 'hsl(0, 0%, 70%)';
       }
-
-      barChartData.push(dateData);
     }
 
-    return barChartData;
+    // Iterate over the input data
+    for (let diseaseData of Object.values(data)) {
+      for (let item of diseaseData) {
+        let date = item.date;
+        let disease = Object.keys(item.data)[0];
+        let value = item.data[disease];
+
+        // If this date has not been seen before, initialize it in dateDict
+        if (!dateDict[date]) {
+          dateDict[date] = { date: date };
+          // Initialize all diseases for this date
+          for (let disease of diseases) {
+            dateDict[date][disease] = 0;
+            dateDict[date][disease + "Color"] = generateColor(disease);
+          }
+        }
+
+        // Add the value to the corresponding disease on this date
+        dateDict[date][disease] = parseFloat(value);
+      }
+    }
+
+    // Return the values of dateDict as an array
+    return Object.values(dateDict);
   }
 
-  const newBarData = prepareBarChartData(dateDiseaseCounts);
-  newBarData.sort((a, b) => new Date(a.date) - new Date(b.date));
-  setBarData(newBarData); // update the state variable
+  // Use your data here
+  data = restructureData(data);
 
-  console.log('barData111', barData);
 
-  } 
-}, [data, selectedGarden]);
+  console.log('asdasdata', data);
+
+  // const dateDiseaseCounts = {};
+
+
+  //   function formatDate(time_stamp) {
+  //     const [dayOfWeek, day, month, year, time, timeZone] = time_stamp.split(/[-\s:]/);
+  //     const months = {
+  //       Jan: '01',
+  //       Feb: '02',
+  //       Mar: '03',
+  //       Apr: '04',
+  //       May: '05',
+  //       Jun: '06',
+  //       Jul: '07',
+  //       Aug: '08',
+  //       Sep: '09',
+  //       Oct: '10',
+  //       Nov: '11',
+  //       Dec: '12',
+  //     };
+
+  //     return `${year}-${months[month]}-${day}`;
+  //   }
+
+  //   data.forEach(diseaseInfo => {
+  //     const date = formatDate(diseaseInfo.timestamp);
+  //     const disease = diseaseInfo.disease;
+
+  //     if (!dateDiseaseCounts[date]) {
+  //       dateDiseaseCounts[date] = {
+  //         "Mosaic Disease": 0,
+  //         "Bacterial Blight": 0,
+  //         "Green Mite": 0,
+  //         "Brown Streak Disease": 0,
+  //         "Healthy": 0,
+  //         "Unknown": 0
+  //       };
+  //     }
+
+  //     dateDiseaseCounts[date][disease]++;
+  //   });  
+
+  //   console.log('dateDiseaseCounts', dateDiseaseCounts);
+
+  //   function prepareBarChartData(dateDiseaseCounts) {
+  //     const diseaseColors = {
+  //       "Mosaic Disease": "hsl(229, 70%, 50%)",
+  //       "Bacterial Blight": "hsl(296, 70%, 50%)",
+  //       "Green Mite": "hsl(97, 70%, 50%)",
+  //       "Brown Streak Disease": "hsl(340, 70%, 50%)",
+  //       "Healthy": "hsl(120, 70%, 50%)",
+  //       "Unknown": "hsl(0, 0%, 70%)",
+  //     };
+
+  //     const barChartData = [];
+
+  //     for (const date in dateDiseaseCounts) {
+  //       const dateData = { date };
+  //       const diseaseCounts = dateDiseaseCounts[date];
+
+  //       for (const disease in diseaseCounts) {
+  //         const count = diseaseCounts[disease];
+  //         const colorKey = `${disease}Color`;
+
+  //         dateData[disease] = count;
+  //         dateData[colorKey] = diseaseColors[disease];
+  //       }
+
+  //       barChartData.push(dateData);
+  //     }
+
+  //     return barChartData;
+  //   }
+
+  //   const newBarData = prepareBarChartData(dateDiseaseCounts);
+  //   newBarData.sort((a, b) => new Date(a.date) - new Date(b.date));
+  //   setBarData(newBarData); // update the state variable
+
+  //   console.log('barData111', barData);
 
   const dataexam = {
     country: "AD",
@@ -131,7 +191,7 @@ const BarChart = ({ isDashboard = false, data, selectedGarden }) => {
 
   return (
     <ResponsiveBar
-      data={barData}
+      data={data}
       theme={{
         // added
         axis: {

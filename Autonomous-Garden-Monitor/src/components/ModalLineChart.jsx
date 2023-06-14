@@ -5,94 +5,22 @@ import { mockLineData as data } from "../data/mockData";
 
 
 
-const mockLineData1 = [
-  {
-    id: "Green Mite",
-    color: tokens("dark").redAccent[200],
-    data: [
-      {
-        x: "06/06/2023",
-        y: 1,
-      },
-      {
-        x: "06/09/2023",
-        y: 1,
-      },
-    ],
-  },
-  {
-    id: "Healthy",
-    color: tokens("dark").greenAccent[500],
-    data: [
-      {
-        x: "06/07/2023",
-        y: 0.5,
-      },
-      {
-        x: "06/08/2023",
-        y: 1.3,
-      },
-      {
-        x: "06/10/2023",
-        y: 1,
-      },
-    ],
-  },
-];
 
-
-
-const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = false }) => {
+const LineChart = ({ isCustomLineColors = false, id, chartData, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
 
   //get the disease info of selected plant
-  const plantLineData = lineData[id];
-  console.log('linedata import',lineData[id]);
+  const plantLineData = chartData[id];
+  
+  //sort date
+  plantLineData.sort((a, b) => {
+    var dateA = new Date(a.date), dateB = new Date(b.date);
+    return dateA - dateB;
+});
 
-  //date sort function
-  function sortObjectByKeys(obj) {
-    if (obj) {
-      let entries = Object.entries(obj);
-      entries.sort((a, b) => {
-        let timeA = Date.parse(a[0]);
-        let timeB = Date.parse(b[0]);
-        return timeA - timeB;
-      });
-      return Object.fromEntries(entries);
-    } else {
-      console.error('The input object is null or undefined!');
-      return obj;
-    }
-  }
-
-  //sort the disease's date using date-sort function:'sortObjectByKeys'
-  for (let disease in plantLineData) {
-    console.log('log the object', plantLineData[disease]); // log the object
-    plantLineData[disease] = sortObjectByKeys(plantLineData[disease]);
-  }
-
-  console.log('plantLineData ',plantLineData);
-
-  // function formatDate(dateStr) {
-  //   const date = new Date(dateStr);
-  //   const day = String(date.getDate()).padStart(2, '0');
-  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
-  //   const year = date.getFullYear();
-
-  //   return `${month}/${day}/${year}`;
-  // }
-
-  // const formattedData1 = Object.entries(plantLineData).map(([id, dataObj]) => {
-  //   const data = Object.entries(dataObj).map(([x, y]) => ({ x: formatDate(x), y }));
-
-  //   return {
-  //     id,
-  //     data
-  //   };
-  // });
-  // console.log('formattedData1', formattedData1);
+console.log('linedata import',plantLineData);
 
 
   // here you define your color values. Replace these with the actual colors you want.
@@ -105,67 +33,77 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
     'Unknown': 'black',
   };
 
-  // let newData = formattedData1.map(item => {
-  //   return {
-  //     id: item.id,
-  //     color: diseaseColors[item.id],
-  //     data: item.data
-  //   };
-  // });
+  
+  
+// First, convert to a intermediate data structure where you can easily manipulate data
+let intermediateData = plantLineData.map(({ date, data }) => {
+  let key = Object.keys(data)[0];
+  let value = parseFloat(data[key]);
+  return {
+    id: key,
+    data: { x: date, y: value }
+  };
+});
 
-  // console.log('newData', newData);
+// Now, reduce it to the desired format
+let transformedData = intermediateData.reduce((acc, { id, data }) => {
+  let foundIndex = acc.findIndex(item => item.id === id);
+  
+  if (foundIndex >= 0) {
+    acc[foundIndex].data.push(data);
+  } else {
+    acc.push({
+      id: id,
+      color: id === "Healthy" ? "green" : "purple",
+      data: [data]
+    });
+  }
 
+  return acc;
+}, []);
 
-  // First, get a set of all unique 'x' values
-  // let allXValues = new Set();
-  // for (let item of newData) {
-  //   for (let data of item.data) {
-  //     allXValues.add(data.x);
-  //   }
-  // }
-
-  // // Then, for each item in newData, check if it has all 'x' values
-  // for (let item of newData) {
-  //   let currentXValues = new Set(item.data.map(data => data.x));
-  //   // let firstMissing = true;   // flag to check if it's the first missing entry
-
-  //   for (let xValue of allXValues) {
-  //     // If the current item doesn't have this 'x' value, add it with 'y' set to 0
-  //     if (!currentXValues.has(xValue)) {
-  //       item.data.push({ x: xValue, y: 0 });
-  //     }
-  //   }
-
-  //   // Optional: Sort the data array by 'x' value
-  //   item.data.sort((a, b) => a.x.localeCompare(b.x));
-  // }
-
-  // console.log('newData2', newData);
+console.log('transformedData', transformedData);
 
 
-
-
-
-
-
-  // const formattedData2 = Object.entries(formattedData1).map(([id, dataObj]) => {
-  //   const data = Object.entries(dataObj).map(([x, y]) => ({x, y}));
-  //   return {
-  //     id,
-  //     color: tokens("dark").redAccent[200],
-  //     data
-  //   };
-  // });
-
-  // console.log('formattedData2',formattedData2);
-
-
-
-
+  
+// const mockLineData1 = [
+//   {
+//     id: "Green Mite",
+//     color: tokens("dark").redAccent[200],
+//     data: [
+//       {
+//         x: "06/06/2023",
+//         y: 1,
+//       },
+//       {
+//         x: "06/09/2023",
+//         y: 1,
+//       },
+//     ],
+//   },
+//   {
+//     id: "Healthy",
+//     color: tokens("dark").greenAccent[500],
+//     data: [
+//       {
+//         x: "06/07/2023",
+//         y: 0.5,
+//       },
+//       {
+//         x: "06/08/2023",
+//         y: 1.3,
+//       },
+//       {
+//         x: "06/10/2023",
+//         y: 1,
+//       },
+//     ],
+//   },
+// ];
 
   return (
     <ResponsiveLine
-      data={data}
+      data={transformedData}
       theme={{
         axis: {
           domain: {
@@ -206,7 +144,7 @@ const LineChart = ({ isCustomLineColors = false, id, lineData, isDashboard = fal
         type: "linear",
         min: "auto",
         max: "auto",
-        stacked: true,
+        stacked: false,
         reverse: false,
       }}
       yFormat=" >-.2f"

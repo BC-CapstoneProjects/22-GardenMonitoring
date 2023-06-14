@@ -1,5 +1,5 @@
 import "./Subject.css";
-import LineChart from "../../scenes/line/ModalLineChart";
+import ModalLineChart from "../../scenes/line/ModalLineChart";
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -13,7 +13,7 @@ import React, { useRef } from 'react';
 
 function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun, 
   water, soil, minColdHard, leaves, flowers, flowerColor, bloomSize, flowerTime, suitableLocations,
-  propMethods, otherMethods, containers, link, imageUrls, index, lineData, selectedGarden } ) {
+  propMethods, otherMethods, containers, link, imageUrls, index, chartData, selectedGarden } ) {
 
   // initialize ref to null, later this will point to a file input DOM element
   const hiddenFileInput = React.useRef(null);
@@ -76,7 +76,7 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
   console.log('imageUrls',imageUrls, index)
   console.log('indexcheck', index)
 
-  console.log('lineData in Subject', lineData)
+  console.log('chartData in Subject', chartData)
   
 
   const [diseaseData, setDiseaseData] = useState(null);
@@ -148,7 +148,7 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
       />
       </div>
         <p className="border-primary rounded">
-        <LineChart id={id} lineData={lineData} />
+        <ModalLineChart id={id} chartData={chartData} />
         </p>
       </div>
       <div >
