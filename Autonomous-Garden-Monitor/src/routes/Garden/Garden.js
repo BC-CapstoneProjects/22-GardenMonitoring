@@ -66,7 +66,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const [lineData, setLineData] = useState('');
+  const [chartData, setChartData] = useState('');
 
   // listens for changes of the 'plants' state and logs it to the console
   // useEffect(() => {
@@ -210,7 +210,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     }
   };
 
-  const fetchScans = async () => {
+  const fetchScans = async (plants, gardenName) => {
     const scanResults = await updatePlantHealth(PlantDescriptions, selectedGarden);
     console.log("scan results... results:", scanResults);
     return scanResults;
@@ -226,6 +226,12 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     setShowGardenButton(false);
     setIsLoading(true);
     setAnimateEye(true);
+    
+    getChartData(plants, gardenName).then((importedChartData) => {
+      setChartData(importedChartData);
+      console.log('setChartData:', chartData);
+    });
+
     try {
       // Call getImage route from the API using the selected 'gardenName'
       const user = await Auth.currentAuthenticatedUser();
@@ -256,10 +262,6 @@ const Garden = ({ setScans, setSelectedGarden }) => {
         setScans(plantsWithUpdatedState);
       });
 
-      getChartData(plants, gardenName).then((chartData) => {
-        setLineData(chartData);
-        console.log('setLineData:', lineData);
-      });
 
     } 
     catch (error) {
@@ -312,13 +314,13 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [selectedPlant, setSelectedPlant] = useState(null);
 
   // Add a function to handle plant clicks
-  const handlePlantClick = (plant, index, lineData) => {
+  const handlePlantClick = (plant, index, chartData) => {
     const imageUrl = imageUrls[index] || plant.imageSrc; // remove the hardcoded localhost URL
     // console.log('lineData from handlePlantClick', lineData)
     setSelectedPlant({
       ...plant,
       imageUrl,
-      lineData
+      chartData
     });
     setModalOpen(true);
     setSubjectID(plant.id);
@@ -449,7 +451,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
               {/* {selectedGarden} Weekly Report */}
             </Typography>
             <Box height="250px" mt="-20px">
-              <BarChart isDashboard={true} data={localScans} selectedGarden={selectedGarden} />
+              <BarChart isDashboard={true} data={chartData} selectedGarden={selectedGarden} />
             </Box>
           </Box>
         }
@@ -519,7 +521,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                           link,
                           disease,
                         },
-                        index, lineData
+                        index, chartData
                       )
                     }
                   >
@@ -562,7 +564,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                         handlePlantClick({
                           id, name, type, imageUrls, imageSrc, imageAlt, state, soil, minColdHard, leaves, sun, flowers, flowerColor, bloomSize, suitableLocations,
                           propMethods, otherMethods, containers, link, disease
-                        }, index, lineData)
+                        }, index, chartData)
                       }
                     />
                   </Box>

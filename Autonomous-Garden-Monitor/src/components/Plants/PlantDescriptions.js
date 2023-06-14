@@ -211,7 +211,7 @@ async function updatePlantHealth(plants, bucketName) {
 // this function saves the number of the diseased plants in slected garden.
 async function getChartData(plants, bucketName) {
 
-  const user = await Auth.currentAuthenticatedUser();
+  const user = await Auth.currentAuthenticatedUser();   
 
   let IdMap = {};
   

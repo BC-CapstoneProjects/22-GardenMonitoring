@@ -3,42 +3,98 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockLineData as data } from "../data/mockData";
 
-const LineChart = ({ isCustomLineColors = false, data, isDashboard = false }) => {
+const LineChart = ({ isCustomLineColors = false, chartData, isDashboard = true }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const labels = ["Mosaic Disease", "Bacterial Blight", "Green Mite", "Brown Streak Disease", "Healthy", "Unknown"];
-  const dateDiseaseCounts = {};
+  if (chartData === null) {
+    return <p>loading...</p>;
+  } else {
 
-  function formatDate(time_stamp) {
-    const [dayOfWeek, day, month, year, time, timeZone ] = time_stamp.split(/[-\s:]/);
-    const months = {
-      Jan: '01',
-      Feb: '02',
-      Mar: '03',
-      Apr: '04',
-      May: '05',
-      Jun: '06',
-      Jul: '07',
-      Aug: '08',
-      Sep: '09',
-      Oct: '10',
-      Nov: '11',
-      Dec: '12'
-    };
-    return `${year}-${months[month]}-${day}`;
+  //get the disease info of selected plant
+  const plantLineData = chartData;
+
+  //   //sort date
+  //   plantLineData.sort((a, b) => {
+  //     var dateA = new Date(a.date), dateB = new Date(b.date);
+  //     return dateA - dateB;
+  // });
+
+  console.log('linedata import', plantLineData);
+
+
+  // Here's an example of how you can map diseases to colors
+  let diseaseColorMap = {
+    'Green Mite': 'red',
+    'Healthy': 'green',
+    'Mosaic Disease': 'orange',
+    'Bacterial Blight': 'purple',
+    'Brown Streak Disease': 'pink',
+    'Unknown': 'black',
+  };
+
+
+// A set to collect all unique dates
+let uniqueDates = new Set();
+
+// A map to collect the disease data
+let diseaseData = {};
+
+// Populate the set with unique dates and the map with disease data
+for (let array of Object.values(plantLineData)) {
+  for (let entry of array) {
+    uniqueDates.add(entry.date);
+    for (let [disease, value] of Object.entries(entry.data)) {
+      if (!diseaseData[disease]) {
+        diseaseData[disease] = {};
+      }
+      diseaseData[disease][entry.date] = value;
+    }
   }
+}
 
-  data.forEach(plantData => {
-    const date = formatDate(plantData.timestamp);
-    const disease = formatDate(plantData.timestamp);
-    // if (!dateDiseaseCounts)
+// Convert the set to an array and sort the dates
+uniqueDates = Array.from(uniqueDates).sort();
 
-  })
+// Convert the map to the required output format, adding missing dates
+let output = Object.entries(diseaseData).map(([disease, data]) => {
+  return {
+    id: disease,
+    color: diseaseColorMap[disease],
+    data: uniqueDates.map(date => {
+      return { x: date, y: data[date] || '0' };
+    })
+  }
+});
+
+
+
+//   const output = []
+
+// for (let array of Object.values(plantLineData)) {
+//   for (let entry of array) {
+//     for (let [disease, value] of Object.entries(entry.data)) {
+//       let existingEntry = output.find(e => e.id === disease)
+//       if (existingEntry) {
+//         existingEntry.data.push({ x: entry.date, y: value })
+//       } else {
+//         output.push({
+//           id: disease,
+//           color: diseaseColorMap[disease],
+//           data: [
+//             { x: entry.date, y: value }
+//           ]
+//         })
+//       }
+//     }
+//   }
+// }
+
+console.log('output',output)
 
   return (
     <ResponsiveLine
-      data={data}
+      data={output}
       theme={{
         axis: {
           domain: {
@@ -77,9 +133,9 @@ const LineChart = ({ isCustomLineColors = false, data, isDashboard = false }) =>
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",
-        min: "auto",
-        max: "auto",
-        stacked: true,
+        min: "0",
+        max: "1",
+        stacked: false,
         reverse: false,
       }}
       yFormat=" >-.2f"
@@ -141,6 +197,7 @@ const LineChart = ({ isCustomLineColors = false, data, isDashboard = false }) =>
       ]}
     />
   );
+};
 };
 
 export default LineChart;
