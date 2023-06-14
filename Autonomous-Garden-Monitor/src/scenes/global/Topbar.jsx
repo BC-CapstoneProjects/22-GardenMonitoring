@@ -16,6 +16,7 @@ import { listGardenDatabases } from "../../graphql/queries.js";
 import Amplify, { API, graphqlOperation } from "aws-amplify";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import { Auth } from 'aws-amplify';
 // import React, { useState } from 'react';
 
 const Topbar = () => {
@@ -54,8 +55,16 @@ const Topbar = () => {
 
   // Navigate to Sign
   const redirectToSign = () => {
-    navigate("/");
-  };
+    Auth.signOut()
+      .then( ()=> {
+        console.log("Successfully signed out");
+        navigate("/");
+      })
+      .catch( (error) => {
+          console.log("Error signing out: ", error);
+      } ) 
+  }
+
   const redirectTo = (info) => {
     navigate("/" + info);
   };
@@ -201,7 +210,7 @@ const Topbar = () => {
               console.log("Log out clicked");
             }}
           >
-            Brown Streak
+            {/* Brown Streak */}
           </MenuItem>
           <MenuItem
             onClick={() => {
@@ -209,7 +218,7 @@ const Topbar = () => {
               console.log("Log out clicked");
             }}
           >
-            Brown Streak Disease
+            {/* Brown Streak Disease */}
           </MenuItem>
         </Menu>
         {/* <Menu

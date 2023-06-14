@@ -137,10 +137,14 @@ def monitor(app):
                         attempts = 0
                         if hold_counter > 5 and images_captured < 2:
                             # plant names become "Plant_n" where n is some number 0-7
-                            img_name = str(
-                                "images/Plant" + "_" + str(
-                                    images_captured) + ".png")
-                            cv2.imwrite(img_name, me.get_frame_read().frame)
+                            img_name = str("images/Plant" + "_" + str(images_captured) + ".jpg")
+                            frame = me.get_frame_read().frame
+
+                            # Resize the image
+                            resized_frame = cv2.resize(frame, (224, 224))
+
+                            # Save the resized image
+                            cv2.imwrite(img_name, resized_frame)
                             images_captured += 1
                             image_captured = True
                             hold_counter = 0
@@ -228,7 +232,7 @@ def monitor(app):
                     elif attempts == 10:
                         # me.land()
                         print(bcolors.FAIL + f"{attempts} failed attempts, landing." + bcolors.ENDC)
-                        app.monitoring = False
+                        # app.monitoring = False
                         me.streamoff()
 
         except:
