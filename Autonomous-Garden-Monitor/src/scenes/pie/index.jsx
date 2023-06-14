@@ -7,30 +7,15 @@ const Pie = ({ data, selectedGarden}) => {
   console.log('data',data);
   
   if (!data) {
-    return <p>Select Garden...</p>;
+    return <p>Loading...Please reopen the page</p>;
   }
-
-  // return (
-  //   <Box m="20px">
-  //     <Header title="Bar Chart" subtitle="Weekly report" />
-  //     <Box height="75vh">
-  //       <BarChart
-  //         isDashboard={true}
-  //         data={data}
-  //         selectedGarden={selectedGarden}
-  //       />
-  //     </Box>
-  //   </Box>
-  // );
-
 
   return (
     <Box m="20px">
-      <Header title="Pie Chart" subtitle="Simple Pie Chart" />
+      <Header title={`${selectedGarden}🌱`} subtitle="Garden Disease Pie Chart" />
       <Box height="75vh">
         <PieChart 
-          pieData={data}
-          selectedGarden={selectedGarden} />
+          pieData={data} />
       </Box>
     </Box>
   );
