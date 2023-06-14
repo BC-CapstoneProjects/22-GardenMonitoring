@@ -1,0 +1,10 @@
+{
+  "resourceName": "NotificationTabel",
+  "tableName": "NotificationTabel",
+  "partitionKey": {
+    "fieldName": "UserId",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}
