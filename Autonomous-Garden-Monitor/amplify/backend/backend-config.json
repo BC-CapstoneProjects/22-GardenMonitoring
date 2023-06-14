@@ -1,101 +1,86 @@
 {
+  "api": {
+    "apid051cd6e": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "Notification"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
   "auth": {
-    "dev1e3ee0d4": {
+    "dev2479df4a": {
       "customAuth": false,
       "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
       "providerPlugin": "awscloudformation",
-      "service": "Cognito",
-      "serviceType": "imported"
+      "service": "Cognito"
+    }
+  },
+  "function": {
+    "Notification": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "NotificationTabel"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
-    "AMPLIFY_auth_dev1e3ee0d4_allowUnauthenticatedIdentities": {
+    "AMPLIFY_function_Notification_deploymentBucketName": {
       "usedBy": [
         {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
+          "category": "function",
+          "resourceName": "Notification"
         }
       ]
     },
-    "AMPLIFY_auth_dev1e3ee0d4_authRoleArn": {
+    "AMPLIFY_function_Notification_s3Key": {
       "usedBy": [
         {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
+          "category": "function",
+          "resourceName": "Notification"
         }
       ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_authRoleName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_identityPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_identityPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_nativeClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_unauthRoleArn": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_unauthRoleName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_userPoolId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_userPoolName": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
-    },
-    "AMPLIFY_auth_dev1e3ee0d4_webClientId": {
-      "usedBy": [
-        {
-          "category": "auth",
-          "resourceName": "dev1e3ee0d4"
-        }
-      ]
+    }
+  },
+  "storage": {
+    "NotificationTabel": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
     }
   }
 }
