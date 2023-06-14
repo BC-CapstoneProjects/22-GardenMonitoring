@@ -38,8 +38,11 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
     try {
       const user = await Auth.currentAuthenticatedUser();
   
+      // Define the desired file name
+      const desiredFileName = `${name}.jpg`;
+  
       // Fetch the presigned URL
-      const response = await fetch(`http://localhost:9000/putImage/${user.username}/${selectedGarden}/${fileUploaded.name}`, {
+      const response = await fetch(`http://localhost:9000/putImage/${user.username}/${selectedGarden}/${desiredFileName}`, {
         method: 'PUT',
         headers: {
           'Content-Type': fileUploaded.type,

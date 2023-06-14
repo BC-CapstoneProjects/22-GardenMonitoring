@@ -19,6 +19,8 @@ import CardMedia from '@mui/material/CardMedia';
 import SidebarBarChart from "../../scenes/bar/index";
 import TextField from '@mui/material/TextField';
 import { Auth } from 'aws-amplify';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 
 const Garden = ({ setScans, setSelectedGarden }) => {
@@ -43,6 +45,9 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   // state variable to track changes of 'state' in PlantDescriptions.js
   const [plants, setPlants] = useState(PlantDescriptions);
+  // state variable to hold dictionaries with plant names as keys and their corresponding URLs as values
+  const [plantURLs, setPlantURLs] = useState({});
+  
   
 
   // Add useState hooks for scans and selectedGarden
@@ -123,6 +128,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
   //   return transformedData;
   // };
 
+
   useEffect(() => {
     // we could add more code here to be executed when the refreshKey state changes...
     // i.e. the 'Brand' component is clicked
@@ -149,6 +155,76 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       }
     }
   }, [selectedGarden]);
+
+  // Function to generate timestamp in desired format
+  const getFormattedTimestamp = () => {
+    const date = new Date();
+    const day = date.toLocaleString('en-US', { weekday: 'short' }); // added weekday
+    const month = date.toLocaleString('en-US', { day: '2-digit' });
+    const monthName = date.toLocaleString('en-US', { month: 'short' });
+    const year = date.getUTCFullYear(); // get UTC year
+    const hours = date.getUTCHours(); // Use UTC hours
+    const minutes = date.getUTCMinutes(); // Use UTC minutes
+    const seconds = date.getUTCSeconds(); // Use UTC seconds
+
+    const timestamp = `${day}-${month}-${monthName}-${year}_${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}_+0000`; // Use UTC timezone
+
+    return timestamp;
+  };
+
+  // Function to be triggered by button to upload timestamp
+  // Function to be triggered by button to upload timestamp
+  const uploadTimestamp = async () => {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      
+      const timestamp = getFormattedTimestamp();
+      const desiredFileName = `time_stamp.txt`;
+      
+      // Create a Blob object from the timestamp string
+      const timestampFile = new Blob([timestamp], { type: 'text/plain' });
+
+      // First, fetch the presigned URL
+      const response = await fetch(`http://localhost:9000/putImage/${user.username}/${selectedGarden}/${desiredFileName}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'text/plain', // Update the content type to match the file you're uploading
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error getting presigned URL');
+      }
+      
+      const { presignedUrls } = await response.json();
+
+      // Then, upload the timestamp file to the presigned URL
+      const uploadResponse = await fetch(presignedUrls, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: timestampFile,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Error uploading timestamp');
+      }
+
+      console.log('Timestamp uploaded successfully');
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // extracts the filename from the presigned url to set the corresponding card with the right plant image
+  // we have to use key/value pair instead of using an array's index and the url
+  const extractPlantNameFromURL = (url) => {
+    let urlParts = url.split('/');
+    let fileName = urlParts[urlParts.length - 1]; // get the last part of the url
+    let plantName = fileName.split('.')[0]; // remove the file extension
+    return plantName;
+  }
 
   const refreshPage = () => {
     setRefreshKey((prevKey) => prevKey + 1);// increments the previous value of refreshKey state before updating
@@ -237,6 +313,15 @@ const Garden = ({ setScans, setSelectedGarden }) => {
       const user = await Auth.currentAuthenticatedUser();
       const response = await fetch(`http://localhost:9000/getImage/${user.username}/${gardenName}`); 
       const result = await response.json();
+      // Create a dictionary for plant URLs
+      let plantURLs = {};
+      // Iterate through the presignedUrls
+      for (let url of result.presignedUrls) {
+        let plantName = extractPlantNameFromURL(url);
+        plantURLs[plantName] = url;
+      }
+      // Save the dictionary in the state
+      setPlantURLs(plantURLs);
       console.log("API Result:", result);
 
       // const barData2 = { data: localScans, selectedGarden: selectedGarden }; // create barData object here
@@ -315,7 +400,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
 
   // Add a function to handle plant clicks
   const handlePlantClick = (plant, index, chartData) => {
-    const imageUrl = imageUrls[index] || plant.imageSrc; // remove the hardcoded localhost URL
+    const imageUrl = plantURLs[plant.name] || plant.imageSrc; // remove the hardcoded localhost URL
     // console.log('lineData from handlePlantClick', lineData)
     setSelectedPlant({
       ...plant,
@@ -363,7 +448,13 @@ const Garden = ({ setScans, setSelectedGarden }) => {
     <Box m="15px" paddingBottom="150px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" paddingLeft="50px">
-        <Box sx={{ flexGrow: 1, marginRight: "20px" }}><Header title={<Box marginRight="40px"><GardenButton /></Box>} subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" ></Header></Box>
+        <Box sx={{ flexGrow: 1, marginRight: "20px" }}>
+          <Header title={<Box marginRight="40px"><GardenButton />
+            
+            </Box>} subtitle="&nbsp;&nbsp;&nbsp;Welcome to your garden 🌳" >
+          </Header>
+        </Box>
+        
       </Box>
 
       {/* Input fields for creating and deleting buckets */}
@@ -456,6 +547,8 @@ const Garden = ({ setScans, setSelectedGarden }) => {
           </Box>
         }
 
+        {/* Button to trigger timestamp upload */}
+        <Button onClick={uploadTimestamp}>Evaluate Garden</Button>
         {/* GRID & CHARTS */}
         <Box>
           <Box
@@ -529,7 +622,7 @@ const Garden = ({ setScans, setSelectedGarden }) => {
                     <CardMedia
                       component="img"
                       height="180px"
-                      image={imageUrls[index] || imageSrc}
+                      image={plantURLs[name] || imageSrc} // use plantURLs instead of imageUrls
                       alt={imageAlt}
                     />
                   </Card>

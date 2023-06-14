@@ -12,6 +12,12 @@ const BarChart = ({ isDashboard = false, data}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  if (!data) {
+    return <p>
+      not found...
+      </p>;
+  }
+    
 
   console.log('bardata import', data);
 

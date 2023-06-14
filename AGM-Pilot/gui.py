@@ -235,10 +235,11 @@ class App(ttk.Frame):
         )
         self.check_2.grid(row=9, column=0, padx=5, pady=50, sticky="nsew")
 
-        self.dashboard = ttk.Button(self.account_frame, style="Accent.TButton", text="Go to my AGM Dashboard",
+        self.dashboard = ttk.Button(self.account_frame, style="Accent.TButton", text="Go to AGM Dashboard",
                                     command=lambda: webbrowser.open("http://localhost:3000/"))
         self.dashboard.grid(row=8, column=0, padx=5, pady=20, sticky="nsew")
-        self.dashboard.grid_remove()  # initially hide the button
+        # self.dashboard.grid_remove()  # initially hide the button
+
 
         # log out Button
         self.logout_button = ttk.Button(self.account_frame, text="Log out", command=self.logout)
@@ -457,6 +458,7 @@ class App(ttk.Frame):
                 self.username = username
                 self.username_label.config(text=f'Welcome, {username}!')
                 self.dashboard.grid(row=7, column=0, padx=5, pady=20, sticky="nsew")
+                self.dashboard.config(text="Go to my AGM Dashboard")
                 self.logout_button.grid(row=10, column=0, padx=5, pady=20, sticky="nsew")  # Show logout button
                 self.update_option_list()
                 # Hide these elements
@@ -476,13 +478,13 @@ class App(ttk.Frame):
         self.password.grid()
         self.password_entry.grid()
         self.login_button.grid()
+        self.dashboard.config(text="Go to AGM Dashboard")
 
         #clear the options menu
         self.option_menu_list.clear()
         self.optionmenu['menu'].delete(0, 'end')
 
         self.logout_button.grid_forget()  # hide the logout button
-        self.dashboard.grid_forget() # hide the dashboard button
         self.username_label.config(text="")  # clear the username label
 
     def update_option_list(self):

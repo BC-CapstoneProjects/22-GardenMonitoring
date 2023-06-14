@@ -1,7 +1,7 @@
 import express from 'express';
 import { s3Client } from "../public/libs/s3Client.js";
 import { dynamoDbClient } from '../public/libs/dynamoDbClient.js';
-import { PutItemCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
+import { PutItemCommand, UpdateItemCommand, GetItemCommand, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { CreateBucketCommand } from '@aws-sdk/client-s3';
 import { PutBucketNotificationConfigurationCommand, PutBucketCorsCommand } from '@aws-sdk/client-s3';
 import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda'
@@ -12,7 +12,7 @@ router.post("/:userId/:bucketName", async (req, res) => {
   let bucketName = req.params.bucketName;
   const userId = req.params.userId;
 
-  // Function to add or update the DynamoDB table
+  // Function to add or update the DynamoDB table 'Bucket'
   async function updateDynamoDb() {
     const getParams = {
       TableName: 'Bucket',
@@ -22,7 +22,7 @@ router.post("/:userId/:bucketName", async (req, res) => {
     };
 
     const userData = await dynamoDbClient.send(new GetItemCommand(getParams));
-
+    // if user is not found in the Bucket table, create new entry
     if (!userData.Item) {
       bucketName = `${userId}-bc-garden`;
 
@@ -36,6 +36,7 @@ router.post("/:userId/:bucketName", async (req, res) => {
 
       await dynamoDbClient.send(new PutItemCommand(putParams));
     } else {
+      // user exists, update their userId with new bucket name
       const updateParams = {
         TableName: 'Bucket',
         Key: {

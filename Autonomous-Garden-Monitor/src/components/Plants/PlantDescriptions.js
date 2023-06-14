@@ -258,6 +258,7 @@ async function getChartData(plants, bucketName) {
   for (let key in IdMap) {
     for (let i = 0; i < IdMap[key].length; i++) {
         // Parse date
+        console.log(`date part:${IdMap[key][i].date}`);
         let dateParts = IdMap[key][i].date.split('-');
         let day = dateParts[1];
         let month = new Date(Date.parse(dateParts[2] +" 1, 2012")).getMonth()+1;
