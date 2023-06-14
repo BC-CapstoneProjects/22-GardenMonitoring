@@ -1,11 +1,11 @@
 import Garden from "./routes/Garden/Garden";
 import Settings from "./routes/Settings";
 import Account from "./routes/Settings/Account";
-import Notifications from "./routes/Settings/Notifications";
-import Sign from './routes/Sign'
+// import Notifications from "./routes/Settings/Notifications";
+import Sign from "./routes/Sign";
 // import "./index.css";
-import '@aws-amplify/ui-react/styles.css';
-
+import "@aws-amplify/ui-react/styles.css";
+import Privacy from "./routes/Settings/Privacy";
 //min
 import React, { useState, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -23,60 +23,60 @@ import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import { plants, getChartData } from "./components/Plants/PlantDescriptions";
 import { useNavigate } from "react-router-dom";
-import logo from './logo.css';
-import { I18n } from 'aws-amplify';
-import { translations } from '@aws-amplify/ui-react';
-import { updateScans } from "./components/Plants/PlantDescriptions";
-
+import logo from "./logo.css";
+import { I18n } from "aws-amplify";
+import { translations } from "@aws-amplify/ui-react";
 
 
 // AWS Cognito
-import { Authenticator } from '@aws-amplify/ui-react';
-import { View, Button, Text, Image, useTheme, Heading } from '@aws-amplify/ui-react';
-import awsconfig from './aws-exports';
-import { Amplify } from 'aws-amplify';
-import { Auth } from 'aws-amplify';
+import { Authenticator } from "@aws-amplify/ui-react";
+import {
+  View,
+  Button,
+  Text,
+  Image,
+  useTheme,
+  Heading,
+} from "@aws-amplify/ui-react";
+import awsconfig from "./aws-exports";
+import { Amplify } from "aws-amplify";
+import { Auth } from "aws-amplify";
 import { linearGradientDef } from "@nivo/core";
-import { AmplifyConfirmSignUp, AuthState } from '@aws-amplify/ui-react';
+import { AmplifyConfirmSignUp, AuthState } from "@aws-amplify/ui-react";
 
-
-Amplify.configure(awsconfig)
-
+Amplify.configure(awsconfig);
 
 const handleSignOut = async () => {
   try {
     await Auth.signOut();
   } catch (error) {
-    console.log('Error signing out: ', error);
+    console.log("Error signing out: ", error);
   }
 };
 
+const services = {
+  handleSignUp: async (formData, navigate) => {
+    let { username, password, attributes } = formData;
+    // custom username
+    username = username.toLowerCase();
+    attributes.email = attributes.email.toLowerCase();
 
-// const services = {
-//   handleSignUp: async (formData, navigate) => {
-
-
-//     let { username, password, attributes } = formData;
-//     // custom username
-//     username = username.toLowerCase();
-//     attributes.email = attributes.email.toLowerCase();
-
-//     // phone_number validation
-//     const phoneNumberRegex = /^\d{10}$/;
-//     if (!phoneNumberRegex.test(attributes.phone_number)) {
-//       alert("Phone Number format is incorrect. Please enter a 10-digit phone number.");
-//       return;
-//     }
-//     else {
-//       return Auth.signUp({
-//         username,
-//         password,
-//         attributes,
-//       });
-//     }
-//   }
-// };
-
+    // phone_number validation
+    const phoneNumberRegex = /^\d{10}$/;
+    if (!phoneNumberRegex.test(attributes.phone_number)) {
+      alert(
+        "Phone Number format is incorrect. Please enter a 10-digit phone number."
+      );
+      return;
+    } else {
+      return Auth.signUp({
+        username,
+        password,
+        attributes,
+      });
+    }
+  },
+};
 
 // I18n.putVocabularies(translations);
 // I18n.setLanguage('fr');
@@ -92,28 +92,29 @@ const handleSignOut = async () => {
 //   },
 // });
 
-
-
 const components = {
   Header() {
     const { tokens } = useTheme();
 
     const handleClick = () => {
-      window.open('https://www.bellevuecollege.edu/sustainability/food-backup/garden/', '_blank');
+      window.open(
+        "https://www.bellevuecollege.edu/sustainability/food-backup/garden/",
+        "_blank"
+      );
     };
 
     return (
       <div style={{}}>
         <View textAlign="center" padding={tokens.space.large}>
-          <Button
-            style={{ border: 'none',}}>
-            <Image onClick={handleClick}
+          <Button style={{ border: "none" }}>
+            <Image
+              onClick={handleClick}
               alt="Sign up plant"
               src="/assets/logo4.png"
               style={{
-                width: '160x',
-                height: '160px',
-                borderRadius: '20%',
+                width: "160x",
+                height: "160px",
+                borderRadius: "20%",
               }}
             />
           </Button>
@@ -127,9 +128,7 @@ const components = {
 
     return (
       <View textAlign="center" padding={tokens.space.large}>
-        <Text>
-          &copy; All Rights Reserved
-        </Text>
+        <Text>&copy; All Rights Reserved</Text>
       </View>
     );
   },
@@ -149,24 +148,20 @@ const components = {
           level={3}
         >
           Enter Information:
-        </Heading>  
+        </Heading>
       );
       handleSignOut();
     },
     Footer() {
-      return <Text></Text>;
+      return <Text>Footer Information</Text>;
     },
   },
-
-
-
-
 };
 
 const formFields = {
   signIn: {
     username: {
-      placeholder: 'Enter your email or username',
+      placeholder: "Enter your email or username",
     },
   },
   // preferred_username: {
@@ -177,43 +172,40 @@ const formFields = {
   // },
   resetPassword: {
     username: {
-      placeholder: 'Enter your email or username',
+      placeholder: "Enter your email or username",
     },
   },
   signUp: {
     preferred_username: {
-      label: 'Garden Name:',
-      placeholder: 'Enter your Garden Name:',
+      label: "Garden Name:",
+      placeholder: "Enter your Garden Name:",
       // isRequired: false,
       // order: 2,
     },
     address: {
-      label: 'Address:',
-      placeholder: 'Enter your Address:',
+      label: "Address:",
+      placeholder: "Enter your Address:",
     },
   },
 
   forceNewPassword: {
     password: {
-      placeholder: 'Enter your Password:',
+      placeholder: "Enter your Password:",
     },
   },
 
   confirmSignUp: {
     confirmation_code: {
       hidden: true,
-      placeholder: 'Enter your Password:',
-      labelHidden: true
+      placeholder: "Enter your Password:",
+      labelHidden: true,
     },
   },
-
 };
 
 
 
 function App() {
-
-
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
@@ -223,7 +215,9 @@ function App() {
   const [scans, setScans] = useState([]);
 
   // Add useState hook for selectedGarden
-  const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
+  const [selectedGarden, setSelectedGarden] = useState(
+    localStorage.getItem("selectedGarden") || "Select Garden"
+  );
   // Add useEffect hook to update localStorage when selectedGarden changes
   useEffect(() => {
     localStorage.setItem('selectedGarden', selectedGarden);
@@ -270,17 +264,16 @@ function App() {
                 {/* <Route path="/garden" element={<Garden />} />
               <Route path="/view/:subjectID" element={<Garden />} /> */}
 
-                <Route path="/account" element={<Account />} />
-                <Route path="/notifications" element={<Notifications />} />
-              </Routes>
-            </main>
-          </div>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
-    </Authenticator>
+              <Route path="/account" element={<Account />} />
+              <Route path="/privacy" element={<Privacy />} />
+            </Routes>
+          </main>
+        </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
+    </Authenticator> 
   );
 }
-
 
 export default App;
 
@@ -298,10 +291,7 @@ export default App;
 //   );
 // }
 
-
 // function AuthenticatedApp() {
-
-
 
 //   // Add useState hook for selectedGarden
 //   const [selectedGarden, setSelectedGarden] = useState(localStorage.getItem('selectedGarden') || "Select Garden");
@@ -312,8 +302,6 @@ export default App;
 
 //   // get most recent drone scan data from api for every id in PlantDescriptions
 //   const [scans, setScans] = useState([]);
-
-
 
 //   const handleSignOut = async () => {
 //     try {
@@ -353,12 +341,10 @@ export default App;
 
 // function App() {
 
-
 //   const [theme, colorMode] = useMode();
 //   const [isSidebar, setIsSidebar] = useState(true);
 //   const location = useLocation();
 //   const isSignPage = location.pathname === "/";
-
 
 //   return (
 //     <ColorModeContext.Provider value={colorMode}>
