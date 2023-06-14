@@ -1,5 +1,6 @@
 import { Auth } from 'aws-amplify';
 
+
 const plants = [
   {
     id: 0,
@@ -174,22 +175,23 @@ async function updatePlantHealth(plants, bucketName) {
     const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
 
     if (response.ok) {
-    const data = await response.json();
+      const data = await response.json();
 
-    // If there are any scans, update the plant with the most recent scan
-    if (data && data[0] && data[0].length > 0) {
-      const mostRecentScan = data[0][0];
-      plant.disease = mostRecentScan.disease;
-      plant.probability = mostRecentScan.probability;
-      plant.timestamp = mostRecentScan.time_stamp;
-    } 
+      // console.log("response11", data);
 
-    } 
-    // if the 
+      // If there are any scans, update the plant with the most recent scan
+      if (data && data[0] && data[0].length > 0) {
+        const mostRecentScan = data[0][0];
+        plant.disease = mostRecentScan.disease;
+        plant.probability = mostRecentScan.probability;
+        plant.timestamp = mostRecentScan.time_stamp;
+      }
+
+    }
+    // if there's no data saved in DynamoDB for this plant,
     if (!response.ok) {
 
       await response.json();
-    
       plant.disease = "N/A";
       plant.probability = "N/A";
       plant.timestamp = "N/A";
@@ -197,12 +199,87 @@ async function updatePlantHealth(plants, bucketName) {
   }
 
   // Return the updated plants array
-  console.log('updatePlantHealth output:', plants);
+  console.log('updatePlantHealth output:', plants.length);
 
   const updatedPlants = await plants.map(updatePlantState);
 
   return updatedPlants;
 }
+
+
+
+// this function saves the number of the diseased plants in slected garden.
+async function getChartData(plants, bucketName) {
+
+  const user = await Auth.currentAuthenticatedUser();   
+
+  let IdMap = {};
+  
+  for (const plant of plants) {
+    const response = await fetch(`http://localhost:9000/getScans/${user.username}/${bucketName}/Plant_${plant.id}`);
+    let id = `${plant.id}`;
+    let importData = [];
+
+
+    if (response.ok) {
+      const data = await response.json();
+      let countMap = {};
+
+      // If there are any scans, update the plant with the most recent scan
+      if (data && data[0] && data[0].length > 0) {
+        for (let i = 0; i < data[0].length; i++) {
+          const currentScan = data[0][i];
+          importData.push(currentScan);
+        }
+      }
+
+      console.log("importData", importData);
+      // console.log("getLineChartData2", plant.id);
+
+      //transfrom data structure
+      const transformedData = importData.map(entry => {
+        return {
+          date: entry.time_stamp,
+          data: { [entry.disease]: entry.probability }
+        };
+      });
+
+
+      IdMap[id] = transformedData;
+
+      console.log('transformedData:', transformedData);
+    }
+    // if there's no data saved in DynamoDB for this plant,
+    if (!response.ok) {
+      return null;
+    }
+  }
+  //transform data format
+  for (let key in IdMap) {
+    for (let i = 0; i < IdMap[key].length; i++) {
+        // Parse date
+        let dateParts = IdMap[key][i].date.split('-');
+        let day = dateParts[1];
+        let month = new Date(Date.parse(dateParts[2] +" 1, 2012")).getMonth()+1;
+        let yearParts = dateParts[3].split('_');
+        let year = yearParts[0];
+
+        // Format date
+        let formattedDate = month.toString().padStart(2, '0') + '/' + day + '/' + year;
+
+        // Replace the date in the object
+        IdMap[key][i].date = formattedDate;
+    }
+  }
+
+
+  // Return the updated plants array
+  console.log('IdMap:', IdMap);
+
+  return IdMap;
+}
+
+
 
 
 // this function updates a the 'state' field for the given plant based on it's disease label
@@ -290,4 +367,4 @@ updateAllImageSrcs(plants).then((updatedPlants) => {
   plants = updatedPlants;
 });
 
-export { plants, updatePlantHealth, updatePlantState };
+export { plants, updatePlantHealth, updatePlantState, getChartData };

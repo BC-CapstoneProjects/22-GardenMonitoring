@@ -1,9 +1,9 @@
 import os
 import tkinter as tk
 from time import strftime, gmtime
-from tkinter import messagebox
+from tkinter import messagebox, Toplevel, Canvas
 import tkinter.ttk as ttk
-import threading
+from threading import Thread
 from pilot import monitor
 import botocore
 from ttkthemes import ThemedTk
@@ -11,40 +11,54 @@ import webbrowser
 import boto3
 import requests
 from aws_config import aws_exports
-
-# Just simply import the azure.tcl file
-
-
-button_names = {
-    "0": "1. View gardens",
-    "1": "2. Create a new garden",
-    "2": "3. Sync garden data",
-    "3": "4. Start garden monitoring",
-}
+import configparser
+from PIL import Image, ImageTk
 
 """
 gui.py was built with the help from the following
-Example script and assets, for testing the Azure ttk theme.
-Any additional implementation is original work created by
+Example script and assets, for testing the Azure ttk theme:
+    - Original Author: rdbende
+    - License: MIT license
+    - Source: https://github.com/rdbende/ttk-widget-factory
+Additional implementation and functionality is original work created by
 Capstone, Group 7 (AGM), at Bellevue College.
-Original Author: rdbende
-License: MIT license
-Source: https://github.com/rdbende/ttk-widget-factory
 """
-
-
-# import tkinter as tk
-# from tkinter import ttk
-
-def start_monitoring():
-    monitor_thread = threading.Thread(target=monitor)
-    monitor_thread.start()
-    print("drone landed")
 
 
 class App(ttk.Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent=None, **kwargs):
+        """
+        The constructor for the App class. Initializes a new App instance.
+        :param master: Parent widget for this frame.
+        :param kwargs: Additional arguments to pass to the parent class constructor.
+        """
+
+        self.current_image = None  # holds the current image
+
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
+        aws_access_key_id = config.get('default', 'aws_access_key_id')
+        aws_secret_access_key = config.get('default', 'aws_secret_access_key')
+
+        session = boto3.Session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+        print(session.profile_name)
+        print(session.available_profiles)
+
+        print("AWS_ACCESS_KEY_ID: ", os.environ.get("AWS_ACCESS_KEY_ID"))
+        print("AWS_SECRET_ACCESS_KEY: ", os.environ.get("AWS_SECRET_ACCESS_KEY"))
+
+        super().__init__(parent, **kwargs)
+        # Initialize instance variables
+        self.root = parent
+        self.thread = None  # The thread that will run the monitoring function
+        self.monitoring = False  # Flag to indicate whether monitoring is active
+        self.switch_update_job = None # holds ID of update_switch job
+
         ttk.Frame.__init__(self)
 
         # Call the get_user method to retrieve the IAM user information
@@ -86,13 +100,95 @@ class App(ttk.Frame):
         # Create widgets :)
         self.setup_widgets()
 
+    def start_monitoring(self):
+        """
+        Start the monitoring function in a separate thread. If monitoring is already active, do nothing.
+
+        :return: None
+        """
+        if self.thread is not None and self.thread.is_alive():
+            messagebox.showinfo("System Alert", "Monitoring thread is already running")
+            return
+
+        self.monitoring = True  # Set the flag to indicate that monitoring should be active
+
+        # Create a new thread that runs the monitoring function.
+        # We pass self (the App instance) as an argument to the function, and set daemon=True
+        # so that the thread will exit when the main program exits.
+        self.thread = Thread(target=monitor, args=(self,), daemon=True)
+        self.thread.start()  # Start the thread
+        # Enable the switch
+        self.switch.state(("!disabled",))  # Remove the "disabled" state
+        self.update_switch()  # Start updating the switch state
+
+    def stop_monitoring(self):
+        """
+        Signal the monitoring thread to stop.
+
+        :return: None
+        """
+        self.monitoring = False  # Set the flag to indicate that monitoring should stop
+        print("Tello disconnecting")
+        # Disable the switch
+        self.switch.state(("disabled",))  # Add the "disabled" state
+        # Cancel the switch update job
+        if self.switch_update_job is not None:
+            self.root.after_cancel(self.switch_update_job)
+            self.switch_update_job = None
+
+    def is_monitoring(self):
+        """
+        Check if the monitoring thread is still running.
+
+        :return: True if the monitoring thread is alive, False otherwise.
+        """
+        if self.thread is None:  # If the thread was never started, it's not running
+            # Disable the switch
+            self.switch.state(("disabled",))  # Add the "disabled" state
+            return False
+        elif not self.thread.is_alive():  # If the thread has finished running
+            # Disable the switch
+            self.switch.state(("disabled",))  # Add the "disabled" state
+            # Cancel the switch update job
+            if self.switch_update_job is not None:
+                self.root.after_cancel(self.switch_update_job)
+                self.switch_update_job = None
+        return self.thread.is_alive()  # Check if the thread is alive
+
+    def update_switch(self):
+        """
+        Update the state of the switch to reflect whether monitoring is active.
+
+        :return: None
+        """
+        if self.is_monitoring():
+            # Monitoring is active, enable the switch
+            self.switch.state(("!disabled",))  # Remove the "disabled" state
+        else:
+            # Monitoring is not active, disable the switch
+            self.switch.state(("disabled",))  # Add the "disabled" state
+
+        # Schedule the next update
+        self.switch_update_job = self.root.after(1000, self.update_switch)  # Check the state every second
+
     def update_tree(self, *args):
         # Clear the tree
         for i in self.treeview.get_children():
             self.treeview.delete(i)
 
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
+        aws_access_key_id = config.get('default', 'aws_access_key_id')
+        aws_secret_access_key = config.get('default', 'aws_secret_access_key')
+
+        session = boto3.Session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+
         # Get the objects from the selected garden (bucket)
-        s3 = boto3.resource('s3')
+        s3 = session.resource('s3')
         bucket = s3.Bucket(self.selected_garden.get())
         for obj in bucket.objects.all():
             # Insert the object into the tree
@@ -180,7 +276,7 @@ class App(ttk.Frame):
         # Accentbutton, uses 'monitoring' function imported from pilot.py
         self.accentbutton = ttk.Button(
             self.widgets_frame, text="Start Garden Monitoring", style="Accent.TButton",
-            command=start_monitoring
+            command=self.start_monitoring
         )
 
         self.accentbutton.grid(row=7, column=0, columnspan=2, padx=5, pady=10, sticky="nsew")
@@ -270,6 +366,25 @@ class App(ttk.Frame):
         self.tab_2 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_2, text="Local image preview")
 
+        # Create a scrollbar
+        self.scrollbar = ttk.Scrollbar(self.tab_2)
+        self.scrollbar.pack(side="right", fill="y")
+
+        # Create a canvas
+        self.canvas = Canvas(self.tab_2, yscrollcommand=self.scrollbar.set)
+        self.canvas.pack(side="left")
+
+        # Configure the scrollbar
+        self.scrollbar.config(command=self.canvas.yview)
+
+        # Add another frame inside the canvas
+        self.inner_frame = ttk.Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
+
+        self.display_images()
+
+        self.inner_frame.bind("<Configure>", lambda event: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
         # Tab #3
         self.logs = ttk.Frame(self.notebook)
         self.notebook.add(self.logs, text="Monitoring Logs")
@@ -277,6 +392,33 @@ class App(ttk.Frame):
         # Sizegrip
         self.sizegrip = ttk.Sizegrip(self)
         self.sizegrip.grid(row=100, column=100, padx=(0, 5), pady=(0, 5))
+
+    def display_images(self):
+        # Get list of all image files in 'images' directory
+        image_dir = 'images/'
+        image_files = [f for f in os.listdir(image_dir) if f.endswith('.png') or f.endswith('.jpg')]
+
+        # Grid dimensions
+        columns = 1  # We use only one column since we're scrolling vertically
+
+        # Loop over image files
+        for index, image_file in enumerate(image_files):
+            # Open image file
+            img = Image.open(os.path.join(image_dir, image_file))
+
+            # Convert to PhotoImage
+            photo_img = ImageTk.PhotoImage(img)
+
+            # Create a label with image
+            img_label = ttk.Label(self.inner_frame, image=photo_img)
+
+            # This line makes sure the image isn't garbage collected
+            img_label.image = photo_img
+
+            # Add label to grid
+            row, col = divmod(index, columns)
+            img_label.grid(row=row, column=col, padx=5, pady=5)
+
 
     def authenticate_user(self):
         # AccountInfo

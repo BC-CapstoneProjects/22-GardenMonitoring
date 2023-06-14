@@ -3,28 +3,28 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockLineData as data } from "../data/mockData";
 
-const LineChart = ({ isCustomLineColors = false, chartData, isDashboard = true }) => {
+
+
+
+const LineChart = ({ isCustomLineColors = false, id, chartData, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  if (chartData === null) {
-    return <p>loading...</p>;
-  } else {
 
   //get the disease info of selected plant
-  const plantLineData = chartData;
+  const plantLineData = chartData[id];
+  
+  //sort date
+  plantLineData.sort((a, b) => {
+    var dateA = new Date(a.date), dateB = new Date(b.date);
+    return dateA - dateB;
+});
 
-  //   //sort date
-  //   plantLineData.sort((a, b) => {
-  //     var dateA = new Date(a.date), dateB = new Date(b.date);
-  //     return dateA - dateB;
-  // });
-
-  console.log('linedata import', plantLineData);
+console.log('linedata import',plantLineData);
 
 
-  // Here's an example of how you can map diseases to colors
-  let diseaseColorMap = {
+  // here you define your color values. Replace these with the actual colors you want.
+  let diseaseColors = {
     'Green Mite': 'red',
     'Healthy': 'green',
     'Mosaic Disease': 'orange',
@@ -33,68 +33,77 @@ const LineChart = ({ isCustomLineColors = false, chartData, isDashboard = true }
     'Unknown': 'black',
   };
 
-
-// A set to collect all unique dates
-let uniqueDates = new Set();
-
-// A map to collect the disease data
-let diseaseData = {};
-
-// Populate the set with unique dates and the map with disease data
-for (let array of Object.values(plantLineData)) {
-  for (let entry of array) {
-    uniqueDates.add(entry.date);
-    for (let [disease, value] of Object.entries(entry.data)) {
-      if (!diseaseData[disease]) {
-        diseaseData[disease] = {};
-      }
-      diseaseData[disease][entry.date] = value;
-    }
-  }
-}
-
-// Convert the set to an array and sort the dates
-uniqueDates = Array.from(uniqueDates).sort();
-
-// Convert the map to the required output format, adding missing dates
-let output = Object.entries(diseaseData).map(([disease, data]) => {
+  
+  
+// First, convert to a intermediate data structure where you can easily manipulate data
+let intermediateData = plantLineData.map(({ date, data }) => {
+  let key = Object.keys(data)[0];
+  let value = parseFloat(data[key]);
   return {
-    id: disease,
-    color: diseaseColorMap[disease],
-    data: uniqueDates.map(date => {
-      return { x: date, y: data[date] || '0' };
-    })
-  }
+    id: key,
+    data: { x: date, y: value }
+  };
 });
 
+// Now, reduce it to the desired format
+let transformedData = intermediateData.reduce((acc, { id, data }) => {
+  let foundIndex = acc.findIndex(item => item.id === id);
+  
+  if (foundIndex >= 0) {
+    acc[foundIndex].data.push(data);
+  } else {
+    acc.push({
+      id: id,
+      color: id === "Healthy" ? "green" : "purple",
+      data: [data]
+    });
+  }
+
+  return acc;
+}, []);
+
+console.log('transformedData', transformedData);
 
 
-//   const output = []
-
-// for (let array of Object.values(plantLineData)) {
-//   for (let entry of array) {
-//     for (let [disease, value] of Object.entries(entry.data)) {
-//       let existingEntry = output.find(e => e.id === disease)
-//       if (existingEntry) {
-//         existingEntry.data.push({ x: entry.date, y: value })
-//       } else {
-//         output.push({
-//           id: disease,
-//           color: diseaseColorMap[disease],
-//           data: [
-//             { x: entry.date, y: value }
-//           ]
-//         })
-//       }
-//     }
-//   }
-// }
-
-console.log('output',output)
+  
+// const mockLineData1 = [
+//   {
+//     id: "Green Mite",
+//     color: tokens("dark").redAccent[200],
+//     data: [
+//       {
+//         x: "06/06/2023",
+//         y: 1,
+//       },
+//       {
+//         x: "06/09/2023",
+//         y: 1,
+//       },
+//     ],
+//   },
+//   {
+//     id: "Healthy",
+//     color: tokens("dark").greenAccent[500],
+//     data: [
+//       {
+//         x: "06/07/2023",
+//         y: 0.5,
+//       },
+//       {
+//         x: "06/08/2023",
+//         y: 1.3,
+//       },
+//       {
+//         x: "06/10/2023",
+//         y: 1,
+//       },
+//     ],
+//   },
+// ];
 
   return (
     <ResponsiveLine
-      data={output}
+      data={transformedData}
       theme={{
         axis: {
           domain: {
@@ -110,7 +119,7 @@ console.log('output',output)
           ticks: {
             line: {
               stroke: colors.grey[100],
-              strokeWidth: 1,
+              strokeWidth: 3,
             },
             text: {
               fill: colors.grey[100],
@@ -133,8 +142,8 @@ console.log('output',output)
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",
-        min: "0",
-        max: "1",
+        min: "auto",
+        max: "auto",
         stacked: false,
         reverse: false,
       }}
@@ -147,7 +156,7 @@ console.log('output',output)
         tickSize: 0,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "Date of Analysis", // added
+        legend: isDashboard ? undefined : "Date", // added
         legendOffset: 36,
         legendPosition: "middle",
       }}
@@ -164,24 +173,24 @@ console.log('output',output)
       enableGridX={false}
       enableGridY={false}
       pointSize={8}
-      pointColor={{ theme: "background" }}
+      pointColor={{ from: "serieColor" }}
       pointBorderWidth={2}
       pointBorderColor={{ from: "serieColor" }}
       pointLabelYOffset={-12}
       useMesh={true}
       legends={[
         {
-          anchor: "bottom-right",
+          anchor: "top-right",
           direction: "column",
-          justify: false,
+          justify: true,
           translateX: 100,
           translateY: 0,
           itemsSpacing: 0,
           itemDirection: "left-to-right",
-          itemWidth: 80,
+          itemWidth: 90,
           itemHeight: 20,
           itemOpacity: 0.75,
-          symbolSize: 12,
+          symbolSize: 10,
           symbolShape: "circle",
           symbolBorderColor: "rgba(0, 0, 0, .5)",
           effects: [
@@ -197,7 +206,6 @@ console.log('output',output)
       ]}
     />
   );
-};
 };
 
 export default LineChart;

@@ -17,13 +17,16 @@ import Form from "./scenes/form";
 import Line from "./scenes/line";
 import Pie from "./scenes/pie";
 import Geography from "./scenes/geography";
+import Downloads from "./scenes/downloads";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
+import { plants, getChartData } from "./components/Plants/PlantDescriptions";
 import { useNavigate } from "react-router-dom";
 import logo from "./logo.css";
 import { I18n } from "aws-amplify";
 import { translations } from "@aws-amplify/ui-react";
+
 
 // AWS Cognito
 import { Authenticator } from "@aws-amplify/ui-react";
@@ -200,11 +203,16 @@ const formFields = {
   },
 };
 
+
+
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
   const isSignPage = location.pathname === "/";
+  const [chartData, setChartData] = useState('');
+  // get most recent drone scan data from api for every id in PlantDescriptions
+  const [scans, setScans] = useState([]);
 
   // Add useState hook for selectedGarden
   const [selectedGarden, setSelectedGarden] = useState(
@@ -212,51 +220,48 @@ function App() {
   );
   // Add useEffect hook to update localStorage when selectedGarden changes
   useEffect(() => {
-    localStorage.setItem("selectedGarden", selectedGarden);
+    localStorage.setItem('selectedGarden', selectedGarden);
+
+    getChartData(plants, selectedGarden).then((importedChartData) => {
+      setChartData(importedChartData);
+      console.log('chartData:', chartData);
+    });
+
   }, [selectedGarden]);
 
-  // get most recent drone scan data from api for every id in PlantDescriptions
-  const [scans, setScans] = useState([]);
+  
+
+
+  
+
 
   return (
-    // <Authenticator components={components} formFields={formFields}>
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="app">
-          <Sidebar isSidebar={isSidebar} />
-          <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <Garden
-                    setScans={setScans}
-                    setSelectedGarden={setSelectedGarden}
-                  />
-                }
-              />
-              <Route
-                path="/view/:subjectID"
-                element={
-                  <Garden
-                    setScans={setScans}
-                    setSelectedGarden={setSelectedGarden}
-                  />
-                }
-              />
-              {/* <Route path="/" element={<Sign />} /> */}
-              <Route path="/form" element={<Form />} />
-              <Route
-                path="/bar"
-                element={<Bar data={scans} selectedGarden={selectedGarden} />}
-              />
-              <Route path="/pie" element={<Pie />} />
-              <Route path="/line" element={<Line />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/geography" element={<Geography />} />
-              {/* <Route path="/garden" element={<Garden />} />
+    <Authenticator components={components} formFields={formFields} >
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div className="app">
+            <Sidebar isSidebar={isSidebar} />
+            <main className="content">
+              <Topbar setIsSidebar={setIsSidebar} />
+              <Routes>
+                <Route
+                  path="/"
+                  element={<Garden setScans={setScans}  chartData={chartData} setSelectedGarden={setSelectedGarden} />}
+                />
+                <Route
+                  path="/view/:subjectID"
+                  element={<Garden setScans={setScans} setSelectedGarden={setSelectedGarden} />}
+                />
+                {/* <Route path="/" element={<Sign />} /> */}
+                <Route path="/form" element={<Form />} />
+                <Route path="/bar" element={<Bar data={chartData} selectedGarden={selectedGarden} />} />
+                <Route path="/pie" element={<Pie data={chartData} selectedGarden={selectedGarden} />} />
+                <Route path="/line" element={<Line data={chartData} selectedGarden={selectedGarden} />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/geography" element={<Geography />} />
+                <Route path="/downloads" element={<Downloads />} />
+                {/* <Route path="/garden" element={<Garden />} />
               <Route path="/view/:subjectID" element={<Garden />} /> */}
 
               <Route path="/account" element={<Account />} />
@@ -266,7 +271,7 @@ function App() {
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
-    // {/* </Authenticator> */}
+    </Authenticator> 
   );
 }
 
