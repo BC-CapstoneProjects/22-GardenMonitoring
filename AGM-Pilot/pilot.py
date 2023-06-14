@@ -1,7 +1,9 @@
 import logging
-import os
 import time
-from time import gmtime, strftime
+
+from pathlib import Path
+import sys
+import os
 
 import boto3
 import cv2
@@ -10,30 +12,44 @@ import numpy as np
 from botocore.exceptions import ClientError
 from djitellopy import tello
 
-from config.definitions import ROOT_DIR
+"""
+pilot.py is original work created by:
+Capstone, Group 7 (AGM), at Bellevue College.
+"""
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.join(base_path, relative_path)
+
 
 thres = 0.50
 nmsThres = 0.2
 classNames = []
-classFile = 'ss.names'  # Contains a total of 91 different objects which can be recognized by the code
+classFile = str(resource_path('ss.names'))
 with open(classFile, 'rt') as f:
     classNames = f.read().split('\n')
+print(classFile)
+configPath = str(resource_path('ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'))
+weightsPath = str(resource_path("frozen_inference_graph.pb"))
+print("Current working directory:", os.getcwd())
 
-configPath = 'ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
-weightsPath = "frozen_inference_graph.pb"
-
-net = cv2.dnn_DetectionModel(weightsPath, configPath)
+# setup cv2 dnn
+net = cv2.dnn_DetectionModel(resource_path('frozen_inference_graph.pb'),
+                             resource_path('ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'))
 net.setInputSize(320, 320)
 net.setInputScale(1.0 / 127.5)
 net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
 
-# me.enable_mission_pads()
-# me.set_mission_pad_detection_direction(2)#enables for both forward and downward detection
-
-
+# store movements of Tello
 flight_path = {}
-
 plant_x = 0
 plant_y = 0
 
@@ -50,90 +66,11 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-session = boto3.Session()
-
-client = session.client('s3')
-s3 = session.resource('s3')
-gardens = {}
-p = os.path.join(ROOT_DIR, 'images')
-images = os.listdir(p)
+images_folder = str(resource_path('images'))
+images = os.listdir(images_folder)
 
 
-def new_user_garden(user_client):
-    os.system('cls')
-    garden_created = False
-    while not garden_created:
-        garden_name = input("Please provide a unique Garden ID or type 'q' to quit: ")
-        if garden_name == 'q':
-            break;
-        try:
-            response = user_client.create_bucket(
-                Bucket=garden_name,
-                CreateBucketConfiguration={
-                    'LocationConstraint': 'us-west-2',
-                },
-            )
-        except user_client.exceptions.ClientError:
-            print(bcolors.FAIL + "Invalid bucket name\n" + bcolors.ENDC)
-            continue
-        except user_client.exceptions.BucketAlreadyExists:
-            print(bcolors.FAIL + "Garden name already exists\n" + bcolors.ENDC)
-            continue
-        except user_client.exceptions.BucketAlreadyOwnedByYou:
-            client_response = input(
-                bcolors.FAIL + "Garden already exists and is owned by you, would you like to use it?\n" + bcolors.ENDC)
-            if client_response.lower() == 'y':
-                for bucket in s3.buckets.all():
-                    if garden_name == bucket.name:
-                        gardens[garden_name] = "active"
-                        garden_created = True
-                        continue
-            else:
-                continue
-        else:
-            garden_created = True
-
-
-def list_gardens(user_client):
-    os.system('cls')
-    for bucket in s3.buckets.all():
-        # existing s3 buckets will default to a non-active status
-        if bucket.name not in gardens:
-            gardens[bucket.name] = "non-active"
-
-    print("Enter the garden name to toggle between active and non-active status, or enter 'q' to go back.\n\n")
-    print("Garden name, Status: \n")
-    garden_number = 1
-    for key, value in gardens.items():
-        print('- %s, %s' % (key, value))
-        garden_number += 1
-
-
-def select_garden(user_client):
-    invalid_response = False
-    garden_selection = ""
-    while 'q' not in garden_selection:
-        os.system('cls')
-        list_gardens(user_client)
-        if invalid_response:
-            print("\n\nGarden status was not updated")
-            time.sleep(.5)
-        garden_selection = input("\n>    ")
-        if garden_selection in gardens and gardens[garden_selection] == "non-active":
-            gardens[garden_selection] = "active"
-            print(garden_selection, "was found and is", gardens[garden_selection])
-            invalid_response = False
-        elif garden_selection in gardens and gardens[garden_selection] == "active":
-            gardens[garden_selection] = "non-active"
-            print(garden_selection, "was found and is", gardens[garden_selection])
-            invalid_response = False
-        else:
-            invalid_response = True
-            continue
-
-
-def monitor(flag):
-    flag = True
+def monitor(app):
     me = tello.Tello()
     me.LOGGER.setLevel(logging.WARNING)
     me.connect()
@@ -169,8 +106,7 @@ def monitor(flag):
     i = 0
     object_not_found_counter = 0
     object_found_counter = 0
-    monitoring = True
-    while monitoring:
+    while app.monitoring:
         img = me.get_frame_read().frame
         classIds, confs, bbox = net.detect(img, confThreshold=thres, nmsThreshold=nmsThres)
         try:
@@ -192,7 +128,7 @@ def monitor(flag):
                         image_captured = False
                         if images_captured >= 2:
                             # me.land()
-                            monitoring = False
+                            app.monitoring = False
                             me.streamoff()
                             continue
 
@@ -289,79 +225,21 @@ def monitor(flag):
                         attempts += 1
                         object_not_found_counter = 0
                         # me.rotate_clockwise(40)
-                    elif attempts > 5:
+                    elif attempts == 10:
                         # me.land()
-                        print(bcolors.FAIL + "5 failed attempts landing" + bcolors.ENDC)
-                        monitoring = False
+                        print(bcolors.FAIL + f"{attempts} failed attempts, landing." + bcolors.ENDC)
+                        app.monitoring = False
                         me.streamoff()
-                        flag = False
-                        return flag
 
         except:
             pass
-        # me.send_rc_control(0, 0, 0, 0)
         cv2.imshow("Image", img)
-        cv2.waitKey(1)
 
+        key = cv2.waitKey(1) & 0xFF  # bitwise AND with 0xFF to isolate last 8 bits
+        # If 'q' key is pressed, break from loop and set app.monitoring to False
+        if key == ord('q'):
+            app.monitoring = False
+            break
 
-def menu():
-    print(strftime("%a-%d-%b-%Y_%H:%M:%S_+0000", gmtime()))
-    print("\nAGM Pilot UI:\n")
-    print("1. View gardens")
-    print("2. Create a new garden")
-    print("3. Sync garden data")
-    print("4. Start garden monitoring\n\n enter 'q' to exit")
-
-    credentials = session.get_credentials()
-    credentials_source = credentials.method
-
-    print("Credentials are coming from:", credentials_source)
-
-
-if __name__ == '__main__':
-    bad_sync = False
-    sync = False
-    user_input = ""
-    while 'q' not in user_input:
-        os.system('cls')
-        menu()
-        if bad_sync:
-            print(
-                bcolors.WARNING + "Garden data could not be synchronized, check 'View gardens' to activate gardens before "
-                                  "synchronizing garden data." + bcolors.ENDC)
-            time.sleep(.5)
-        elif sync:
-            print(bcolors.OKGREEN + "Garden data was successfully synchronized!" + bcolors.ENDC)
-            time.sleep(.5)
-        user_input = input("\n\n>    ")
-        if user_input == '1':
-            bad_sync = False
-            sync = False
-            select_garden(client)
-        elif user_input == '2':
-            bad_sync = False
-            sync = False
-            new_user_garden(client)
-        # elif user_input == '3':
-        #     if sync_garden():
-        #         sync = True
-        #     else:
-        #         bad_sync = True
-        elif user_input == '4':
-            me = tello.Tello()
-            me.LOGGER.setLevel(logging.WARNING)
-            me.connect()
-            print("Battery = " + str(me.get_battery()) + "%")
-            if me.get_battery() <= 15:
-                me.streamoff()
-                print("Battery too low to fly.")
-            else:
-                me.streamon()
-                monitor()
-                me.streamoff()
-                continue
-        else:
-            bad_sync = False
-            sync = False
-            continue
-    print("goodbye!")
+        # After the loop ends, close the window
+    cv2.destroyAllWindows()

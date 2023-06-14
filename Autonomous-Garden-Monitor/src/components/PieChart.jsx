@@ -18,12 +18,51 @@ import { mockPieData as data } from "../data/mockData";
 //   },
 // ];
 
-const PieChart = () => {
+
+  // Here's an example of how you can map diseases to colors
+  let diseaseColorMap = {
+    'Green Mite': 'red',
+    'Healthy': 'green',
+    'Mosaic Disease': 'orange',
+    'Bacterial Blight': 'purple',
+    'Brown Streak Disease': 'pink',
+    'Unknown': 'black',
+  };
+
+
+const PieChart = ({ pieData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  
+// Count map to count the occurrences of each disease
+let countMap = {};
+
+// Process the plantLineData
+for (let array of Object.values(pieData)) {
+  for (let entry of array) {
+    for (let disease in entry.data) {
+      countMap[disease] = (countMap[disease] || 0) + 1;
+    }
+  }
+}
+
+// Construct the mockPieData array
+const mockPieData = Object.entries(countMap).map(([disease, count]) => {
+  return {
+    id: disease,
+    label: disease,
+    value: count,
+    color: diseaseColorMap[disease],
+  }
+});
+
+console.log('mockPieData',mockPieData);
+
+
+
   return (
     <ResponsivePie
-      data={data}
+      data={mockPieData}
       theme={{
         axis: {
           domain: {
