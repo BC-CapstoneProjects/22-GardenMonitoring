@@ -19,9 +19,9 @@ import Stack from "@mui/material/Stack";
 // import React, { useState } from 'react';
 
 const Topbar = () => {
-  var [unreadNotificationCount, setUnreadNotificationCount] = useState(3);
+  // var [unreadNotificationCount, setUnreadNotificationCount] = useState(3);
   var [notifications, setNotifications] = useState(
-    /** @type {{Label,Garden_id}[]} */ []
+    /** @type {{Label,Garden_id,read:boolean,Diseased}[]} */ ([])
   );
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -38,13 +38,14 @@ const Topbar = () => {
       const nList = nData.data.listGardenDatabases.items;
       console.log("notification list", nList);
       setNotifications(nList);
-      var counter = 0;
-      for (let i = 0; i < notifications.length; i++) {
-        if (notifications[i].Diseased == "true") {
-          counter++;
-        }
-      }
-      handleNotificationCount(counter);
+
+      // var counter = 0;
+      // for (let i = 0; i < notifications.length; i++) {
+      //   if (notifications[i].Diseased == "true") {
+      //     counter++;
+      //   }
+      // }
+      // handleNotificationCount(counter);
     } catch (error) {
       console.log("error on fetching notifications", error);
       // handleNotificationCount(8);
@@ -81,8 +82,9 @@ const Topbar = () => {
   const handleNotificationClose = () => {
     setNotificationClick(null);
   };
+
   const handleNotificationCount = (val) => {
-    setUnreadNotificationCount(val);
+    // setUnreadNotificationCount(val);
   };
 
   // State for the person menu
@@ -103,8 +105,8 @@ const Topbar = () => {
   //   setSettingClick(null);
   // };
 
-  const [notification, setNotificationData] = useState(
-    /** @type {{Label,Garden_id}[]}*/ ([])
+  const [notificationDataList, setNotificationData] = useState(
+    /** @type {{Label,Garden_id,read:booolean,Diseased}[]}*/ ([])
   );
 
   useEffect(() => {
@@ -122,11 +124,16 @@ const Topbar = () => {
   }, []);
 
   const dismissNotification = (notification) => {
-    notification.dismissed = true;
+    notification.read = true;
     setNotifications((ns) =>
       ns.map((n) => (n.Garden_id === notification.Garden_id ? notification : n))
     );
   };
+
+  const getUnreadNotifications = (_notifications = notificationDataList) =>
+    _notifications.filter((n) => !n?.read);
+
+  const unreadNotificationCount = getUnreadNotifications().length;
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -156,9 +163,9 @@ const Topbar = () => {
 
         <IconButton onClick={handleNotificationClick}>
           <NotificationsOutlinedIcon />
-          <div className={unreadNotificationCount > 0 ? "counter" : "clear"}>
+          <Box className={unreadNotificationCount > 0 ? "counter" : "clear"} color='white'>
             {unreadNotificationCount}
-          </div>
+          </Box>
         </IconButton>
 
         <Menu
@@ -180,16 +187,14 @@ const Topbar = () => {
               classNaame="col content"
             ></Box>
           </MenuItem>
-          {notification
-            .filter(({ dismissed = false }) => !dismissed)
-            .map((n) => (
-              <MenuItem
-                onClick={() => dismissNotification(n)}
-                sx={{ display: "flex", gap: 2 }}
-              >
-                <span key={n.message}>{n.Label}</span> <Button>X</Button>
-              </MenuItem>
-            ))}
+          {getUnreadNotifications().map((n) => (
+            <MenuItem
+              onClick={() => dismissNotification(n)}
+              sx={{ display: "flex", gap: 2 }}
+            >
+              <span key={n.message}>{n.Label}</span> <Button>X</Button>
+            </MenuItem>
+          ))}
           <MenuItem
             onClick={() => {
               redirectTo("bar");
