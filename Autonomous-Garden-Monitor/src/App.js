@@ -219,54 +219,54 @@ function App() {
   const [scans, setScans] = useState([]);
 
   return (
-    <Authenticator components={components} formFields={formFields}>
-      <ColorModeContext.Provider value={colorMode}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div className="app">
-            <Sidebar isSidebar={isSidebar} />
-            <main className="content">
-              <Topbar setIsSidebar={setIsSidebar} />
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <Garden
-                      setScans={setScans}
-                      setSelectedGarden={setSelectedGarden}
-                    />
-                  }
-                />
-                <Route
-                  path="/view/:subjectID"
-                  element={
-                    <Garden
-                      setScans={setScans}
-                      setSelectedGarden={setSelectedGarden}
-                    />
-                  }
-                />
-                {/* <Route path="/" element={<Sign />} /> */}
-                <Route path="/form" element={<Form />} />
-                <Route
-                  path="/bar"
-                  element={<Bar data={scans} selectedGarden={selectedGarden} />}
-                />
-                <Route path="/pie" element={<Pie />} />
-                <Route path="/line" element={<Line />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/geography" element={<Geography />} />
-                {/* <Route path="/garden" element={<Garden />} />
+    // <Authenticator components={components} formFields={formFields}>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="app">
+          <Sidebar isSidebar={isSidebar} />
+          <main className="content">
+            <Topbar setIsSidebar={setIsSidebar} />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Garden
+                    setScans={setScans}
+                    setSelectedGarden={setSelectedGarden}
+                  />
+                }
+              />
+              <Route
+                path="/view/:subjectID"
+                element={
+                  <Garden
+                    setScans={setScans}
+                    setSelectedGarden={setSelectedGarden}
+                  />
+                }
+              />
+              {/* <Route path="/" element={<Sign />} /> */}
+              <Route path="/form" element={<Form />} />
+              <Route
+                path="/bar"
+                element={<Bar data={scans} selectedGarden={selectedGarden} />}
+              />
+              <Route path="/pie" element={<Pie />} />
+              <Route path="/line" element={<Line />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/geography" element={<Geography />} />
+              {/* <Route path="/garden" element={<Garden />} />
               <Route path="/view/:subjectID" element={<Garden />} /> */}
 
-                <Route path="/account" element={<Account />} />
-                <Route path="/privacy" element={<Privacy />} />
-              </Routes>
-            </main>
-          </div>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
-    </Authenticator>
+              <Route path="/account" element={<Account />} />
+              <Route path="/privacy" element={<Privacy />} />
+            </Routes>
+          </main>
+        </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
+    // {/* </Authenticator> */}
   );
 }
 

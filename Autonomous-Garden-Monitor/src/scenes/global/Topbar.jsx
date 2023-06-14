@@ -14,10 +14,15 @@ import { useNavigate } from "react-router-dom";
 import "./notification_counter.css";
 import { listGardenDatabases } from "../../graphql/queries.js";
 import Amplify, { API, graphqlOperation } from "aws-amplify";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+// import React, { useState } from 'react';
 
 const Topbar = () => {
   var [unreadNotificationCount, setUnreadNotificationCount] = useState(3);
-  var [notifications, setNotifications] = useState([]);
+  var [notifications, setNotifications] = useState(
+    /** @type {{Label,Garden_id}[]} */ []
+  );
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
@@ -98,6 +103,31 @@ const Topbar = () => {
   //   setSettingClick(null);
   // };
 
+  const [notification, setNotificationData] = useState(
+    /** @type {{Label,Garden_id}[]}*/ ([])
+  );
+
+  useEffect(() => {
+    fetch(
+      "https://5yw0zfj7g7.execute-api.us-west-2.amazonaws.com/tedo/Notification?Garden_id=4"
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result); // add this line to inspect the structure of the data
+        setNotificationData(result.data);
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error); // log errors to the console
+      });
+  }, []);
+
+  const dismissNotification = (notification) => {
+    notification.dismissed = true;
+    setNotifications((ns) =>
+      ns.map((n) => (n.Garden_id === notification.Garden_id ? notification : n))
+    );
+  };
+
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
       {/* SEARCH BAR */}
@@ -123,6 +153,7 @@ const Topbar = () => {
         </IconButton>
 
         {/* Notification */}
+
         <IconButton onClick={handleNotificationClick}>
           <NotificationsOutlinedIcon />
           <div className={unreadNotificationCount > 0 ? "counter" : "clear"}>
@@ -144,8 +175,21 @@ const Topbar = () => {
               console.log("Log out clicked");
             }}
           >
-            Bacterial Blight
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+              classNaame="col content"
+            ></Box>
           </MenuItem>
+          {notification
+            .filter(({ dismissed = false }) => !dismissed)
+            .map((n) => (
+              <MenuItem
+                onClick={() => dismissNotification(n)}
+                sx={{ display: "flex", gap: 2 }}
+              >
+                <span key={n.message}>{n.Label}</span> <Button>X</Button>
+              </MenuItem>
+            ))}
           <MenuItem
             onClick={() => {
               redirectTo("bar");

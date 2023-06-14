@@ -1,4 +1,20 @@
 {
+  "api": {
+    "apid051cd6e": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "Notification"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
   "auth": {
     "dev2479df4a": {
       "customAuth": false,
@@ -23,6 +39,48 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "function": {
+    "Notification": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "NotificationTabel"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_Notification_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Notification"
+        }
+      ]
+    },
+    "AMPLIFY_function_Notification_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "Notification"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "NotificationTabel": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
     }
   }
 }

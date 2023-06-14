@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/Notification": {
+      "name": "/Notification",
+      "lambdaFunction": "Notification",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}
