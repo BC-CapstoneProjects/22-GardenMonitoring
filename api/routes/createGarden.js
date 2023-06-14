@@ -3,7 +3,7 @@ import { s3Client } from "../public/libs/s3Client.js";
 import { dynamoDbClient } from '../public/libs/dynamoDbClient.js';
 import { PutItemCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { CreateBucketCommand } from '@aws-sdk/client-s3';
-import { PutBucketNotificationConfigurationCommand } from '@aws-sdk/client-s3';
+import { PutBucketNotificationConfigurationCommand, PutBucketCorsCommand } from '@aws-sdk/client-s3';
 import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda'
 
 const router = express.Router();
@@ -98,7 +98,7 @@ router.post("/:userId/:bucketName", async (req, res) => {
               },
           ],
       },
-  };
+    };
     
     try {
         // Add the notification params to the new s3 bucket
@@ -108,6 +108,32 @@ router.post("/:userId/:bucketName", async (req, res) => {
     catch (error) {
         console.log(`Error setting notification configuration for new bucket: ${bucketName}: Error: ${error}`);
         throw error;
+    }
+
+    // add the appropriate CORS configuration to each new bucket
+    // allows web-app clients to upload new images
+    const corsParams = {
+      Bucket: bucketName,
+      CORSConfiguration: {
+        CORSRules: [
+          {
+            AllowedHeaders: ["*"],
+            AllowedMethods: ["PUT"],
+            AllowedOrigins: ["http://localhost:3000"],
+            MaxAgeSeconds: 3000,
+          },
+        ],
+      },
+    };
+
+    try {
+      // Add the notification params to the new s3 bucket
+      await s3Client.send(new PutBucketCorsCommand(corsParams));
+      console.log(`CORS configuration set for new bucket: ${bucketName}`);
+    }
+    catch (error) {
+      console.log(`Error setting CORS configuration for new bucket: ${bucketName}: Error: ${error}`);
+      throw error;
     }
 
     res.status(200).send(`Bucket "${bucketName}" created successfully.`);

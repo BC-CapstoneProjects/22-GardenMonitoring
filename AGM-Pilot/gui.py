@@ -1,7 +1,7 @@
 import os
 import tkinter as tk
 from time import strftime, gmtime
-from tkinter import messagebox
+from tkinter import messagebox, Toplevel, Canvas
 import tkinter.ttk as ttk
 from threading import Thread
 from pilot import monitor
@@ -11,6 +11,8 @@ import webbrowser
 import boto3
 import requests
 from aws_config import aws_exports
+import configparser
+from PIL import Image, ImageTk
 
 """
 gui.py was built with the help from the following
@@ -31,6 +33,25 @@ class App(ttk.Frame):
         :param master: Parent widget for this frame.
         :param kwargs: Additional arguments to pass to the parent class constructor.
         """
+
+        self.current_image = None  # holds the current image
+
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
+        aws_access_key_id = config.get('default', 'aws_access_key_id')
+        aws_secret_access_key = config.get('default', 'aws_secret_access_key')
+
+        session = boto3.Session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+        print(session.profile_name)
+        print(session.available_profiles)
+
+        print("AWS_ACCESS_KEY_ID: ", os.environ.get("AWS_ACCESS_KEY_ID"))
+        print("AWS_SECRET_ACCESS_KEY: ", os.environ.get("AWS_SECRET_ACCESS_KEY"))
+
         super().__init__(parent, **kwargs)
         # Initialize instance variables
         self.root = parent
@@ -155,8 +176,19 @@ class App(ttk.Frame):
         for i in self.treeview.get_children():
             self.treeview.delete(i)
 
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
+        aws_access_key_id = config.get('default', 'aws_access_key_id')
+        aws_secret_access_key = config.get('default', 'aws_secret_access_key')
+
+        session = boto3.Session(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+
         # Get the objects from the selected garden (bucket)
-        s3 = boto3.resource('s3')
+        s3 = session.resource('s3')
         bucket = s3.Bucket(self.selected_garden.get())
         for obj in bucket.objects.all():
             # Insert the object into the tree
@@ -334,6 +366,25 @@ class App(ttk.Frame):
         self.tab_2 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_2, text="Local image preview")
 
+        # Create a scrollbar
+        self.scrollbar = ttk.Scrollbar(self.tab_2)
+        self.scrollbar.pack(side="right", fill="y")
+
+        # Create a canvas
+        self.canvas = Canvas(self.tab_2, yscrollcommand=self.scrollbar.set)
+        self.canvas.pack(side="left")
+
+        # Configure the scrollbar
+        self.scrollbar.config(command=self.canvas.yview)
+
+        # Add another frame inside the canvas
+        self.inner_frame = ttk.Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
+
+        self.display_images()
+
+        self.inner_frame.bind("<Configure>", lambda event: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
         # Tab #3
         self.logs = ttk.Frame(self.notebook)
         self.notebook.add(self.logs, text="Monitoring Logs")
@@ -341,6 +392,33 @@ class App(ttk.Frame):
         # Sizegrip
         self.sizegrip = ttk.Sizegrip(self)
         self.sizegrip.grid(row=100, column=100, padx=(0, 5), pady=(0, 5))
+
+    def display_images(self):
+        # Get list of all image files in 'images' directory
+        image_dir = 'images/'
+        image_files = [f for f in os.listdir(image_dir) if f.endswith('.png') or f.endswith('.jpg')]
+
+        # Grid dimensions
+        columns = 1  # We use only one column since we're scrolling vertically
+
+        # Loop over image files
+        for index, image_file in enumerate(image_files):
+            # Open image file
+            img = Image.open(os.path.join(image_dir, image_file))
+
+            # Convert to PhotoImage
+            photo_img = ImageTk.PhotoImage(img)
+
+            # Create a label with image
+            img_label = ttk.Label(self.inner_frame, image=photo_img)
+
+            # This line makes sure the image isn't garbage collected
+            img_label.image = photo_img
+
+            # Add label to grid
+            row, col = divmod(index, columns)
+            img_label.grid(row=row, column=col, padx=5, pady=5)
+
 
     def authenticate_user(self):
         # AccountInfo

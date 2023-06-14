@@ -8,7 +8,7 @@ a = Analysis(
     ['gui.py'],
     pathex=[],
     binaries=[],
-    datas=[('src', 'src'), ('amplify', 'amplify'), ('config', 'config'), ('images', 'images'), ('theme', 'theme'), ('azure.tcl', '.'), ('frozen_inference_graph.pb', '.'), ('ss.names', '.'), ('ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt', '.')],
+    datas=[('src', 'src'), ('amplify', 'amplify'), ('config', 'config'), ('images', 'images'), ('theme', 'theme'), ('azure.tcl', '.'), ('frozen_inference_graph.pb', '.'), ('ss.names', '.'), ('ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt', '.'), ('aws_config.py', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
