@@ -2,7 +2,7 @@ import "./Subject.css";
 import LineChart from "../../scenes/line/ModalLineChart";
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AWS from "aws-sdk";
 import { SelectField } from '@aws-amplify/ui-react';
 import { plantTypes } from "../../components/Plants/PlantTypes";
@@ -28,21 +28,50 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
   // this function is called when a file is selected 
   const handleUpload = async event => {
     console.log(`Uploading new plant image for ${name}`);
-    // event.target.files contains a list of selected files. Since the file input allows to select only one file,
-    // we're grabbing the first file in this list.
     const fileUploaded = event.target.files[0];
+    
+    if (!fileUploaded.type.startsWith('image/')) {
+      console.error(`File is not an image: ${fileUploaded.type}`);
+      return;
+    }
+    
     try {
       const user = await Auth.currentAuthenticatedUser();
-      const response = await fetch(`http://localhost:9000/putImage/${user.username}/${selectedGarden}/${fileUploaded}`); 
-      const result = await response.json();
-      console.log(`Uploaded new plant image for ${name}: ${result}`);
+  
+      // Fetch the presigned URL
+      const response = await fetch(`http://localhost:9000/putImage/${user.username}/${selectedGarden}/${fileUploaded.name}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': fileUploaded.type,
+        },
+      }); 
+  
+      if (!response.ok) {
+        throw new Error(`Failed to get presigned URL with status ${response.status}`);
+      }
+  
+      const { presignedUrls } = await response.json();
+  
+      // Upload the file to S3 using the presigned URL
+      const uploadResponse = await fetch(presignedUrls, {
+        method: 'PUT',
+        body: fileUploaded,
+        headers: {
+          'Content-Type': fileUploaded.type,
+        },
+      });
+  
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed with status ${uploadResponse.status}`);
+      }
+  
+      console.log(`Uploaded new plant image for ${name}`);
     }
     catch (error) {
       console.log(`Could not upload image for ${name}: ${error}`);
     }
-    // replace the timestamp file on s3 and trigger ec2 lambda
-      
   };
+  
 
   console.log('imageUrls',imageUrls, index)
   console.log('indexcheck', index)
@@ -105,7 +134,7 @@ function Subject({ id, disease, name, imageSrc, imageUrl, imageAlt, type, sun,
       <div>
       <Button 
           variant="contained" 
-          endIcon={<ArrowUpwardIcon />}
+          endIcon={<CloudUploadIcon />}
           onClick={handleClick}>
           Upload new image
       </Button>
