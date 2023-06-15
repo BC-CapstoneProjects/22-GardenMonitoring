@@ -19,6 +19,10 @@ const BarChart = ({ isDashboard = false, data}) => {
   }
     
 
+  if (!data) {
+    return <p></p>;
+  }
+
   console.log('bardata import', data);
 
   for (let i = 0; i < Object.keys(data).length; i++) {
