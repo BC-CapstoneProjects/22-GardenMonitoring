@@ -7,7 +7,7 @@ const Pie = ({ data, selectedGarden}) => {
   console.log('data',data);
   
   if (!data) {
-    return <p>Loading...Please reopen the page</p>;
+    return <p></p>;
   }
 
   return (

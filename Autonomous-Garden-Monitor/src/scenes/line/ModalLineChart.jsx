@@ -5,7 +5,7 @@ import LineChart from "../../components/ModalLineChart";
 const Line = ({id, chartData}) => {
 
   if (!chartData) {
-    return <p>Loading...Please reopen the page</p>;
+    return <p></p>;
   }
 
   return (
