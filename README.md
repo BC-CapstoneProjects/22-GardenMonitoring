@@ -1,4 +1,7 @@
-# ![logo-thumbnail](https://github.com/BC-CapstoneProjects/22-GardenMonitoring/blob/integration/assets/logo4.PNG)<br> Autonomous Garden Monitoring
+<img src="https://github.com/BC-CapstoneProjects/22-GardenMonitoring/blob/integration/assets/logo4.PNG" width="200" height="200" alt="logo-thumbnail">
+
+# Autonomous Garden Monitoring
+
 
 
 
